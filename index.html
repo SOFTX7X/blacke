@@ -8,51 +8,94 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-blue-500 selection:text-white">
 
-  <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl space-y-6">
+  <div class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
+    
+    <!-- Cabeçalho -->
     <div class="text-center space-y-2">
-      <div class="w-12 h-12 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto text-xl">
+      <div class="w-14 h-14 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
         <i class="fa-solid fa-key"></i>
       </div>
-      <h1 class="text-2xl font-bold">Resgatar Acesso</h1>
-      <p class="text-slate-400 text-sm">Digite o seu código de liberação abaixo</p>
+      <h1 class="text-2xl font-bold tracking-tight">Resgatar Acesso</h1>
+      <p class="text-slate-400 text-sm">Insira o seu código de liberação abaixo para obter os dados</p>
     </div>
 
+    <!-- Formulário -->
     <div class="space-y-4">
-      <input type="text" id="codigoInput" placeholder="Ex: IPTV-ABCD" 
-             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-center uppercase font-mono tracking-wider text-white focus:outline-none focus:border-blue-500">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
+          <i class="fa-solid fa-ticket"></i>
+        </span>
+        <input type="text" id="codigoInput" placeholder="EX: IPTV-ABCD" 
+               class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 uppercase font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
+      </div>
       
-      <button onclick="resgatarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-3 rounded-lg transition">
-        Liberar Acesso &rarr;
+      <button id="btnResgatar" onclick="resgatarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.99] font-semibold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
+        <span>Liberar Acesso</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
       </button>
 
-      <div id="mensagemErro" class="hidden p-3 bg-red-600/20 border border-red-500/30 text-red-400 text-sm text-center rounded-lg">
+      <div id="mensagemErro" class="hidden p-3.5 bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center rounded-xl font-medium">
         Login não encontrado ou já entregue.
       </div>
     </div>
 
-    <!-- Área onde aparecem os dados de IPTV após resgatar -->
-    <div id="resultadoLogin" class="hidden space-y-4 pt-4 border-t border-slate-700">
-      <div class="p-4 bg-slate-900 border border-slate-700 rounded-lg space-y-2">
-        <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
-          <i class="fa-solid fa-circle-check"></i> Acesso Liberado com Sucesso!
-        </h3>
-        <div class="text-xs text-slate-300 space-y-1.5 pt-2">
-          <div><strong>Usuário:</strong> <span id="resUsuario" class="font-mono text-white select-all"></span></div>
-          <div><strong>Senha:</strong> <span id="resSenha" class="font-mono text-white select-all"></span></div>
-          <div><strong>Servidor (DNS):</strong> <span id="resDns" class="font-mono text-white select-all"></span></div>
+    <!-- Área de Resultado (Dados Liberados) -->
+    <div id="resultadoLogin" class="hidden space-y-4 pt-4 border-t border-slate-800/80 animate-fade-in">
+      <div class="p-4 bg-slate-950/80 border border-emerald-500/30 rounded-xl space-y-3.5 shadow-inner">
+        <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+          <i class="fa-solid fa-circle-check text-base"></i>
+          <span>Acesso Liberado com Sucesso!</span>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <!-- Utilizador -->
+          <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-2.5 rounded-lg">
+            <div class="truncate mr-2">
+              <span class="text-slate-400 block text-[10px] uppercase font-semibold">Utilizador</span>
+              <span id="resUsuario" class="font-mono text-white font-bold select-all"></span>
+            </div>
+            <button onclick="copiarTexto('resUsuario', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-md transition text-[11px] flex items-center gap-1 shrink-0">
+              <i class="fa-regular fa-copy"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Senha -->
+          <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-2.5 rounded-lg">
+            <div class="truncate mr-2">
+              <span class="text-slate-400 block text-[10px] uppercase font-semibold">Senha</span>
+              <span id="resSenha" class="font-mono text-white font-bold select-all"></span>
+            </div>
+            <button onclick="copiarTexto('resSenha', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-md transition text-[11px] flex items-center gap-1 shrink-0">
+              <i class="fa-regular fa-copy"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Servidor DNS -->
+          <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-2.5 rounded-lg">
+            <div class="truncate mr-2">
+              <span class="text-slate-400 block text-[10px] uppercase font-semibold">Servidor (DNS)</span>
+              <span id="resDns" class="font-mono text-white font-bold select-all truncate block"></span>
+            </div>
+            <button onclick="copiarTexto('resDns', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-md transition text-[11px] flex items-center gap-1 shrink-0">
+              <i class="fa-regular fa-copy"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Instruções Opcionais -->
           <div id="resInstrucoesContainer" class="pt-2 border-t border-slate-800 hidden">
-            <strong>Instruções:</strong>
-            <p id="resInstrucoes" class="text-slate-400 mt-1"></p>
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold mb-1">Instruções de Instalação</span>
+            <p id="resInstrucoes" class="text-slate-300 text-xs bg-slate-900/50 p-2 rounded-lg border border-slate-800/50"></p>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Rodapé / Suporte -->
     <div class="text-center pt-2">
-      <a href="https://t.me/seu_usuario" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center justify-center gap-1">
-        <i class="fa-brands fa-telegram"></i> Suporte / Comprar pelo Telegram
+      <a href="https://t.me/seu_usuario" target="_blank" class="text-xs text-slate-400 hover:text-blue-400 transition inline-flex items-center gap-1.5 font-medium">
+        <i class="fa-brands fa-telegram text-blue-400 text-sm"></i> Suporte / Comprar pelo Telegram
       </a>
     </div>
   </div>
@@ -66,6 +109,7 @@
       const codigo = document.getElementById('codigoInput').value.trim().toUpperCase();
       const erroDiv = document.getElementById('mensagemErro');
       const resultadoDiv = document.getElementById('resultadoLogin');
+      const btnResgatar = document.getElementById('btnResgatar');
 
       erroDiv.classList.add('hidden');
       resultadoDiv.classList.add('hidden');
@@ -76,72 +120,108 @@
         return;
       }
 
-      // 1. Busca o código no banco
-      const { data: codigoData, error: errCodigo } = await _supabase
-        .from('codigos')
-        .select('*')
-        .eq('codigo', codigo)
-        .maybeSingle();
+      // Efeito de carregamento no botão
+      btnResgatar.disabled = true;
+      btnResgatar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>A verificar...</span>`;
 
-      if (errCodigo || !codigoData) {
-        erroDiv.textContent = 'Login não encontrado ou já entregue.';
-        erroDiv.classList.remove('hidden');
-        return;
+      try {
+        // 1. Busca o código no banco
+        const { data: codigoData, error: errCodigo } = await _supabase
+          .from('codigos')
+          .select('*')
+          .eq('codigo', codigo)
+          .maybeSingle();
+
+        if (errCodigo || !codigoData) {
+          mostrarErro('Login não encontrado ou já entregue.');
+          return;
+        }
+
+        // 2. Verifica se já atingiu o limite de usos
+        const usosAtuais = codigoData.usos || 0;
+        const limite = codigoData.limite || 2;
+
+        if (usosAtuais >= limite || codigoData.usado) {
+          mostrarErro('Login não encontrado ou já entregue.');
+          return;
+        }
+
+        // 3. Incrementa o uso em +1 no banco
+        const novoUso = usosAtuais + 1;
+        const { error: errUpdate } = await _supabase
+          .from('codigos')
+          .update({ 
+            usos: novoUso, 
+            usado: novoUso >= limite 
+          })
+          .eq('id', codigoData.id);
+
+        if (errUpdate) {
+          mostrarErro('Erro ao processar resgate. Tente novamente.');
+          return;
+        }
+
+        // 4. Busca os dados do login associado
+        const { data: loginData, error: errLogin } = await _supabase
+          .from('logins')
+          .select('*')
+          .eq('id', codigoData.login_id)
+          .maybeSingle();
+
+        if (errLogin || !loginData) {
+          mostrarErro('Erro ao carregar dados da conta.');
+          return;
+        }
+
+        // 5. Exibe os dados na tela
+        document.getElementById('resUsuario').textContent = loginData.usuario;
+        document.getElementById('resSenha').textContent = loginData.senha;
+        document.getElementById('resDns').textContent = loginData.dns_url || 'Não informado';
+        
+        if (loginData.instrucoes) {
+          document.getElementById('resInstrucoes').textContent = loginData.instrucoes;
+          document.getElementById('resInstrucoesContainer').classList.remove('hidden');
+        } else {
+          document.getElementById('resInstrucoesContainer').classList.add('hidden');
+        }
+
+        resultadoDiv.classList.remove('hidden');
+
+      } catch (err) {
+        mostrarErro('Ocorreu um erro inesperado.');
+      } finally {
+        btnResgatar.disabled = false;
+        btnResgatar.innerHTML = `<span>Liberar Acesso</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
       }
-
-      // 2. Verifica se já atingiu o limite de usos (ex: 2/2)
-      const usosAtuais = codigoData.usos || 0;
-      const limite = codigoData.limite || 2;
-
-      if (usosAtuais >= limite || codigoData.usado) {
-        erroDiv.textContent = 'Login não encontrado ou já entregue.';
-        erroDiv.classList.remove('hidden');
-        return;
-      }
-
-      // 3. Incrementa o uso em +1 no banco
-      const novoUso = usosAtuais + 1;
-      const { error: errUpdate } = await _supabase
-        .from('codigos')
-        .update({ 
-          usos: novoUso, 
-          usado: novoUso >= limite 
-        })
-        .eq('id', codigoData.id);
-
-      if (errUpdate) {
-        erroDiv.textContent = 'Erro ao processar resgate. Tente novamente.';
-        erroDiv.classList.remove('hidden');
-        return;
-      }
-
-      // 4. Busca os dados do login associado
-      const { data: loginData, error: errLogin } = await _supabase
-        .from('logins')
-        .select('*')
-        .eq('id', codigoData.login_id)
-        .maybeSingle();
-
-      if (errLogin || !loginData) {
-        erroDiv.textContent = 'Erro ao carregar dados da conta.';
-        erroDiv.classList.remove('hidden');
-        return;
-      }
-
-      // 5. Exibe os dados na tela para o cliente
-      document.getElementById('resUsuario').textContent = loginData.usuario;
-      document.getElementById('resSenha').textContent = loginData.senha;
-      document.getElementById('resDns').textContent = loginData.dns_url || 'Não informado';
-      
-      if (loginData.instrucoes) {
-        document.getElementById('resInstrucoes').textContent = loginData.instrucoes;
-        document.getElementById('resInstrucoesContainer').classList.remove('hidden');
-      } else {
-        document.getElementById('resInstrucoesContainer').classList.add('hidden');
-      }
-
-      resultadoDiv.classList.remove('hidden');
     }
+
+    function mostrarErro(mensagem) {
+      const erroDiv = document.getElementById('mensagemErro');
+      erroDiv.textContent = mensagem;
+      erroDiv.classList.remove('hidden');
+    }
+
+    // Função moderna para copiar texto para a área de transferência com feedback visual
+    function copiarTexto(elementId, botao) {
+      const texto = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        const originalHTML = botao.innerHTML;
+        botao.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Copiado!`;
+        botao.classList.add('bg-emerald-600/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
+        
+        setTimeout(() => {
+          botao.innerHTML = originalHTML;
+          botao.classList.remove('bg-emerald-600/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
+        }, 2000);
+      });
+    }
+
+    // Atalho para submeter com a tecla Enter
+    document.getElementById('codigoInput').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        resgatarCodigo();
+      }
+    });
   </script>
 </body>
 </html>
