@@ -20,6 +20,13 @@
       <p class="text-slate-400 text-sm mt-1">Cole o seu código de liberação abaixo</p>
     </div>
 
+    <!-- Botão do Telegram no Início -->
+    <a href="https://t.me/nossoportalbr" target="_blank" 
+       class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 mb-6 text-sm shadow-md">
+      <i class="fa-brands fa-telegram text-lg"></i>
+      <span>Suporte / Comprar pelo Telegram</span>
+    </a>
+
     <!-- Campo de Entrada -->
     <div class="space-y-4" id="formSection">
       <div>
@@ -37,7 +44,7 @@
     </div>
 
     <!-- Área com as informações liberadas -->
-    <div id="resultadoSection" class="hidden space-y-4 mt-6 border-t border-slate-700 pt-6">
+    <div id="resultadoSection" class="hidden space-y-4 mt-2">
       <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3 rounded-lg text-sm text-center mb-4">
         <i class="fa-solid fa-circle-check mr-1"></i> Acesso liberado com sucesso!
       </div>
@@ -85,9 +92,8 @@
   </div>
 
   <script>
-    // Configurações do Supabase (Substitua pelos seus dados)
-    const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
-    const SUPABASE_KEY = 'SUA_CHAVE_ANON_DO_SUPABASE';
+    const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function resgatarCodigo() {
@@ -124,16 +130,15 @@
         return;
       }
 
-      // Preenche as informações
+      // Oculta o campo de digitação do código após o sucesso
+      document.getElementById('formSection').classList.add('hidden');
+
       document.getElementById('outUsuario').value = data.usuario || '';
       document.getElementById('outSenha').value = data.senha || '';
       document.getElementById('outDns').value = data.dns_url || '';
       document.getElementById('outInstrucoes').innerText = data.instrucoes || 'Sem instruções adicionais.';
 
-      // Exibe a seção de resultados
       document.getElementById('resultadoSection').classList.remove('hidden');
-      codigoInput.disabled = true;
-      btn.disabled = true;
     }
 
     function copiar(idInput) {
