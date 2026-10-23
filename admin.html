@@ -10,10 +10,10 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 flex items-center justify-center">
 
-  <!-- Tela de Login do Admin -->
+  <!-- Ecrã de Login do Admin -->
   <div id="loginScreen" class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl">
     <h2 class="text-2xl font-bold text-center mb-4">Painel Administrativo</h2>
-    <p class="text-slate-400 text-sm text-center mb-6">Digite sua senha de acesso</p>
+    <p class="text-slate-400 text-sm text-center mb-6">Digite a sua senha de acesso</p>
     
     <div class="space-y-4">
       <input type="password" id="senhaAdminInput" placeholder="Senha do Admin" onkeydown="verificarEnter(event)"
@@ -55,7 +55,7 @@
         <div>
           <label class="block text-xs text-slate-400 mb-1">Selecione o Login:</label>
           <select id="selectLoginsDisponiveis" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-            <option value="">Carregando logins...</option>
+            <option value="">A carregar logins...</option>
           </select>
         </div>
         <button onclick="gerarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2 rounded-lg transition">Gerar Código para o Login Selecionado</button>
@@ -78,7 +78,7 @@
       </div>
       
       <div id="listaLogins" class="space-y-3 max-h-96 overflow-y-auto pr-1">
-        <p class="text-xs text-slate-400">Carregando lista...</p>
+        <p class="text-xs text-slate-400">A carregar lista...</p>
       </div>
     </div>
 
@@ -191,11 +191,11 @@
       const select = document.getElementById('selectLoginsDisponiveis');
       const listaDiv = document.getElementById('listaLogins');
       
-      select.innerHTML = '<option value="">Carregando...</option>';
-      listaDiv.innerHTML = '<p class="text-xs text-slate-400">Carregando dados...</p>';
+      select.innerHTML = '<option value="">A carregar...</option>';
+      listaDiv.innerHTML = '<p class="text-xs text-slate-400">A carregar dados...</p>';
 
-      // Busca separada para evitar erros de relacionamento no Supabase
-      const { data: logins, error: errLogins } = await _supabase.from('logins').select('*').order('created_at', { ascending: false });
+      // Consulta sem ordenação por coluna inexistente
+      const { data: logins, error: errLogins } = await _supabase.from('logins').select('*');
       const { data: codigos, error: errCodigos } = await _supabase.from('codigos').select('*');
 
       if (errLogins) {
@@ -239,7 +239,6 @@
           vencimentoTexto = realData.vencimento;
         }
 
-        // Filtra os códigos correspondentes a este login
         const codigosList = (codigos || []).filter(c => c.login_id === item.id);
         const codigosHTML = codigosList.length > 0 
           ? codigosList.map(c => `<span class="bg-slate-800 px-2 py-0.5 rounded text-xs font-mono border border-slate-700 ${c.usado ? 'text-slate-500 line-through' : 'text-emerald-400'}">${c.codigo}</span>`).join(' ')
