@@ -8,107 +8,110 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-  <!-- Cabeçalho / Nome da Marca -->
-  <header class="w-full max-w-md py-4 text-center">
-    <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full text-blue-400 text-xs font-bold uppercase tracking-wider shadow-sm">
-      <i class="fa-solid fa-tv"></i>
-      <span>Our Portal</span>
+  <!-- Cabeçalho Full-Width (Esticado de ponta a ponta) -->
+  <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between shadow-lg">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl flex items-center justify-center text-sm shadow-inner">
+        <i class="fa-solid fa-tv"></i>
+      </div>
+      <span class="text-lg font-black tracking-wider text-white uppercase bg-gradient-to-r from-white via-slate-200 to-blue-400 bg-clip-text text-transparent">Our Portal</span>
     </div>
+    <a href="https://t.me/nossoportalbr" target="_blank" 
+       class="text-xs bg-sky-600/20 text-sky-400 border border-sky-500/30 px-3.5 py-2 rounded-xl hover:bg-sky-600/30 transition flex items-center gap-2 font-semibold shadow-sm">
+      <i class="fa-brands fa-telegram text-base"></i>
+      <span class="hidden sm:inline">Suporte / Telegram</span>
+      <span class="sm:hidden">Suporte</span>
+    </a>
   </header>
 
-  <!-- Card Principal -->
-  <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 my-auto">
-    
-    <!-- Cabeçalho do Card -->
-    <div class="text-center space-y-2">
-      <div class="w-14 h-14 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
-        <i class="fa-solid fa-key"></i>
-      </div>
-      <h1 class="text-2xl font-bold tracking-tight">Resgatar Acesso</h1>
-      <p class="text-slate-400 text-sm">Insira o seu código de liberação abaixo</p>
-    </div>
-
-    <!-- Botão do Telegram -->
-    <a href="https://t.me/nossoportalbr" target="_blank" 
-       class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg shadow-sky-600/20 active:scale-[0.99]">
-      <i class="fa-brands fa-telegram text-lg"></i>
-      <span>Suporte / Comprar pelo Telegram</span>
-    </a>
-
-    <!-- Formulário -->
-    <div class="space-y-4" id="formSection">
-      <div class="relative">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
-          <i class="fa-solid fa-ticket"></i>
-        </span>
-        <input type="text" id="codigoInput" placeholder="EX: IPTV-ABCD" 
-               class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 uppercase font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
-      </div>
+  <!-- Conteúdo Principal Centralizado -->
+  <main class="flex-1 flex items-center justify-center p-4 my-auto">
+    <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
       
-      <button onclick="resgatarCodigo()" id="btnResgatar"
-              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-[0.99]">
-        <span>Liberar Acesso</span>
-        <i class="fa-solid fa-arrow-right text-xs"></i>
-      </button>
-
-      <div id="mensagemErro" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm text-center font-medium"></div>
-    </div>
-
-    <!-- Área com as informações liberadas -->
-    <div id="resultadoSection" class="hidden space-y-4 pt-4 border-t border-slate-800/80">
-      <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-xl text-sm text-center font-medium flex items-center justify-center gap-2 shadow-inner">
-        <i class="fa-solid fa-circle-check text-base"></i>
-        <span>Acesso liberado com sucesso!</span>
+      <!-- Cabeçalho do Card -->
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight">Resgatar Acesso</h1>
+        <p class="text-slate-400 text-sm">Insira o seu código de liberação abaixo</p>
       </div>
 
-      <div class="space-y-3 text-xs">
-        <!-- Usuário -->
-        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Usuário</span>
-          <div class="flex items-center justify-between gap-2">
-            <input type="text" id="outUsuario" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
-            <button onclick="copiar('outUsuario', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
-              <i class="fa-regular fa-copy"></i> Copiar
-            </button>
-          </div>
+      <!-- Formulário -->
+      <div class="space-y-4" id="formSection">
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
+            <i class="fa-solid fa-ticket"></i>
+          </span>
+          <input type="text" id="codigoInput" placeholder="EX: IPTV-ABCD" 
+                 class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 uppercase font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
+        </div>
+        
+        <button onclick="resgatarCodigo()" id="btnResgatar"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-[0.99]">
+          <span>Liberar Acesso</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+
+        <div id="mensagemErro" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm text-center font-medium"></div>
+      </div>
+
+      <!-- Área com as informações liberadas -->
+      <div id="resultadoSection" class="hidden space-y-4 pt-4 border-t border-slate-800/80">
+        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-xl text-sm text-center font-medium flex items-center justify-center gap-2 shadow-inner">
+          <i class="fa-solid fa-circle-check text-base"></i>
+          <span>Acesso liberado com sucesso!</span>
         </div>
 
-        <!-- Senha -->
-        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Senha</span>
-          <div class="flex items-center justify-between gap-2">
-            <input type="text" id="outSenha" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
-            <button onclick="copiar('outSenha', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
-              <i class="fa-regular fa-copy"></i> Copiar
-            </button>
+        <div class="space-y-3 text-xs">
+          <!-- Usuário -->
+          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Usuário</span>
+            <div class="flex items-center justify-between gap-2">
+              <input type="text" id="outUsuario" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
+              <button onclick="copiar('outUsuario', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+                <i class="fa-regular fa-copy"></i> Copiar
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- DNS / URL -->
-        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Servidor / DNS / URL</span>
-          <div class="flex items-center justify-between gap-2">
-            <input type="text" id="outDns" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all truncate">
-            <button onclick="copiar('outDns', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
-              <i class="fa-regular fa-copy"></i> Copiar
-            </button>
+          <!-- Senha -->
+          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Senha</span>
+            <div class="flex items-center justify-between gap-2">
+              <input type="text" id="outSenha" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
+              <button onclick="copiar('outSenha', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+                <i class="fa-regular fa-copy"></i> Copiar
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Instruções -->
-        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Instruções de Instalação</span>
-          <div id="outInstrucoes" class="text-slate-300 text-xs whitespace-pre-wrap pt-1 leading-relaxed"></div>
+          <!-- DNS / URL -->
+          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Servidor / DNS / URL</span>
+            <div class="flex items-center justify-between gap-2">
+              <input type="text" id="outDns" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all truncate">
+              <button onclick="copiar('outDns', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+                <i class="fa-regular fa-copy"></i> Copiar
+              </button>
+            </div>
+          </div>
+
+          <!-- Instruções -->
+          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Instruções de Instalação</span>
+            <div id="outInstrucoes" class="text-slate-300 text-xs whitespace-pre-wrap pt-1 leading-relaxed"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-  </div>
+    </div>
+  </main>
 
   <!-- Rodapé -->
-  <footer class="w-full max-w-md py-3 text-center text-slate-600 text-xs">
+  <footer class="w-full py-4 text-center text-slate-600 text-xs border-t border-slate-900">
     &copy; Our Portal. Todos os direitos reservados.
   </footer>
 
