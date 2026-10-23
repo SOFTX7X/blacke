@@ -49,19 +49,19 @@
         <button onclick="salvarLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold py-2 rounded-lg transition">Salvar ou Atualizar no Banco</button>
       </div>
 
-      <!-- Coluna 2: Gerar Novo Código (Com Limite de 2 Usos) -->
+      <!-- Coluna 2: Gerar Novo Código (Substitui os Antigos) -->
       <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
-        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">2. Gerar Código (Até 2 Resgates)</h2>
+        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">2. Gerar Código (Substitui Antigos)</h2>
         <div>
           <label class="block text-xs text-slate-400 mb-1">Selecione o Login:</label>
           <select id="selectLoginsDisponiveis" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
             <option value="">A carregar logins...</option>
           </select>
         </div>
-        <button onclick="gerarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2 rounded-lg transition">Gerar Código para o Login Selecionado</button>
+        <button onclick="gerarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2 rounded-lg transition">Gerar Novo Código (Até 2 Usos)</button>
         
         <div id="resultadoCodigo" class="hidden mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg text-center">
-          <p class="text-xs text-slate-400">Novo Código Gerado (Válido para 2 usos):</p>
+          <p class="text-xs text-slate-400">Novo Código Ativo:</p>
           <p id="codigoGeradoTexto" class="text-lg font-mono font-bold text-emerald-400 select-all my-1"></p>
         </div>
       </div>
@@ -266,7 +266,7 @@
             <div><strong>Vencimento Real:</strong> <span class="text-slate-200 font-semibold">${vencimentoTexto}</span></div>
           </div>
           <div class="text-xs border-t border-slate-800 pt-2 flex flex-wrap items-center gap-1">
-            <strong class="text-slate-400 mr-1">Códigos Gerados:</strong> ${codigosHTML}
+            <strong class="text-slate-400 mr-1">Código Ativo:</strong> ${codigosHTML}
           </div>
         `;
         listaDiv.appendChild(card);
@@ -280,10 +280,13 @@
         return;
       }
 
+      // APAGA OS CÓDIGOS ANTIGOS DESTE LOGIN PARA QUE PAREM DE FUNCIONAR INSTANTANEAMENTE
+      await _supabase.from('codigos').delete().eq('login_id', loginId);
+
       const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
       const codigoUnico = `IPTV-${randomStr}`;
 
-      // Cria o código definindo limite de 2 usos e 0 utilizados inicialmente
+      // Cria o novo código com limite de 2 usos
       const { error } = await _supabase.from('codigos').insert([{ 
         codigo: codigoUnico, 
         login_id: loginId, 
