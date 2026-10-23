@@ -68,7 +68,7 @@
 
     </div>
 
-    <!-- Lista de Logins Salvos -->
+    <!-- Lista de Logins Salvos (Únicos) -->
     <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">Logins Cadastrados e Conexões</h2>
@@ -194,7 +194,6 @@
       select.innerHTML = '<option value="">A carregar...</option>';
       listaDiv.innerHTML = '<p class="text-xs text-slate-400">A carregar dados...</p>';
 
-      // Consulta sem ordenação por coluna inexistente
       const { data: logins, error: errLogins } = await _supabase.from('logins').select('*');
       const { data: codigos, error: errCodigos } = await _supabase.from('codigos').select('*');
 
@@ -210,8 +209,23 @@
         return;
       }
 
-      select.innerHTML = '';
+      // Agrupa logins únicos por nome de usuário para evitar duplicados na tela
+      const loginsUnicosMap = new Map();
       logins.forEach(item => {
+        if (!loginsUnicosMap.has(item.usuario)) {
+          loginsUnicosMap.set(item.usuario, {
+            ...item,
+            ids: [item.id]
+          });
+        } else {
+          loginsUnicosMap.get(item.usuario).ids.push(item.id);
+        }
+      });
+
+      const loginsUnicos = Array.from(loginsUnicosMap.values());
+
+      select.innerHTML = '';
+      loginsUnicos.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
         option.textContent = `Usuário: ${item.usuario}`;
@@ -219,7 +233,7 @@
       });
 
       listaDiv.innerHTML = '';
-      for (const item of logins) {
+      for (const item of loginsUnicos) {
         const realData = await consultarApiIPTV(item.dns_url, item.usuario, item.senha);
 
         let conexoesBadge = `<span class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded-full"><i class="fa-solid fa-tv mr-1"></i> Servidor Offline/Sem resposta</span>`;
@@ -239,7 +253,8 @@
           vencimentoTexto = realData.vencimento;
         }
 
-        const codigosList = (codigos || []).filter(c => c.login_id === item.id);
+        // Agrupa e mostra todos os códigos associados a este usuário
+        const codigosList = (codigos || []).filter(c => item.ids.includes(c.login_id));
         const codigosHTML = codigosList.length > 0 
           ? codigosList.map(c => `<span class="bg-slate-800 px-2 py-0.5 rounded text-xs font-mono border border-slate-700 ${c.usado ? 'text-slate-500 line-through' : 'text-emerald-400'}">${c.codigo}</span>`).join(' ')
           : '<span class="text-xs text-slate-500 italic">Nenhum código gerado ainda</span>';
