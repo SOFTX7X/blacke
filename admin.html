@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - IPTV</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 flex items-center justify-center">
+
+  <!-- Tela de Login do Admin -->
+  <div id="loginScreen" class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl">
+    <h2 class="text-2xl font-bold text-center mb-4">Painel Administrativo</h2>
+    <p class="text-slate-400 text-sm text-center mb-6">Digite sua senha de acesso</p>
+    
+    <div class="space-y-4">
+      <input type="password" id="senhaAdminInput" placeholder="Senha do Admin" 
+             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+      <button onclick="fazerLogin()" class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-3 rounded-lg transition">Entrar</button>
+      <div id="erroLogin" class="hidden text-red-400 text-sm text-center">Senha incorreta!</div>
+    </div>
+  </div>
+
+  <!-- Painel Principal (Oculto até logar) -->
+  <div id="adminPanel" class="hidden max-w-2xl w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl space-y-6">
+    <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+      <h1 class="text-xl font-bold"><i class="fa-solid fa-shield-halved mr-2 text-blue-500"></i>Painel ADM</h1>
+      <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-600/30 transition">Sair</button>
+    </div>
+
+    <!-- 1. Cadastrar Novo Login -->
+    <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
+      <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">1. Cadastrar Login IPTV</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <input type="text" id="cadUsuario" placeholder="Usuário" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+        <input type="text" id="cadSenha" placeholder="Senha" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+      </div>
+      <input type="text" id="cadDns" placeholder="Servidor / DNS / URL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+      <textarea id="cadInstrucoes" placeholder="Instruções de instalação..." rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+      <button onclick="salvarLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold py-2 rounded-lg transition">Salvar Login no Banco</button>
+    </div>
+
+    <!-- 2. Gerar Código Único -->
+    <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
+      <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">2. Gerar Código para Cliente</h2>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Selecione um Login Disponível:</label>
+        <select id="selectLoginsDisponiveis" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+          <option value="">Carregando logins disponíveis...</option>
+        </select>
+      </div>
+      <button onclick="gerarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2 rounded-lg transition">Gerar Código de Resgate</button>
+      
+      <div id="resultadoCodigo" class="hidden mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg text-center">
+        <p class="text-xs text-slate-400">Código gerado com sucesso:</p>
+        <p id="codigoGeradoTexto" class="text-lg font-mono font-bold text-emerald-400 select-all my-1"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configurações do Supabase (Substitua pelos seus dados)
+    const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+    const SUPABASE_KEY = 'SUA_CHAVE_ANON_DO_SUPABASE';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Defina sua senha do painel admin aqui:
+    const SENHA_ADMIN = 'suasenha123';
+
+    function fazerLogin() {
+      const digitada = document.getElementById('senhaAdminInput').value;
+      if (digitada === SENHA_ADMIN) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminPanel').classList.remove('hidden');
+        carregarLoginsDisponiveis();
+      } else {
+        document.getElementById('erroLogin').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('senhaAdminInput').value = '';
+    }
+
+    async function salvarLogin() {
+      const usuario = document.getElementById('cadUsuario').value.trim();
+      const senha = document.getElementById('cadSenha').value.trim();
+      const dns_url = document.getElementById('cadDns').value.trim();
+      const instrucoes = document.getElementById('cadInstrucoes').value.trim();
+
+      if (!usuario || !senha) {
+        alert('Preencha pelo menos o usuário e a senha!');
+        return;
+      }
+
+      const { error } = await _supabase.from('logins').insert([{ usuario, senha, dns_url, instrucoes, status: 'disponivel' }]);
+
+      if (error) {
+        alert('Erro ao salvar: ' + error.message);
+        return;
+      }
+
+      alert('Login cadastrado com sucesso!');
+      document.getElementById('cadUsuario').value = '';
+      document.getElementById('cadSenha').value = '';
+      document.getElementById('cadDns').value = '';
+      document.getElementById('cadInstrucoes').value = '';
+      carregarLoginsDisponiveis();
+    }
+
+    async function carregarLoginsDisponiveis() {
+      const select = document.getElementById('selectLoginsDisponiveis');
+      select.innerHTML = '<option value="">Carregando...</option>';
+
+      const { data, error } = await _supabase.from('logins').select('*').eq('status', 'disponivel');
+
+      if (error) {
+        select.innerHTML = '<option value="">Erro ao carregar logins</option>';
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        select.innerHTML = '<option value="">Nenhum login disponível. Cadastre um acima.</option>';
+        return;
+      }
+
+      select.innerHTML = '';
+      data.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `Usuário: ${item.usuario} | Servidor: ${item.dns_url || 'N/A'}`;
+        select.appendChild(option);
+      });
+    }
+
+    async function gerarCodigo() {
+      const loginId = document.getElementById('selectLoginsDisponiveis').value;
+      if (!loginId) {
+        alert('Selecione um login disponível primeiro!');
+        return;
+      }
+
+      // Cria um código aleatório (ex: IPTV-7391)
+      const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const codigoUnico = `IPTV-${randomStr}`;
+
+      const { error } = await _supabase.from('codigos').insert([{ codigo: codigoUnico, login_id: loginId, usado: false }]);
+
+      if (error) {
+        alert('Erro ao gerar código: ' + error.message);
+        return;
+      }
+
+      document.getElementById('codigoGeradoTexto').innerText = codigoUnico;
+      document.getElementById('resultadoCodigo').classList.remove('hidden');
+      carregarLoginsDisponiveis();
+    }
+  </script>
+</body>
+</html>
