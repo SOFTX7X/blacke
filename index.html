@@ -3,92 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resgatar Acesso</title>
+  <title>Resgatar Acesso - IPTV</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
 
-  <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl">
-    
-    <div class="text-center mb-6">
-      <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mb-3 text-white">
-        <i class="fa-solid fa-key text-xl"></i>
+  <div class="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-2xl space-y-6">
+    <div class="text-center space-y-2">
+      <div class="w-12 h-12 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-key"></i>
       </div>
       <h1 class="text-2xl font-bold">Resgatar Acesso</h1>
-      <p class="text-slate-400 text-sm mt-1">Cole o seu código de liberação abaixo</p>
+      <p class="text-slate-400 text-sm">Digite o seu código de liberação abaixo</p>
     </div>
 
-    <!-- Botão do Telegram no Início -->
-    <a href="https://t.me/nossoportalbr" target="_blank" 
-       class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 mb-6 text-sm shadow-md">
-      <i class="fa-brands fa-telegram text-lg"></i>
-      <span>Suporte / Comprar pelo Telegram</span>
-    </a>
-
-    <!-- Campo de Entrada -->
-    <div class="space-y-4" id="formSection">
-      <div>
-        <input type="text" id="codigoInput" placeholder="Ex: ABC-1234" 
-               class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-center text-lg uppercase tracking-widest font-mono text-white focus:outline-none focus:border-blue-500">
-      </div>
+    <div class="space-y-4">
+      <input type="text" id="codigoInput" placeholder="Ex: IPTV-ABCD" 
+             class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-center uppercase font-mono tracking-wider text-white focus:outline-none focus:border-blue-500">
       
-      <button onclick="resgatarCodigo()" id="btnResgatar"
-              class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
-        <span>Liberar Acesso</span>
-        <i class="fa-solid fa-arrow-right"></i>
+      <button onclick="resgatarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 font-semibold py-3 rounded-lg transition">
+        Liberar Acesso &rarr;
       </button>
 
-      <div id="mensagemErro" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm text-center"></div>
-    </div>
-
-    <!-- Área com as informações liberadas -->
-    <div id="resultadoSection" class="hidden space-y-4 mt-2">
-      <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3 rounded-lg text-sm text-center mb-4">
-        <i class="fa-solid fa-circle-check mr-1"></i> Acesso liberado com sucesso!
-      </div>
-
-      <!-- Usuário -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Usuário</label>
-        <div class="flex items-center gap-2">
-          <input type="text" id="outUsuario" readonly class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono">
-          <button onclick="copiar('outUsuario')" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm transition">
-            <i class="fa-regular fa-copy"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Senha -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Senha</label>
-        <div class="flex items-center gap-2">
-          <input type="text" id="outSenha" readonly class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono">
-          <button onclick="copiar('outSenha')" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm transition">
-            <i class="fa-regular fa-copy"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- DNS / URL -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Servidor / DNS / URL</label>
-        <div class="flex items-center gap-2">
-          <input type="text" id="outDns" readonly class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono">
-          <button onclick="copiar('outDns')" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm transition">
-            <i class="fa-regular fa-copy"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Instruções -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Instruções de Instalação</label>
-        <div id="outInstrucoes" class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300 whitespace-pre-wrap"></div>
+      <div id="mensagemErro" class="hidden p-3 bg-red-600/20 border border-red-500/30 text-red-400 text-sm text-center rounded-lg">
+        Login não encontrado ou já entregue.
       </div>
     </div>
 
+    <!-- Área onde aparecem os dados de IPTV após resgatar -->
+    <div id="resultadoLogin" class="hidden space-y-4 pt-4 border-t border-slate-700">
+      <div class="p-4 bg-slate-900 border border-slate-700 rounded-lg space-y-2">
+        <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-circle-check"></i> Acesso Liberado com Sucesso!
+        </h3>
+        <div class="text-xs text-slate-300 space-y-1.5 pt-2">
+          <div><strong>Usuário:</strong> <span id="resUsuario" class="font-mono text-white select-all"></span></div>
+          <div><strong>Senha:</strong> <span id="resSenha" class="font-mono text-white select-all"></span></div>
+          <div><strong>Servidor (DNS):</strong> <span id="resDns" class="font-mono text-white select-all"></span></div>
+          <div id="resInstrucoesContainer" class="pt-2 border-t border-slate-800 hidden">
+            <strong>Instruções:</strong>
+            <p id="resInstrucoes" class="text-slate-400 mt-1"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center pt-2">
+      <a href="https://t.me/seu_usuario" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center justify-center gap-1">
+        <i class="fa-brands fa-telegram"></i> Suporte / Comprar pelo Telegram
+      </a>
+    </div>
   </div>
 
   <script>
@@ -97,55 +63,84 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function resgatarCodigo() {
-      const codigoInput = document.getElementById('codigoInput');
-      const codigo = codigoInput.value.trim();
-      const msgErro = document.getElementById('mensagemErro');
-      const btn = document.getElementById('btnResgatar');
+      const codigo = document.getElementById('codigoInput').value.trim().toUpperCase();
+      const erroDiv = document.getElementById('mensagemErro');
+      const resultadoDiv = document.getElementById('resultadoLogin');
 
-      msgErro.classList.add('hidden');
+      erroDiv.classList.add('hidden');
+      resultadoDiv.classList.add('hidden');
 
       if (!codigo) {
-        msgErro.innerText = 'Por favor, digite o seu código!';
-        msgErro.classList.remove('hidden');
+        erroDiv.textContent = 'Digite um código válido.';
+        erroDiv.classList.remove('hidden');
         return;
       }
 
-      btn.disabled = true;
-      btn.innerText = 'Verificando...';
+      // 1. Busca o código no banco
+      const { data: codigoData, error: errCodigo } = await _supabase
+        .from('codigos')
+        .select('*')
+        .eq('codigo', codigo)
+        .maybeSingle();
 
-      const { data, error } = await _supabase.rpc('resgatar_login', { codigo_digitado: codigo });
-
-      btn.disabled = false;
-      btn.innerHTML = '<span>Liberar Acesso</span><i class="fa-solid fa-arrow-right"></i>';
-
-      if (error) {
-        msgErro.innerText = 'Erro ao processar código: ' + error.message;
-        msgErro.classList.remove('hidden');
+      if (errCodigo || !codigoData) {
+        erroDiv.textContent = 'Login não encontrado ou já entregue.';
+        erroDiv.classList.remove('hidden');
         return;
       }
 
-      if (!data.sucesso) {
-        msgErro.innerText = data.mensagem;
-        msgErro.classList.remove('hidden');
+      // 2. Verifica se já atingiu o limite de usos (ex: 2/2)
+      const usosAtuais = codigoData.usos || 0;
+      const limite = codigoData.limite || 2;
+
+      if (usosAtuais >= limite || codigoData.usado) {
+        erroDiv.textContent = 'Login não encontrado ou já entregue.';
+        erroDiv.classList.remove('hidden');
         return;
       }
 
-      // Oculta o campo de digitação do código após o sucesso
-      document.getElementById('formSection').classList.add('hidden');
+      // 3. Incrementa o uso em +1 no banco
+      const novoUso = usosAtuais + 1;
+      const { error: errUpdate } = await _supabase
+        .from('codigos')
+        .update({ 
+          usos: novoUso, 
+          usado: novoUso >= limite 
+        })
+        .eq('id', codigoData.id);
 
-      document.getElementById('outUsuario').value = data.usuario || '';
-      document.getElementById('outSenha').value = data.senha || '';
-      document.getElementById('outDns').value = data.dns_url || '';
-      document.getElementById('outInstrucoes').innerText = data.instrucoes || 'Sem instruções adicionais.';
+      if (errUpdate) {
+        erroDiv.textContent = 'Erro ao processar resgate. Tente novamente.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
 
-      document.getElementById('resultadoSection').classList.remove('hidden');
-    }
+      // 4. Busca os dados do login associado
+      const { data: loginData, error: errLogin } = await _supabase
+        .from('logins')
+        .select('*')
+        .eq('id', codigoData.login_id)
+        .maybeSingle();
 
-    function copiar(idInput) {
-      const input = document.getElementById(idInput);
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert('Copiado para a área de transferência!');
+      if (errLogin || !loginData) {
+        erroDiv.textContent = 'Erro ao carregar dados da conta.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
+
+      // 5. Exibe os dados na tela para o cliente
+      document.getElementById('resUsuario').textContent = loginData.usuario;
+      document.getElementById('resSenha').textContent = loginData.senha;
+      document.getElementById('resDns').textContent = loginData.dns_url || 'Não informado';
+      
+      if (loginData.instrucoes) {
+        document.getElementById('resInstrucoes').textContent = loginData.instrucoes;
+        document.getElementById('resInstrucoesContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('resInstrucoesContainer').classList.add('hidden');
+      }
+
+      resultadoDiv.classList.remove('hidden');
     }
   </script>
 </body>
