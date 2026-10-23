@@ -35,9 +35,9 @@
     <!-- Grid com 2 colunas -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <!-- Coluna 1: Cadastrar Login IPTV -->
+      <!-- Coluna 1: Cadastrar ou Atualizar Login IPTV -->
       <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
-        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">1. Cadastrar Novo Login IPTV</h2>
+        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">1. Cadastrar / Atualizar Login IPTV</h2>
         <div class="grid grid-cols-2 gap-2">
           <input type="text" id="cadUsuario" placeholder="Usuário IPTV" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
           <input type="text" id="cadSenha" placeholder="Senha IPTV" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
@@ -46,12 +46,12 @@
         <input type="text" id="cadDns" placeholder="Servidor / DNS / URL (ex: http://obix.blog:80)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 
         <textarea id="cadInstrucoes" placeholder="Instruções de instalação..." rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
-        <button onclick="salvarLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold py-2 rounded-lg transition">Salvar Login no Banco</button>
+        <button onclick="salvarLogin()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold py-2 rounded-lg transition">Salvar ou Atualizar no Banco</button>
       </div>
 
-      <!-- Coluna 2: Gerar Novo Código para Qualquer Login -->
+      <!-- Coluna 2: Gerar Novo Código (Com Limite de 2 Usos) -->
       <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
-        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">2. Gerar Código de Resgate</h2>
+        <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">2. Gerar Código (Até 2 Resgates)</h2>
         <div>
           <label class="block text-xs text-slate-400 mb-1">Selecione o Login:</label>
           <select id="selectLoginsDisponiveis" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
@@ -61,14 +61,14 @@
         <button onclick="gerarCodigo()" class="w-full bg-blue-600 hover:bg-blue-500 text-sm font-semibold py-2 rounded-lg transition">Gerar Código para o Login Selecionado</button>
         
         <div id="resultadoCodigo" class="hidden mt-3 p-3 bg-slate-900 border border-slate-700 rounded-lg text-center">
-          <p class="text-xs text-slate-400">Novo Código Gerado:</p>
+          <p class="text-xs text-slate-400">Novo Código Gerado (Válido para 2 usos):</p>
           <p id="codigoGeradoTexto" class="text-lg font-mono font-bold text-emerald-400 select-all my-1"></p>
         </div>
       </div>
 
     </div>
 
-    <!-- Lista de Logins Salvos (Únicos) -->
+    <!-- Lista de Logins Salvos e Status dos Códigos -->
     <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-lg space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="font-semibold text-sm text-blue-400 uppercase tracking-wider">Logins Cadastrados e Conexões</h2>
@@ -126,20 +126,23 @@
         return;
       }
 
-      const { error } = await _supabase.from('logins').insert([{ 
-        usuario, 
-        senha, 
-        dns_url, 
-        instrucoes, 
-        status: 'disponivel' 
-      }]);
+      const { data: existente } = await _supabase.from('logins').select('id').eq('usuario', usuario).maybeSingle();
+
+      let error;
+      if (existente) {
+        const res = await _supabase.from('logins').update({ senha, dns_url, instrucoes }).eq('id', existente.id);
+        error = res.error;
+      } else {
+        const res = await _supabase.from('logins').insert([{ usuario, senha, dns_url, instrucoes, status: 'disponivel' }]);
+        error = res.error;
+      }
 
       if (error) {
         alert('Erro ao salvar: ' + error.message);
         return;
       }
 
-      alert('Login cadastrado com sucesso!');
+      alert('Login salvo com sucesso!');
       document.getElementById('cadUsuario').value = '';
       document.getElementById('cadSenha').value = '';
       document.getElementById('cadDns').value = '';
@@ -209,23 +212,8 @@
         return;
       }
 
-      // Agrupa logins únicos por nome de usuário para evitar duplicados na tela
-      const loginsUnicosMap = new Map();
-      logins.forEach(item => {
-        if (!loginsUnicosMap.has(item.usuario)) {
-          loginsUnicosMap.set(item.usuario, {
-            ...item,
-            ids: [item.id]
-          });
-        } else {
-          loginsUnicosMap.get(item.usuario).ids.push(item.id);
-        }
-      });
-
-      const loginsUnicos = Array.from(loginsUnicosMap.values());
-
       select.innerHTML = '';
-      loginsUnicos.forEach(item => {
+      logins.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
         option.textContent = `Usuário: ${item.usuario}`;
@@ -233,7 +221,7 @@
       });
 
       listaDiv.innerHTML = '';
-      for (const item of loginsUnicos) {
+      for (const item of logins) {
         const realData = await consultarApiIPTV(item.dns_url, item.usuario, item.senha);
 
         let conexoesBadge = `<span class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded-full"><i class="fa-solid fa-tv mr-1"></i> Servidor Offline/Sem resposta</span>`;
@@ -253,10 +241,14 @@
           vencimentoTexto = realData.vencimento;
         }
 
-        // Agrupa e mostra todos os códigos associados a este usuário
-        const codigosList = (codigos || []).filter(c => item.ids.includes(c.login_id));
+        const codigosList = (codigos || []).filter(c => c.login_id === item.id);
         const codigosHTML = codigosList.length > 0 
-          ? codigosList.map(c => `<span class="bg-slate-800 px-2 py-0.5 rounded text-xs font-mono border border-slate-700 ${c.usado ? 'text-slate-500 line-through' : 'text-emerald-400'}">${c.codigo}</span>`).join(' ')
+          ? codigosList.map(c => {
+              const usos = c.usos || 0;
+              const limite = c.limite || 2;
+              const esgotado = usos >= limite;
+              return `<span class="bg-slate-800 px-2.5 py-1 rounded text-xs font-mono border border-slate-700 ${esgotado ? 'text-slate-500 line-through' : 'text-emerald-400'}">${c.codigo} (${usos}/${limite})</span>`;
+            }).join(' ')
           : '<span class="text-xs text-slate-500 italic">Nenhum código gerado ainda</span>';
 
         const card = document.createElement('div');
@@ -291,7 +283,14 @@
       const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
       const codigoUnico = `IPTV-${randomStr}`;
 
-      const { error } = await _supabase.from('codigos').insert([{ codigo: codigoUnico, login_id: loginId, usado: false }]);
+      // Cria o código definindo limite de 2 usos e 0 utilizados inicialmente
+      const { error } = await _supabase.from('codigos').insert([{ 
+        codigo: codigoUnico, 
+        login_id: loginId, 
+        usos: 0, 
+        limite: 2, 
+        usado: false 
+      }]);
 
       if (error) {
         alert('Erro ao gerar código: ' + error.message);
