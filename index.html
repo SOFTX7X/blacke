@@ -3,16 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resgatar Acesso - IPTV</title>
+  <title>Our Portal - Resgatar Acesso</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 selection:bg-blue-500 selection:text-white">
 
-  <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
+  <!-- Cabeçalho / Nome da Marca -->
+  <header class="w-full max-w-md py-4 text-center">
+    <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full text-blue-400 text-xs font-bold uppercase tracking-wider shadow-sm">
+      <i class="fa-solid fa-tv"></i>
+      <span>Our Portal</span>
+    </div>
+  </header>
+
+  <!-- Card Principal -->
+  <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 my-auto">
     
-    <!-- Cabeçalho -->
+    <!-- Cabeçalho do Card -->
     <div class="text-center space-y-2">
       <div class="w-14 h-14 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
         <i class="fa-solid fa-key"></i>
@@ -98,6 +107,11 @@
 
   </div>
 
+  <!-- Rodapé -->
+  <footer class="w-full max-w-md py-3 text-center text-slate-600 text-xs">
+    &copy; Our Portal. Todos os direitos reservados.
+  </footer>
+
   <script>
     const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
@@ -125,7 +139,6 @@
 
         if (error) {
           msgErro.innerText = 'Erro ao processar código: ' + error.message;
-          msgOcorrencia = true;
           msgErro.classList.remove('hidden');
           return;
         }
