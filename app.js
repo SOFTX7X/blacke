@@ -1,10 +1,39 @@
-// Configurações do Supabase para o BLACKE LAVEX
 const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let imagemBase64 = "";
+
+// Sistema para carregar a Logo personalizada direto do dispositivo
+function mudarLogo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const logoUrl = e.target.result;
+    document.getElementById('logoIcon').classList.add('hidden');
+    const imgLogo = document.getElementById('logoImg');
+    imgLogo.src = logoUrl;
+    imgLogo.classList.remove('hidden');
+    
+    // Salva no navegador para não sumir ao atualizar a página
+    localStorage.setItem('blacke_lavex_logo', logoUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Carregar logo salva ao iniciar (se houver)
+window.addEventListener('DOMContentLoaded', () => {
+  const savedLogo = localStorage.getItem('blacke_lavex_logo');
+  if (savedLogo) {
+    document.getElementById('logoIcon').classList.add('hidden');
+    const imgLogo = document.getElementById('logoImg');
+    imgLogo.src = savedLogo;
+    imgLogo.classList.remove('hidden');
+  }
+});
 
 // Modal
 function abrirModal() {
@@ -17,30 +46,26 @@ function fecharModal() {
   removerImagem();
 }
 
-// Processar Upload do Arquivo do Sistema (Instagram-style)
+// Upload de imagem do Card
 function processarImagem(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  if (file.size > 5 * 1024 * 1024) { // Limite de 5MB
-    alert("A imagem selecionada é muito grande. Escolha uma de até 5MB.");
+  if (file.size > 5 * 1024 * 1024) {
+    alert("A imagem é muito grande. Escolha uma de até 5MB.");
     return;
   }
 
   const reader = new FileReader();
   reader.onload = function(e) {
     imagemBase64 = e.target.result;
-    
-    // Atualizar prévia visual
     document.getElementById('imagePreview').src = imagemBase64;
     document.getElementById('previewContainer').classList.remove('hidden');
     document.getElementById('uploadArea').classList.add('hidden');
   };
-
   reader.readAsDataURL(file);
 }
 
-// Remover prévia selecionada
 function removerImagem() {
   imagemBase64 = "";
   document.getElementById('fileInput').value = "";
@@ -49,7 +74,7 @@ function removerImagem() {
   document.getElementById('uploadArea').classList.remove('hidden');
 }
 
-// Carregar sites cadastrados no mural
+// Carregar mural
 async function carregarMural() {
   const grid = document.getElementById('muralGrid');
   const loading = document.getElementById('loadingState');
@@ -66,27 +91,27 @@ async function carregarMural() {
     grid.innerHTML = '';
 
     if (!data || data.length === 0) {
-      grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">Nenhum site cadastrado ainda. Seja o primeiro a publicar!</div>`;
+      grid.innerHTML = `<div class="col-span-full text-center py-20 text-zinc-600 font-mono text-xs">NENHUM REGISTRO ENCONTRADO NO SISTEMA.</div>`;
       return;
     }
 
     data.forEach(item => {
       const card = document.createElement('div');
-      card.className = "bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 transition-all group";
+      card.className = "bg-zinc-950 border border-zinc-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between hover:border-zinc-700 transition-all group";
       
       card.innerHTML = `
         <div>
-          <div class="h-48 w-full overflow-hidden bg-slate-950 relative">
-            <img src="${item.image_url}" alt="${item.brand_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop'">
+          <div class="h-48 w-full overflow-hidden bg-black relative">
+            <img src="${item.image_url}" alt="${item.brand_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 filter grayscale group-hover:grayscale-0" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop'">
           </div>
           <div class="p-5 space-y-2">
-            <h3 class="font-bold text-lg text-white tracking-wide">${item.brand_name}</h3>
-            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3">${item.caption || 'Sem descrição.'}</p>
+            <h3 class="font-mono font-bold text-sm text-white tracking-wide uppercase">${item.brand_name}</h3>
+            <p class="text-zinc-400 text-xs font-sans leading-relaxed line-clamp-3">${item.caption || 'Sem descrição.'}</p>
           </div>
         </div>
         <div class="p-5 pt-0">
-          <a href="${item.link_url}" target="_blank" class="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 py-3 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm">
-            <span>Acessar Site</span>
+          <a href="${item.link_url}" target="_blank" class="w-full bg-zinc-900 hover:bg-emerald-500 text-zinc-300 hover:text-black border border-zinc-800 hover:border-emerald-400 py-3 rounded-xl text-xs font-mono font-semibold flex items-center justify-center gap-2 transition-all shadow-sm">
+            <span>ACESSAR SITE</span>
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
           </a>
         </div>
@@ -95,11 +120,11 @@ async function carregarMural() {
     });
 
   } catch (err) {
-    loading.innerHTML = `<p class="text-red-400">Erro ao carregar os dados do mural.</p>`;
+    loading.innerHTML = `<p class="text-red-500 font-mono text-xs">ERRO DE CONEXÃO COM O BANCO DE DADOS.</p>`;
   }
 }
 
-// Salvar publicação no banco
+// Salvar
 async function salvarSite() {
   const nome = document.getElementById('inputNome').value.trim();
   const link = document.getElementById('inputLink').value.trim();
@@ -110,19 +135,19 @@ async function salvarSite() {
   erroDiv.classList.add('hidden');
 
   if (!imagemBase64) {
-    erroDiv.innerText = "Por favor, adicione uma foto de capa para o seu site!";
+    erroDiv.innerText = "Adicione uma foto de capa.";
     erroDiv.classList.remove('hidden');
     return;
   }
 
   if (!nome || !link) {
-    erroDiv.innerText = "Preencha o Nome da Marca e o Link de Acesso!";
+    erroDiv.innerText = "Preencha o Nome e o Link.";
     erroDiv.classList.remove('hidden');
     return;
   }
 
   btn.disabled = true;
-  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Publicando...`;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...`;
 
   try {
     const { error } = await _supabase.from('sites_publicos').insert([
@@ -132,12 +157,9 @@ async function salvarSite() {
     if (error) throw error;
 
     fecharModal();
-    
-    // Resetar campos
     document.getElementById('inputNome').value = '';
     document.getElementById('inputLink').value = '';
     document.getElementById('inputLegenda').value = '';
-    
     carregarMural();
   } catch (err) {
     erroDiv.innerText = "Erro ao publicar: " + err.message;
@@ -148,5 +170,4 @@ async function salvarSite() {
   }
 }
 
-// Inicializar
 carregarMural();
