@@ -4,7 +4,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Funções para abrir e fechar o modal de cadastro
+let imagemBase64 = "";
+
+// Modal
 function abrirModal() {
   document.getElementById('modalCadastro').classList.remove('hidden');
 }
@@ -12,9 +14,42 @@ function abrirModal() {
 function fecharModal() {
   document.getElementById('modalCadastro').classList.add('hidden');
   document.getElementById('formErro').classList.add('hidden');
+  removerImagem();
 }
 
-// Carregar e renderizar os sites cadastrados no mural público
+// Processar Upload do Arquivo do Sistema (Instagram-style)
+function processarImagem(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) { // Limite de 5MB
+    alert("A imagem selecionada é muito grande. Escolha uma de até 5MB.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    imagemBase64 = e.target.result;
+    
+    // Atualizar prévia visual
+    document.getElementById('imagePreview').src = imagemBase64;
+    document.getElementById('previewContainer').classList.remove('hidden');
+    document.getElementById('uploadArea').classList.add('hidden');
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// Remover prévia selecionada
+function removerImagem() {
+  imagemBase64 = "";
+  document.getElementById('fileInput').value = "";
+  document.getElementById('imagePreview').src = "";
+  document.getElementById('previewContainer').classList.add('hidden');
+  document.getElementById('uploadArea').classList.remove('hidden');
+}
+
+// Carregar sites cadastrados no mural
 async function carregarMural() {
   const grid = document.getElementById('muralGrid');
   const loading = document.getElementById('loadingState');
@@ -64,10 +99,9 @@ async function carregarMural() {
   }
 }
 
-// Salvar novo site no banco de dados do Supabase
+// Salvar publicação no banco
 async function salvarSite() {
   const nome = document.getElementById('inputNome').value.trim();
-  const capa = document.getElementById('inputCapa').value.trim();
   const link = document.getElementById('inputLink').value.trim();
   const legenda = document.getElementById('inputLegenda').value.trim();
   const erroDiv = document.getElementById('formErro');
@@ -75,8 +109,14 @@ async function salvarSite() {
 
   erroDiv.classList.add('hidden');
 
-  if (!nome || !capa || !link) {
-    erroDiv.innerText = "Preencha pelo menos o Nome, o Link da Capa e o Link de Acesso!";
+  if (!imagemBase64) {
+    erroDiv.innerText = "Por favor, adicione uma foto de capa para o seu site!";
+    erroDiv.classList.remove('hidden');
+    return;
+  }
+
+  if (!nome || !link) {
+    erroDiv.innerText = "Preencha o Nome da Marca e o Link de Acesso!";
     erroDiv.classList.remove('hidden');
     return;
   }
@@ -86,20 +126,18 @@ async function salvarSite() {
 
   try {
     const { error } = await _supabase.from('sites_publicos').insert([
-      { brand_name: nome, image_url: capa, link_url: link, caption: legenda }
+      { brand_name: nome, image_url: imagemBase64, link_url: link, caption: legenda }
     ]);
 
     if (error) throw error;
 
     fecharModal();
     
-    // Limpar os campos do formulário
+    // Resetar campos
     document.getElementById('inputNome').value = '';
-    document.getElementById('inputCapa').value = '';
     document.getElementById('inputLink').value = '';
     document.getElementById('inputLegenda').value = '';
     
-    // Atualizar o mural instantaneamente para mostrar o novo site
     carregarMural();
   } catch (err) {
     erroDiv.innerText = "Erro ao publicar: " + err.message;
@@ -110,5 +148,5 @@ async function salvarSite() {
   }
 }
 
-// Inicializar carregamento automático ao abrir a página
+// Inicializar
 carregarMural();
