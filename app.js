@@ -34,23 +34,29 @@ function aviso(msg){
   }, 40);
 })();
 
-/* Chuva binária de fundo */
+/* Chuva binária de fundo (leve: poucas colunas, ~11 quadros/s, pausa fora da tela) */
 (function rain(){
   const cv = $('rain'); if (!cv || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const ctx = cv.getContext('2d'); const size = 16; let cols, drops;
-  function resize(){ cv.width = innerWidth; cv.height = innerHeight; cols = Math.ceil(cv.width/size); drops = Array.from({length:cols}, () => Math.random()*-50); }
+  const ctx = cv.getContext('2d'); let size, cols, drops;
+  function resize(){
+    size = innerWidth < 700 ? 26 : 20;
+    cv.width = innerWidth; cv.height = innerHeight;
+    cols = Math.ceil(cv.width/size); drops = Array.from({length:cols}, () => Math.random()*-40);
+    ctx.font = (size-6) + 'px IBM Plex Mono, monospace';
+  }
   resize(); addEventListener('resize', resize);
   let last = 0;
   function draw(t){
     requestAnimationFrame(draw);
-    if (document.hidden || t - last < 70) return; last = t;
-    ctx.fillStyle = 'rgba(6,7,13,.14)'; ctx.fillRect(0,0,cv.width,cv.height);
-    ctx.font = '13px IBM Plex Mono, monospace';
+    if (document.hidden || document.body.classList.contains('modal-open') || t - last < 90) return;
+    last = t;
+    ctx.fillStyle = 'rgba(6,7,13,.16)'; ctx.fillRect(0,0,cv.width,cv.height);
     for (let i=0;i<cols;i++){
+      if (drops[i] < 0){ drops[i]++; continue; }
       const y = drops[i]*size;
-      ctx.fillStyle = Math.random() > .96 ? 'rgba(111,214,255,.9)' : 'rgba(123,108,255,.45)';
+      ctx.fillStyle = Math.random() > .95 ? 'rgba(111,214,255,.9)' : 'rgba(123,108,255,.5)';
       ctx.fillText(Math.random() > .5 ? '1' : '0', i*size, y);
-      if (y > cv.height && Math.random() > .975) drops[i] = 0;
+      if (y > cv.height && Math.random() > .97) drops[i] = 0;
       drops[i] += 1;
     }
   }
@@ -58,22 +64,35 @@ function aviso(msg){
 })();
 
 /* Modal */
-function abrirModal(){ $('modalCadastro').hidden = false; setTimeout(() => $('inputNome').focus(), 60); }
-function fecharModal(){ $('modalCadastro').hidden = true; $('formErro').hidden = true; removerImagem(); }
+function abrirModal(){ document.body.classList.add('modal-open'); $('modalCadastro').hidden = false; setTimeout(() => $('inputNome').focus(), 60); }
+function fecharModal(){ document.body.classList.remove('modal-open'); $('modalCadastro').hidden = true; $('formErro').hidden = true; removerImagem(); }
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('modalCadastro').hidden) fecharModal(); });
 $('modalCadastro').addEventListener('mousedown', e => { if (e.target.id === 'modalCadastro') fecharModal(); });
 $('uploadArea').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
 
-function processarImagem(event){
+/* Reduz a imagem antes de enviar (900px, JPEG) — deixa o mural muito mais leve */
+function comprimir(file){
+  return new Promise((ok, falha) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 900 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', .8));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(); };
+    img.src = url;
+  });
+}
+async function processarImagem(event){
   const file = event.target.files[0]; if (!file) return;
-  if (file.size > 5*1024*1024){ mostrarErro('A imagem passa de 5 MB. Escolha uma menor.'); return; }
-  const r = new FileReader();
-  r.onload = e => {
-    imagemBase64 = e.target.result;
+  if (file.size > 15*1024*1024){ mostrarErro('A imagem passa de 15 MB. Escolha uma menor.'); return; }
+  try{
+    imagemBase64 = await comprimir(file);
     $('imagePreview').src = imagemBase64;
-    $('previewContainer').hidden = false; $('uploadArea').hidden = true;
-  };
-  r.readAsDataURL(file);
+    $('previewContainer').hidden = false; $('uploadArea').hidden = true; $('formErro').hidden = true;
+  }catch(_){ mostrarErro('Não foi possível ler essa imagem. Tente outra.'); }
 }
 function removerImagem(){
   imagemBase64 = ""; $('fileInput').value = ""; $('imagePreview').src = "";
@@ -88,12 +107,32 @@ function efeitoCard(card){
     const x = e.clientX - r.left, y = e.clientY - r.top;
     card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
     if (e.pointerType === 'mouse'){
-      const rx = ((y/r.height) - .5) * -6, ry = ((x/r.width) - .5) * 8;
-      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+      const rx = ((y/r.height) - .5) * -4, ry = ((x/r.width) - .5) * 5;
+      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
     }
   });
   card.addEventListener('pointerleave', () => { card.style.transform = ''; });
 }
+
+/* Legenda longa: "Ver mais / Ver menos" (ou toque na própria legenda) */
+function ligarLegenda(card){
+  const p = card.querySelector('.cap'), b = card.querySelector('.more');
+  const alternar = () => {
+    const aberto = p.classList.toggle('open');
+    b.textContent = aberto ? 'Ver menos' : 'Ver mais';
+  };
+  b.addEventListener('click', alternar);
+  p.addEventListener('click', () => { if (p.classList.contains('can')) alternar(); });
+}
+function medirLegendas(){
+  document.querySelectorAll('.card').forEach(card => {
+    const p = card.querySelector('.cap'), b = card.querySelector('.more');
+    if (p.classList.contains('open')) return;
+    const longa = p.scrollHeight > p.clientHeight + 1;
+    p.classList.toggle('can', longa); b.classList.toggle('show', longa);
+  });
+}
+let _rz; addEventListener('resize', () => { clearTimeout(_rz); _rz = setTimeout(medirLegendas, 150); });
 
 function desenhar(lista){
   const grid = $('muralGrid'); grid.innerHTML = '';
@@ -102,18 +141,20 @@ function desenhar(lista){
     card.className = 'card'; card.style.setProperty('--i', Math.min(i, 12));
     card.innerHTML = `
       <div class="cover">
-        <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy"
+        <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async"
              onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       </div>
       <div class="body">
         <h3>${esc(item.brand_name)}</h3>
-        <p>${esc(item.caption) || 'Sem legenda.'}</p>
+        <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
+        <button class="more" type="button">Ver mais</button>
       </div>
       <a class="visit" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
         <span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>`;
-    efeitoCard(card); grid.appendChild(card);
+    efeitoCard(card); ligarLegenda(card); grid.appendChild(card);
   });
+  requestAnimationFrame(medirLegendas);
   const total = registros.length;
   $('contador').textContent = lista.length === total ? `${total} ${total === 1 ? 'site' : 'sites'}` : `${lista.length} de ${total}`;
   const est = $('estado'); est.className = 'estado';
