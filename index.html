@@ -47,10 +47,10 @@
 
     <!-- Grid de Cards (Onde os sites aparecem) -->
     <div id="muralGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Os cards são injetados via JavaScript aqui -->
+      <!-- Cards serão injetados via JS -->
     </div>
 
-    <!-- Estado Vazio / Carregando -->
+    <!-- Estado de Carregamento -->
     <div id="loadingState" class="text-center py-12 text-slate-500">
       <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
       <p>Carregando projetos...</p>
@@ -60,11 +60,11 @@
 
   <!-- Modal de Cadastro -->
   <div id="modalCadastro" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 md:p-8 space-y-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 md:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-globe text-indigo-400"></i> Cadastrar Novo Site / Marca
+          <i class="fa-solid fa-globe text-indigo-400"></i> Publicar no BLACKE LAVEX
         </h3>
         <button onclick="fecharModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -72,14 +72,31 @@
       </div>
 
       <div class="space-y-4">
+        
+        <!-- Área de Upload e Prévia da Foto (Estilo Instagram) -->
         <div>
-          <label class="block text-xs uppercase font-semibold text-slate-400 mb-1">Nome da Marca / Site</label>
-          <input type="text" id="inputNome" placeholder="Ex: Meu Portal VIP" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs uppercase font-semibold text-slate-400 mb-2">Foto de Capa do Site</label>
+          
+          <div id="uploadArea" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 bg-slate-950/60 rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 group-hover:text-indigo-400 transition-colors"></i>
+            <span class="text-xs text-slate-400 group-hover:text-slate-200">Clique para selecionar uma imagem do computador/celular</span>
+            <span class="text-[10px] text-slate-600">PNG, JPG, WEBP (Prévia instantânea)</span>
+          </div>
+
+          <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="processarImagem(event)">
+
+          <!-- Contêiner de Prévia da Imagem -->
+          <div id="previewContainer" class="hidden relative mt-2 rounded-2xl overflow-hidden border border-slate-800 h-48 bg-slate-950">
+            <img id="imagePreview" src="" alt="Prévia" class="w-full h-full object-cover">
+            <button onclick="removerImagem()" class="absolute top-3 right-3 bg-red-600/80 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-lg text-xs">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
 
         <div>
-          <label class="block text-xs uppercase font-semibold text-slate-400 mb-1">Link da Foto de Capa (URL da Imagem)</label>
-          <input type="url" id="inputCapa" placeholder="https://exemplo.com/imagem.jpg" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs uppercase font-semibold text-slate-400 mb-1">Nome da Marca / Site</label>
+          <input type="text" id="inputNome" placeholder="Ex: Meu Portal VIP" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
@@ -107,7 +124,7 @@
     &copy; BLACKE LAVEX. Todos os direitos reservados.
   </footer>
 
-  <!-- Ligação com o Script JS Separado -->
+  <!-- Script JS Separado -->
   <script src="app.js"></script>
 </body>
 </html>
