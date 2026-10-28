@@ -19,16 +19,6 @@ function aviso(msg){
   clearTimeout(aviso._t); aviso._t = setTimeout(() => t.classList.remove('on'), 2800);
 }
 
-/* Logo (clique para trocar) */
-$('brandBtn').addEventListener('click', e => { e.preventDefault(); $('logoFileInput').click(); });
-function mudarLogo(event){
-  const file = event.target.files[0]; if (!file) return;
-  const r = new FileReader();
-  r.onload = e => { $('logoImg').src = e.target.result; try{ localStorage.setItem('blacke_lavex_logo', e.target.result); }catch(_){} };
-  r.readAsDataURL(file);
-}
-try{ const s = localStorage.getItem('blacke_lavex_logo'); if (s) $('logoImg').src = s; }catch(_){}
-
 /* Título que "decodifica" ao carregar */
 (function scramble(){
   const el = $('heroTitle'), final = el.dataset.text;

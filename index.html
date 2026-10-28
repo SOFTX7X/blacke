@@ -18,11 +18,10 @@
   <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 
   <header class="topbar">
-    <a class="brand" href="#" id="brandBtn" title="Clique para trocar a logo">
+    <a class="brand" href="./">
       <span class="logo-ring"><img id="logoImg" src="logo.png" alt="Logo BLACKE LAVEX"></span>
       <span class="brand-name">BLACKE <b>LAVEX</b></span>
     </a>
-    <input type="file" id="logoFileInput" accept="image/*" hidden onchange="mudarLogo(event)">
     <button class="btn-primary" onclick="abrirModal()">
       <i class="fa-solid fa-plus"></i><span>Publicar link</span>
     </button>
@@ -30,10 +29,10 @@
 
   <main>
     <section class="hero">
-      <p class="hero-tag"><span class="dot"></span> rede ativa</p>
-      <h1 id="heroTitle" data-text="Seu site. Sem rosto.">Seu site. Sem rosto.</h1>
-      <p class="hero-sub">Mural aberto de sites e marcas. Publique seu link com uma capa e uma legenda, sem precisar de conta.</p>
-
+      <div class="hero-text">
+        <h1 id="heroTitle" data-text="Mural de sites e marcas">Mural de sites e marcas</h1>
+        <p class="hero-sub">Publique seu link com capa e legenda. Sem conta, sem cadastro.</p>
+      </div>
       <div class="searchbar">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="busca" type="search" placeholder="Buscar por nome ou legenda" autocomplete="off">
