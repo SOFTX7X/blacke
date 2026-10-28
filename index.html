@@ -3,104 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Our Portal - Resgatar Acesso</title>
+  <title>BLACKE LAVEX - Resgatar Acesso</title>
+  
+  <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Ficheiro de Estilos Personalizados -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-  <!-- Cabeçalho Full-Width com Logo de Imagem -->
-  <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-lg">
+  <!-- Cabeçalho Full-Width -->
+  <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-4 flex items-center justify-between shadow-xl">
     <div class="flex items-center gap-3">
-      <img src="logo.png" alt="Our Portal" class="h-10 w-auto object-contain rounded-lg">
+      <div class="h-10 w-10 bg-gradient-to-tr from-violet-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-black tracking-wider text-xl shadow-lg shadow-indigo-500/20 border border-indigo-400/30">
+        BL
+      </div>
+      <span class="font-bold text-lg tracking-wide text-white">BLACKE <span class="text-indigo-400">LAVEX</span></span>
     </div>
+    
     <a href="https://t.me/nossoportalbr" target="_blank" 
-       class="text-xs bg-sky-600/20 text-sky-400 border border-sky-500/30 px-3.5 py-2 rounded-xl hover:bg-sky-600/30 transition flex items-center gap-2 font-semibold shadow-sm">
-      <i class="fa-brands fa-telegram text-base"></i>
-      <span class="hidden sm:inline">Suporte / Telegram</span>
+       class="text-xs bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 px-4 py-2.5 rounded-xl hover:bg-indigo-600/30 transition-all flex items-center gap-2 font-semibold shadow-sm hover:shadow-indigo-500/10">
+      <i class="fa-brands fa-telegram text-base text-indigo-400"></i>
+      <span class="hidden sm:inline">Suporte VIP / Telegram</span>
       <span class="sm:hidden">Suporte</span>
     </a>
   </header>
 
-  <!-- Conteúdo Principal Centralizado -->
-  <main class="flex-1 flex flex-col items-center justify-center p-4 my-6 space-y-6">
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 flex flex-col items-center justify-center p-4 my-8 space-y-6">
     
     <!-- Card Principal de Resgate -->
-    <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6">
+    <div class="max-w-md w-full bg-slate-900/90 backdrop-blur-2xl border border-slate-800/90 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
       
+      <!-- Detalhe Visual de Brilho de Fundo -->
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
       <!-- Cabeçalho do Card -->
-      <div class="text-center space-y-2">
-        <div class="w-14 h-14 bg-gradient-to-br from-blue-600/30 to-indigo-600/30 text-blue-400 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
+      <div class="text-center space-y-3">
+        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-indigo-400 border border-indigo-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
           <i class="fa-solid fa-key"></i>
         </div>
-        <h1 class="text-2xl font-bold tracking-tight">Resgatar Acesso</h1>
-        <p class="text-slate-400 text-sm">Insira o seu código de liberação abaixo</p>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Resgatar Acesso</h1>
+        <p class="text-slate-400 text-sm">Insira o seu código de liberação fornecido abaixo</p>
       </div>
 
-      <!-- Formulário -->
+      <!-- Formulário de Digitação -->
       <div class="space-y-4" id="formSection">
         <div class="relative">
           <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500">
             <i class="fa-solid fa-ticket"></i>
           </span>
-          <input type="text" id="codigoInput" placeholder="EX: IPTV-ABCD" 
-                 class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3.5 uppercase font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition">
+          <input type="text" id="codigoInput" placeholder="EX: BLACKE-ABCD" 
+                 class="w-full bg-slate-950/90 border border-slate-800 rounded-2xl pl-11 pr-4 py-4 uppercase font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner">
         </div>
         
         <button onclick="resgatarCodigo()" id="btnResgatar"
-                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-[0.99]">
+                class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer">
           <span>Liberar Acesso</span>
           <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
 
-        <div id="mensagemErro" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm text-center font-medium"></div>
+        <div id="mensagemErro" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-2xl text-sm text-center font-medium animate-pulse"></div>
       </div>
 
-      <!-- Área com as informações liberadas -->
+      <!-- Área de Resultados (Liberada após código válido) -->
       <div id="resultadoSection" class="hidden space-y-4 pt-4 border-t border-slate-800/80">
-        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3.5 rounded-xl text-sm text-center font-medium flex items-center justify-center gap-2 shadow-inner">
+        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl text-sm text-center font-medium flex items-center justify-center gap-2 shadow-inner">
           <i class="fa-solid fa-circle-check text-base"></i>
           <span>Acesso liberado com sucesso!</span>
         </div>
 
         <div class="space-y-3 text-xs">
           <!-- Usuário -->
-          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Usuário</span>
+          <div class="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold tracking-wider">Usuário</span>
             <div class="flex items-center justify-between gap-2">
               <input type="text" id="outUsuario" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
-              <button onclick="copiar('outUsuario', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+              <button onclick="copiar('outUsuario', this)" class="btn-copiar">
                 <i class="fa-regular fa-copy"></i> Copiar
               </button>
             </div>
           </div>
 
           <!-- Senha -->
-          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Senha</span>
+          <div class="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold tracking-wider">Senha</span>
             <div class="flex items-center justify-between gap-2">
               <input type="text" id="outSenha" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all">
-              <button onclick="copiar('outSenha', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+              <button onclick="copiar('outSenha', this)" class="btn-copiar">
                 <i class="fa-regular fa-copy"></i> Copiar
               </button>
             </div>
           </div>
 
-          <!-- DNS / URL -->
-          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Servidor / DNS / URL</span>
+          <!-- Servidor / DNS / URL -->
+          <div class="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold tracking-wider">Servidor / DNS / URL</span>
             <div class="flex items-center justify-between gap-2">
               <input type="text" id="outDns" readonly class="w-full bg-transparent border-none text-white font-mono font-bold text-sm focus:outline-none select-all truncate">
-              <button onclick="copiar('outDns', this)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5 shrink-0 font-medium">
+              <button onclick="copiar('outDns', this)" class="btn-copiar">
                 <i class="fa-regular fa-copy"></i> Copiar
               </button>
             </div>
           </div>
 
           <!-- Instruções -->
-          <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl space-y-1">
-            <span class="text-slate-400 block text-[10px] uppercase font-semibold">Instruções de Instalação</span>
+          <div class="bg-slate-950/80 border border-slate-800 p-3.5 rounded-2xl space-y-1">
+            <span class="text-slate-400 block text-[10px] uppercase font-semibold tracking-wider">Instruções de Instalação</span>
             <div id="outInstrucoes" class="text-slate-300 text-xs whitespace-pre-wrap pt-1 leading-relaxed"></div>
           </div>
         </div>
@@ -108,34 +122,34 @@
 
     </div>
 
-    <!-- Bloco de Avisos, Como Usar e Apps Compatíveis -->
-    <div class="max-w-md w-full bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-5 space-y-4 text-xs text-slate-300">
-      <h3 class="font-bold text-sm text-blue-400 flex items-center gap-2 border-b border-slate-800 pb-2">
-        <i class="fa-solid fa-circle-info"></i> Como Usar & Dicas
+    <!-- Bloco de Dicas e Apps Compatíveis -->
+    <div class="max-w-md w-full bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-3xl p-6 space-y-4 text-xs text-slate-300 shadow-xl">
+      <h3 class="font-bold text-sm text-indigo-400 flex items-center gap-2 border-b border-slate-800/80 pb-3">
+        <i class="fa-solid fa-circle-info text-indigo-400"></i> Como Usar & Guia Rápido
       </h3>
       
-      <div class="space-y-2.5">
-        <div class="flex items-start gap-2.5">
-          <span class="bg-blue-600/20 text-blue-400 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border border-blue-500/30">1</span>
-          <p><strong class="text-white">Insira o código:</strong> Digite o código gratuito fornecido no campo acima e clique em "Liberar Acesso".</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3">
+          <span class="bg-indigo-600/20 text-indigo-400 font-bold w-6 h-6 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">1</span>
+          <p><strong class="text-white">Insira o código:</strong> Digite o seu código fornecido no campo acima e clique no botão de liberação.</p>
         </div>
 
-        <div class="flex items-start gap-2.5">
-          <span class="bg-blue-600/20 text-blue-400 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border border-blue-500/30">2</span>
-          <p><strong class="text-white">Copie os dados:</strong> Utilize os botões de cópia rápida para copiar o Utilizador, a Senha e o Servidor DNS.</p>
+        <div class="flex items-start gap-3">
+          <span class="bg-indigo-600/20 text-indigo-400 font-bold w-6 h-6 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">2</span>
+          <p><strong class="text-white">Copie as credenciais:</strong> Utilize os botões de cópia para transferir o Utilizador, Senha e URL do Servidor com facilidade.</p>
         </div>
 
-        <div class="flex items-start gap-2.5">
-          <span class="bg-blue-600/20 text-blue-400 font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border border-blue-500/30">3</span>
-          <p><strong class="text-white">Aplicativos Compatíveis:</strong> Funciona em Smart TVs, TV Box, Fire Stick, Celulares e Computadores através de leitores IPTV com suporte a Xtream Codes (ex: <span class="text-white font-medium">IPTV Smarters Pro, TiviMate, XCIPTV</span>).</p>
+        <div class="flex items-start gap-3">
+          <span class="bg-indigo-600/20 text-indigo-400 font-bold w-6 h-6 rounded-xl flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">3</span>
+          <p><strong class="text-white">Aplicativos Compatíveis:</strong> Funciona em Smart TVs, TV Box, Fire Stick, Smartphones e PC via leitores com suporte Xtream Codes (<span class="text-indigo-300 font-medium">IPTV Smarters Pro, TiviMate, XCIPTV</span>).</p>
         </div>
       </div>
 
-      <div class="pt-2 border-t border-slate-800/80 text-center">
-        <p class="text-slate-400 mb-2">Está com alguma dúvida ou precisa de suporte?</p>
+      <div class="pt-3 border-t border-slate-800/80 text-center space-y-2">
+        <p class="text-slate-400">Dúvidas ou problemas com seu resgate?</p>
         <a href="https://t.me/nossoportalbr" target="_blank" 
-           class="inline-flex items-center justify-center gap-2 w-full bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 py-2.5 rounded-xl font-semibold transition">
-          <i class="fa-brands fa-telegram text-base"></i> Entrar no Grupo / Suporte do Telegram
+           class="inline-flex items-center justify-center gap-2 w-full bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 py-3 rounded-2xl font-semibold transition-all">
+          <i class="fa-brands fa-telegram text-base"></i> Entrar no Suporte Telegram
         </a>
       </div>
     </div>
@@ -143,84 +157,11 @@
   </main>
 
   <!-- Rodapé -->
-  <footer class="w-full py-4 text-center text-slate-600 text-xs border-t border-slate-900">
-    &copy; Our Portal. Todos os direitos reservados.
+  <footer class="w-full py-4 text-center text-slate-500 text-xs border-t border-slate-900/80">
+    &copy; BLACKE LAVEX. Todos os direitos reservados.
   </footer>
 
-  <script>
-    const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    async function resgatarCodigo() {
-      const codigoInput = document.getElementById('codigoInput');
-      const codigo = codigoInput.value.trim().toUpperCase();
-      const msgErro = document.getElementById('mensagemErro');
-      const btn = document.getElementById('btnResgatar');
-
-      msgErro.classList.add('hidden');
-
-      if (!codigo) {
-        msgErro.innerText = 'Por favor, digite o seu código!';
-        msgErro.classList.remove('hidden');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Verificando...</span>`;
-
-      try {
-        const { data, error } = await _supabase.rpc('resgatar_login', { codigo_digitado: codigo });
-
-        if (error) {
-          msgErro.innerText = 'Erro ao processar código: ' + error.message;
-          msgErro.classList.remove('hidden');
-          return;
-        }
-
-        if (!data.sucesso) {
-          msgErro.innerText = data.mensagem;
-          msgErro.classList.remove('hidden');
-          return;
-        }
-
-        // Oculta o campo de digitação após o sucesso
-        document.getElementById('formSection').classList.add('hidden');
-
-        document.getElementById('outUsuario').value = data.usuario || '';
-        document.getElementById('outSenha').value = data.senha || '';
-        document.getElementById('outDns').value = data.dns_url || '';
-        document.getElementById('outInstrucoes').innerText = data.instrucoes || 'Sem instruções adicionais.';
-
-        document.getElementById('resultadoSection').classList.remove('hidden');
-      } catch (err) {
-        msgErro.innerText = 'Ocorreu um erro inesperado.';
-        msgErro.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>Liberar Acesso</span><i class="fa-solid fa-arrow-right text-xs"></i>';
-      }
-    }
-
-    function copiar(idInput, botao) {
-      const input = document.getElementById(idInput);
-      navigator.clipboard.writeText(input.value).then(() => {
-        const originalHTML = botao.innerHTML;
-        botao.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> Copiado!`;
-        botao.classList.add('bg-emerald-600/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-        
-        setTimeout(() => {
-          botao.innerHTML = originalHTML;
-          botao.classList.remove('bg-emerald-600/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
-        }, 2000);
-      });
-    }
-
-    document.getElementById('codigoInput').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        resgatarCodigo();
-      }
-    });
-  </script>
+  <!-- Ficheiro de Script JS -->
+  <script src="app.js"></script>
 </body>
 </html>
