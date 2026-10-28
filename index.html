@@ -7,6 +7,15 @@
   
   <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: {
+        // Paleta "anônima": grafite + prata azulada (sem verde, rosa ou vermelho)
+        accent: { DEFAULT: '#b7c0cb', hi: '#e3e7ec' },
+        ink: '#050506'
+      } } }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Supabase JS Client -->
@@ -15,7 +24,7 @@
   <!-- Estilos Personalizados -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
+<body class="bg-black text-white min-h-screen flex flex-col justify-between selection:bg-accent selection:text-black">
 
   <!-- Cabeçalho Minimalista e Centralizado -->
   <header class="w-full bg-zinc-950 border-b border-zinc-900 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-2xl">
@@ -27,17 +36,17 @@
     <div class="flex items-center gap-3 cursor-pointer" onclick="document.getElementById('logoFileInput').click()" title="Clique para alterar a logo">
       <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="mudarLogo(event)">
       
-      <div id="logoBox" class="h-10 w-10 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center text-emerald-400 font-mono font-bold text-lg overflow-hidden shadow-inner">
-        <i id="logoIcon" class="fa-solid fa-terminal"></i>
-        <img id="logoImg" src="" alt="Logo" class="w-full h-full object-cover hidden">
+      <div id="logoBox" class="h-10 w-10 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center text-accent font-mono font-bold text-lg overflow-hidden shadow-inner">
+        <i id="logoIcon" class="fa-solid fa-terminal hidden"></i>
+        <img id="logoImg" src="logo.png" alt="Logo" class="w-full h-full object-cover grayscale contrast-125" onerror="this.classList.add('hidden');document.getElementById('logoIcon').classList.remove('hidden')">
       </div>
       
-      <span class="font-mono font-extrabold tracking-widest text-base sm:text-lg text-white">BLACKE <span class="text-emerald-400">LAVEX</span></span>
+      <span class="font-mono font-extrabold tracking-widest text-base sm:text-lg text-white">BLACKE <span class="text-accent">LAVEX</span></span>
     </div>
 
     <!-- Direita: Botão de Cadastrar com Cor Viva -->
     <div class="w-32 flex justify-end">
-      <button onclick="abrirModal()" class="bg-emerald-500 hover:bg-emerald-400 text-black text-xs sm:text-sm px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer">
+      <button onclick="abrirModal()" class="bg-accent hover:bg-accent-hi text-black text-xs sm:text-sm px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-black/40 flex items-center gap-2 cursor-pointer">
         <i class="fa-solid fa-plus"></i>
         <span class="hidden sm:inline">Cadastrar</span>
       </button>
@@ -54,7 +63,7 @@
 
     <!-- Estado de Carregamento -->
     <div id="loadingState" class="text-center py-20 text-zinc-600 font-mono text-sm">
-      <i class="fa-solid fa-circle-notch fa-spin text-xl mb-2 text-emerald-500"></i>
+      <i class="fa-solid fa-circle-notch fa-spin text-xl mb-2 text-accent"></i>
       <p>CARREGANDO REDE...</p>
     </div>
 
@@ -66,7 +75,7 @@
       
       <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
         <h3 class="text-sm font-mono font-bold text-white flex items-center gap-2 uppercase tracking-wider">
-          <i class="fa-solid fa-terminal text-emerald-400"></i> Nova Publicação
+          <i class="fa-solid fa-terminal text-accent"></i> Nova Publicação
         </h3>
         <button onclick="fecharModal()" class="text-zinc-500 hover:text-white text-lg cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -79,8 +88,8 @@
         <div>
           <label class="block text-[10px] uppercase font-mono font-semibold text-zinc-400 mb-2">Foto de Capa</label>
           
-          <div id="uploadArea" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-zinc-800 hover:border-emerald-500/50 bg-zinc-900/50 rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group">
-            <i class="fa-solid fa-image text-3xl text-zinc-600 group-hover:text-emerald-400 transition-colors"></i>
+          <div id="uploadArea" onclick="document.getElementById('fileInput').click()" class="border-2 border-dashed border-zinc-800 hover:border-accent/50 bg-zinc-900/50 rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group">
+            <i class="fa-solid fa-image text-3xl text-zinc-600 group-hover:text-accent transition-colors"></i>
             <span class="text-xs text-zinc-400 group-hover:text-zinc-200">Clique para carregar imagem</span>
           </div>
 
@@ -88,7 +97,7 @@
 
           <div id="previewContainer" class="hidden relative mt-2 rounded-2xl overflow-hidden border border-zinc-800 h-48 bg-zinc-900">
             <img id="imagePreview" src="" alt="Prévia" class="w-full h-full object-cover">
-            <button onclick="removerImagem()" class="absolute top-3 right-3 bg-red-600/90 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg text-xs cursor-pointer">
+            <button onclick="removerImagem()" class="absolute top-3 right-3 bg-zinc-900/90 border border-zinc-700 text-zinc-200 hover:bg-zinc-800 w-8 h-8 rounded-full flex items-center justify-center shadow-lg text-xs cursor-pointer">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -96,22 +105,22 @@
 
         <div>
           <label class="block text-[10px] uppercase font-mono font-semibold text-zinc-400 mb-1">Nome da Marca / Site</label>
-          <input type="text" id="inputNome" placeholder="Ex: Anonymous BR" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 font-mono">
+          <input type="text" id="inputNome" placeholder="Ex: Anonymous BR" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent font-mono">
         </div>
 
         <div>
           <label class="block text-[10px] uppercase font-mono font-semibold text-zinc-400 mb-1">Link de Acesso (URL)</label>
-          <input type="url" id="inputLink" placeholder="https://" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 font-mono">
+          <input type="url" id="inputLink" placeholder="https://" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent font-mono">
         </div>
 
         <div>
           <label class="block text-[10px] uppercase font-mono font-semibold text-zinc-400 mb-1">Legenda Simples</label>
-          <textarea id="inputLegenda" rows="3" placeholder="Escreva uma descrição..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-emerald-500 resize-none font-mono"></textarea>
+          <textarea id="inputLegenda" rows="3" placeholder="Escreva uma descrição..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-accent resize-none font-mono"></textarea>
         </div>
 
-        <div id="formErro" class="hidden text-red-400 text-xs text-center font-mono bg-red-500/10 border border-red-500/20 p-3 rounded-xl"></div>
+        <div id="formErro" class="hidden text-zinc-200 text-xs text-center font-mono bg-zinc-900 border border-zinc-600 p-3 rounded-xl"></div>
 
-        <button onclick="salvarSite()" id="btnSalvar" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 cursor-pointer uppercase text-xs tracking-wider">
+        <button onclick="salvarSite()" id="btnSalvar" class="w-full bg-accent hover:bg-accent-hi text-black font-mono font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-black/40 cursor-pointer uppercase text-xs tracking-wider">
           Publicar no Mural
         </button>
       </div>

@@ -5,6 +5,14 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let imagemBase64 = "";
 
+// Evita que textos/links cadastrados injetem HTML ou scripts na página
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function urlSegura(u) {
+  return /^https?:\/\//i.test(u) ? esc(u) : '#';
+}
+
 // Sistema para carregar a Logo personalizada direto do dispositivo
 function mudarLogo(event) {
   const file = event.target.files[0];
@@ -13,10 +21,10 @@ function mudarLogo(event) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const logoUrl = e.target.result;
-    document.getElementById('logoIcon').classList.add('hidden');
     const imgLogo = document.getElementById('logoImg');
     imgLogo.src = logoUrl;
     imgLogo.classList.remove('hidden');
+    document.getElementById('logoIcon').classList.add('hidden');
     
     // Salva no navegador para não sumir ao atualizar a página
     localStorage.setItem('blacke_lavex_logo', logoUrl);
@@ -28,10 +36,7 @@ function mudarLogo(event) {
 window.addEventListener('DOMContentLoaded', () => {
   const savedLogo = localStorage.getItem('blacke_lavex_logo');
   if (savedLogo) {
-    document.getElementById('logoIcon').classList.add('hidden');
-    const imgLogo = document.getElementById('logoImg');
-    imgLogo.src = savedLogo;
-    imgLogo.classList.remove('hidden');
+    document.getElementById('logoImg').src = savedLogo;
   }
 });
 
@@ -102,15 +107,15 @@ async function carregarMural() {
       card.innerHTML = `
         <div>
           <div class="h-48 w-full overflow-hidden bg-black relative">
-            <img src="${item.image_url}" alt="${item.brand_name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 filter grayscale group-hover:grayscale-0" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop'">
+            <img src="${esc(item.image_url)}" alt="${esc(item.brand_name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 grayscale contrast-110 brightness-90 group-hover:brightness-110" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop'">
           </div>
           <div class="p-5 space-y-2">
-            <h3 class="font-mono font-bold text-sm text-white tracking-wide uppercase">${item.brand_name}</h3>
-            <p class="text-zinc-400 text-xs font-sans leading-relaxed line-clamp-3">${item.caption || 'Sem descrição.'}</p>
+            <h3 class="font-mono font-bold text-sm text-white tracking-wide uppercase">${esc(item.brand_name)}</h3>
+            <p class="text-zinc-400 text-xs font-sans leading-relaxed line-clamp-3">${esc(item.caption) || 'Sem descrição.'}</p>
           </div>
         </div>
         <div class="p-5 pt-0">
-          <a href="${item.link_url}" target="_blank" class="w-full bg-zinc-900 hover:bg-emerald-500 text-zinc-300 hover:text-black border border-zinc-800 hover:border-emerald-400 py-3 rounded-xl text-xs font-mono font-semibold flex items-center justify-center gap-2 transition-all shadow-sm">
+          <a href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer" class="w-full bg-zinc-900 hover:bg-accent text-zinc-300 hover:text-black border border-zinc-800 hover:border-accent-hi py-3 rounded-xl text-xs font-mono font-semibold flex items-center justify-center gap-2 transition-all shadow-sm">
             <span>ACESSAR SITE</span>
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
           </a>
@@ -120,7 +125,7 @@ async function carregarMural() {
     });
 
   } catch (err) {
-    loading.innerHTML = `<p class="text-red-500 font-mono text-xs">ERRO DE CONEXÃO COM O BANCO DE DADOS.</p>`;
+    loading.innerHTML = `<p class="text-zinc-400 font-mono text-xs">ERRO DE CONEXÃO COM O BANCO DE DADOS.</p>`;
   }
 }
 
