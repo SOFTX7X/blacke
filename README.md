@@ -15,7 +15,7 @@ Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública)
   - só reserva quem tem 1 site; troca a cada 30 dias (1h de tolerância); libera após 90 dias sem sites.
 - **Denúncias com motivo** (golpe, impróprio, link quebrado, outro). 5 denúncias tiram o site do mural.
 - **Posição da foto**: ao publicar/editar, arraste a imagem dentro da prévia para escolher o enquadramento.
-- Cards de altura fixa. "Ver detalhes" desliza um painel por cima do próprio card (legenda completa com rolagem, @, acessos, data e domínio) sem mexer no resto da grade; o menu ⋮ tem copiar link, compartilhar, denunciar e (em "Meus sites") editar/excluir.
+- Cards de altura fixa. "Ler legenda" (ou tocar na legenda) abre um balão flutuante ao lado do card com o texto completo, sem mexer na imagem nem na grade; o menu ⋮ tem copiar link, compartilhar, denunciar e (em "Meus sites") editar/excluir.
 - Categorias, ordenar por acessos, contador de acessos, "Carregar mais", limite de 10 sites por chave.
 
 ## Preparado para o painel admin (ainda não incluído)

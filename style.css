@@ -251,8 +251,8 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 /* ===== v8: cards de altura fixa, menu ⋯ e detalhes ===== */
 .grid{align-items:stretch}
 .card{height:100%}
-.card .cover{aspect-ratio:16/10;cursor:pointer}
-.card .body{flex:1;display:flex;flex-direction:column;gap:0;padding:2px 14px 0;margin-top:-20px;cursor:pointer}
+.card .cover{aspect-ratio:16/10}
+.card .body{flex:1;display:flex;flex-direction:column;gap:0;padding:2px 14px 0;margin-top:-20px}
 .card .body h3{font-size:16.5px;line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .line2{display:flex;align-items:center;justify-content:space-between;gap:8px;height:20px;margin-bottom:6px}
 .line2 .arroba{margin:0;min-width:0}
@@ -293,33 +293,12 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 }
 @keyframes slideup{from{transform:translateY(100%)}}
 
-/* ===== v10: detalhes dentro do card (sem mexer no layout) ===== */
-.card{--fh:68px}
-.det{position:absolute;left:0;right:0;top:0;bottom:var(--fh);z-index:4;display:flex;flex-direction:column;padding:14px 16px 10px;
-  background:linear-gradient(180deg,rgba(12,14,27,.9),rgba(12,14,27,.97) 38%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);transform:translateY(16px);opacity:0;visibility:hidden;
-  transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s .32s}
-.card.open .det{transform:none;opacity:1;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility 0s}
-.card.open{border-color:#3a3f87}
-.det-top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-.det-top .tag{position:static}
-.det-x{flex:none;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:rgba(17,20,42,.9);color:var(--muted);cursor:pointer;transition:.2s}
-.det-x:hover{color:#fff;border-color:var(--violet)}
-.det h4{flex:none;font:700 17px/1.25 var(--display);letter-spacing:-.01em;overflow-wrap:anywhere}
-.det-meta{flex:none;display:flex;flex-wrap:wrap;gap:2px 10px;margin:5px 0 10px;font:400 11.5px var(--mono);color:var(--muted)}
-.det-meta span:first-child{color:var(--ice)}
-.det-txt{flex:1;min-height:0;overflow-y:auto;padding-right:6px;font-size:14px;line-height:1.6;color:#d6d9ee;white-space:pre-wrap;overflow-wrap:anywhere;overscroll-behavior:contain}
-.det-txt::-webkit-scrollbar{width:4px}
-.det-link{flex:none;display:flex;align-items:center;gap:7px;margin-top:10px;padding-top:9px;border-top:1px solid var(--line);font:400 11.5px var(--mono);color:var(--muted)}
-.det-link span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-@media (max-width:640px){
-  .card{--fh:56px}
-  .det{padding:10px 11px 8px}
-  .det-top{margin-bottom:6px}
-  .det-x{width:26px;height:26px}
-  .det h4{font-size:14px}
-  .det-meta{font-size:10.5px;margin:3px 0 7px}
-  .det-txt{font-size:12.5px;line-height:1.55}
-  .det-link{font-size:10.5px;margin-top:7px;padding-top:7px}
-}
+/* ===== v11: balão da legenda ===== */
+.card .cap{cursor:pointer}
+#pop{position:fixed;z-index:72;padding:14px 8px 14px 16px;border:1px solid #3a3f87;border-radius:14px;background:#0d1020;box-shadow:0 24px 54px -12px rgba(0,0,0,.85),0 0 0 1px rgba(123,108,255,.1);animation:popIn .16s ease-out}
+@keyframes popIn{from{opacity:0;transform:translateY(6px)}}
+#pop::before{content:"";position:absolute;left:var(--ax,50%);top:-6px;width:11px;height:11px;margin-left:-5px;background:#0d1020;border-left:1px solid #3a3f87;border-top:1px solid #3a3f87;transform:rotate(45deg)}
+#pop.up::before{top:auto;bottom:-6px;transform:rotate(225deg)}
+.pop-txt{max-height:min(38vh,250px);overflow-y:auto;padding-right:10px;font-size:14px;line-height:1.65;color:#dcdff2;white-space:pre-wrap;overflow-wrap:anywhere;overscroll-behavior:contain}
+.pop-txt::-webkit-scrollbar{width:4px}
+@media (max-width:640px){.pop-txt{font-size:13.5px}}

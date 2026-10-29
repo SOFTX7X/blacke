@@ -91,7 +91,7 @@ function fecharTopo(m){
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('menu').hidden){ fecharMenu(); return; }
-  if (document.querySelector('.card.open')){ fecharDetalhes(); return; }
+  if (!$('pop').hidden){ fecharPop(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
   if (abertos.length) fecharTopo(abertos[abertos.length-1]);
 });
@@ -227,7 +227,7 @@ function efeitoCard(card){
   card.addEventListener('pointermove', e => {
     const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
-    if (e.pointerType === 'mouse' && !card.classList.contains('open')){
+    if (e.pointerType === 'mouse'){
       const rx = ((y/r.height) - .5) * -4, ry = ((x/r.width) - .5) * 5;
       card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
     }
@@ -241,7 +241,7 @@ const ehDono = item => !!S.hash && item.owner_hash === S.hash;
 function acharItem(id){ return S.itens.concat(S.meus).find(s => String(s.id) === String(id)); }
 function acoesDe(item){
   const l = [
-    { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
+    { act:'detalhes', ic:'fa-regular fa-message', txt:'Ler legenda' },
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
   ];
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
@@ -255,31 +255,19 @@ function criarCard(item, i){
   const card = document.createElement('article');
   card.className = 'card'; card.dataset.id = item.id; card.style.setProperty('--i', Math.min(i, 12));
   card.innerHTML = `
-    <div class="cover" data-act="detalhes">
+    <div class="cover">
       <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
     </div>
-    <div class="body" data-act="detalhes">
+    <div class="body">
       <h3>${esc(item.brand_name)}</h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
         <span class="meta" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
       </div>
-      <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
-      <button class="ver" type="button" data-act="detalhes">Ver detalhes <i class="fa-solid fa-angle-right"></i></button>
-    </div>
-    <div class="det" role="region" aria-label="Detalhes de ${esc(item.brand_name)}">
-      <div class="det-top"><span class="tag">${esc(item.categoria || 'Outros')}</span>
-        <button class="det-x" type="button" data-act="fechardet" aria-label="Fechar detalhes"><i class="fa-solid fa-xmark"></i></button></div>
-      <h4>${esc(item.brand_name)}</h4>
-      <div class="det-meta">
-        ${item.handle ? `<span>@${esc(item.handle)}</span>` : '<span>anônimo</span>'}
-        <span>${n} ${n === 1 ? 'acesso' : 'acessos'}</span>
-        ${item.created_at ? `<span>${new Date(item.created_at).toLocaleDateString('pt-BR')}</span>` : ''}
-      </div>
-      <div class="det-txt">${esc(item.caption) || 'Sem legenda.'}</div>
-      <div class="det-link"><i class="fa-solid fa-link"></i><span>${esc(hostDe(item.link_url))}</span></div>
+      <p class="cap" data-act="detalhes">${esc(item.caption) || 'Sem legenda.'}</p>
+      <button class="ver" type="button" data-act="detalhes">Ler legenda <i class="fa-solid fa-angle-right"></i></button>
     </div>
     <div class="foot">
       <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
@@ -291,7 +279,7 @@ function criarCard(item, i){
   return card;
 }
 function anexar(lista, reset){
-  const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
+  const grid = $('muralGrid'); if (reset){ grid.innerHTML = ''; fecharPop(); }
   lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
 }
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
@@ -330,15 +318,41 @@ async function copiarLink(id){
   catch(_){ const t = document.createElement('textarea'); t.value = it.link_url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
   aviso('Link copiado');
 }
-function hostDe(u){ try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } }
-/* Detalhes DENTRO do card: um painel desliza por cima, o card não muda de tamanho */
-function fecharDetalhes(){ document.querySelectorAll('.card.open').forEach(c => c.classList.remove('open')); }
-function abrirDetalhes(id){
-  const card = document.querySelector(`.card[data-id="${CSS.escape(String(id))}"]`); if (!card) return;
-  const abrindo = !card.classList.contains('open');
-  fecharDetalhes();
-  if (abrindo){ card.style.transform = ''; card.classList.add('open'); card.querySelector('.det-txt').scrollTop = 0; }
+/* Balão da legenda: flutua ao lado do card, não mexe em nada do layout nem na imagem */
+let popId = null;
+const cardDe = id => document.querySelector(`.card[data-id="${CSS.escape(String(id))}"]`);
+function fecharPop(){ $('pop').hidden = true; popId = null; }
+function posicionarPop(card){
+  const p = $('pop'), r = card.getBoundingClientRect(), vw = innerWidth, vh = innerHeight;
+  const w = Math.min(Math.max(r.width, 280), 360, vw - 16);
+  p.style.width = w + 'px';
+  const h = p.offsetHeight;
+  let left = Math.min(Math.max(8, r.left + r.width/2 - w/2), vw - w - 8);
+  const abaixo = vh - r.bottom, acima = r.top;
+  const embaixo = abaixo >= h + 16 || abaixo >= acima;
+  let top = embaixo ? r.bottom + 10 : r.top - h - 10;
+  top = Math.min(Math.max(8, top), vh - h - 8);
+  p.style.left = left + 'px'; p.style.top = top + 'px';
+  p.style.setProperty('--ax', Math.min(Math.max(22, r.left + r.width/2 - left), w - 22) + 'px');
+  p.classList.toggle('up', !embaixo);
 }
+function abrirDetalhes(id){
+  if (popId === String(id) && !$('pop').hidden){ fecharPop(); return; }
+  const card = cardDe(id), it = acharItem(id); if (!card || !it) return;
+  $('popTxt').textContent = it.caption || 'Sem legenda.'; $('popTxt').scrollTop = 0;
+  popId = String(id); $('pop').hidden = false; posicionarPop(card);
+}
+let _pr;
+function seguirPop(){
+  if ($('pop').hidden) return;
+  cancelAnimationFrame(_pr);
+  _pr = requestAnimationFrame(() => {
+    const card = cardDe(popId); if (!card) return fecharPop();
+    const r = card.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return fecharPop();
+    posicionarPop(card);
+  });
+}
+addEventListener('scroll', seguirPop, { passive:true }); addEventListener('resize', seguirPop);
 async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
@@ -544,7 +558,7 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
-  if (!e.target.closest('.card') && !e.target.closest('#menu')) fecharDetalhes();
+  if (!e.target.closest('#pop') && !(el && el.dataset.act === 'detalhes')) fecharPop();
   if (!el) return;
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
@@ -554,7 +568,6 @@ document.addEventListener('click', e => {
     case 'detalhes': abrirDetalhes(id); break;
     case 'copiar': copiarLink(id); break;
     case 'compartilhar': compartilhar(id); break;
-    case 'fechardet': fecharDetalhes(); break;
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
