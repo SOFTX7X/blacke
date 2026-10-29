@@ -91,6 +91,7 @@ function fecharTopo(m){
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('menu').hidden){ fecharMenu(); return; }
+  if (document.querySelector('.card.open')){ fecharDetalhes(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
   if (abertos.length) fecharTopo(abertos[abertos.length-1]);
 });
@@ -226,7 +227,7 @@ function efeitoCard(card){
   card.addEventListener('pointermove', e => {
     const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
-    if (e.pointerType === 'mouse'){
+    if (e.pointerType === 'mouse' && !card.classList.contains('open')){
       const rx = ((y/r.height) - .5) * -4, ry = ((x/r.width) - .5) * 5;
       card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
     }
@@ -267,6 +268,18 @@ function criarCard(item, i){
       </div>
       <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
       <button class="ver" type="button" data-act="detalhes">Ver detalhes <i class="fa-solid fa-angle-right"></i></button>
+    </div>
+    <div class="det" role="region" aria-label="Detalhes de ${esc(item.brand_name)}">
+      <div class="det-top"><span class="tag">${esc(item.categoria || 'Outros')}</span>
+        <button class="det-x" type="button" data-act="fechardet" aria-label="Fechar detalhes"><i class="fa-solid fa-xmark"></i></button></div>
+      <h4>${esc(item.brand_name)}</h4>
+      <div class="det-meta">
+        ${item.handle ? `<span>@${esc(item.handle)}</span>` : '<span>anônimo</span>'}
+        <span>${n} ${n === 1 ? 'acesso' : 'acessos'}</span>
+        ${item.created_at ? `<span>${new Date(item.created_at).toLocaleDateString('pt-BR')}</span>` : ''}
+      </div>
+      <div class="det-txt">${esc(item.caption) || 'Sem legenda.'}</div>
+      <div class="det-link"><i class="fa-solid fa-link"></i><span>${esc(hostDe(item.link_url))}</span></div>
     </div>
     <div class="foot">
       <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
@@ -317,58 +330,19 @@ async function copiarLink(id){
   catch(_){ const t = document.createElement('textarea'); t.value = it.link_url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
   aviso('Link copiado');
 }
-let detId = null;
-const listaAtual = () => S.aba === 'meus' ? S.meus : S.itens;
 function hostDe(u){ try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } }
+/* Detalhes DENTRO do card: um painel desliza por cima, o card não muda de tamanho */
+function fecharDetalhes(){ document.querySelectorAll('.card.open').forEach(c => c.classList.remove('open')); }
 function abrirDetalhes(id){
-  const it = acharItem(id); if (!it) return;
-  detId = String(it.id);
-  const n = it.cliques || 0;
-  $('dtBg').src = $('dtImg').src = it.image_url;
-  $('dtCat').textContent = it.categoria || 'Outros'; $('dtNome').textContent = it.brand_name;
-  const ar = $('dtArroba'); ar.hidden = !it.handle; ar.textContent = it.handle ? '@' + it.handle : ''; ar.dataset.h = it.handle || '';
-  $('dtAcessos').textContent = n;
-  $('dtData').textContent = it.created_at ? new Date(it.created_at).toLocaleDateString('pt-BR') : '—';
-  $('dtLegenda').textContent = it.caption || 'Sem legenda.';
-  $('dtHost').textContent = hostDe(it.link_url); $('dtUrl').textContent = it.link_url;
-  $('dtCopy').dataset.id = it.id; $('dtScroll').scrollTop = 0;
-  const outras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
-  $('dtFoot').innerHTML = `
-    <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-    ${outras.map(a => `<button class="sq${a.danger ? ' del' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" title="${a.txt}" aria-label="${a.txt}"><i class="${a.ic}"></i></button>`).join('')}`;
-  const l = listaAtual(), i = l.findIndex(s => String(s.id) === detId);
-  $('dtPrev').hidden = $('dtNext').hidden = l.length < 2 || i < 0;
-  $('dtPrev').disabled = i <= 0; $('dtNext').disabled = i < 0 || i >= l.length - 1;
-  $('dtPos').textContent = l.length > 1 && i >= 0 ? `${i + 1} / ${l.length}` : '';
-  abrir('modalDetalhes');
-}
-function navegarFicha(dir){
-  const l = listaAtual(), i = l.findIndex(s => String(s.id) === detId), p = l[i + dir];
-  if (p) abrirDetalhes(p.id);
+  const card = document.querySelector(`.card[data-id="${CSS.escape(String(id))}"]`); if (!card) return;
+  const abrindo = !card.classList.contains('open');
+  fecharDetalhes();
+  if (abrindo){ card.style.transform = ''; card.classList.add('open'); card.querySelector('.det-txt').scrollTop = 0; }
 }
 async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
 }
-addEventListener('keydown', e => {
-  if ($('modalDetalhes').hidden || document.querySelector('.modal:not([hidden]):not(#modalDetalhes)')) return;
-  if (e.key === 'ArrowLeft') navegarFicha(-1); else if (e.key === 'ArrowRight') navegarFicha(1);
-});
-/* Celular: arrastar a capa para baixo fecha a ficha */
-(function arrastarFicha(){
-  const v = $('dtVisual'), f = document.querySelector('.ficha'); let y0 = null, dy = 0;
-  v.addEventListener('pointerdown', e => {
-    if (innerWidth > 760 || e.pointerType === 'mouse' || e.target.closest('button')) return;
-    y0 = e.clientY; dy = 0; v.setPointerCapture(e.pointerId); f.style.transition = 'none';
-  });
-  v.addEventListener('pointermove', e => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); f.style.transform = `translateY(${dy}px)`; });
-  const fim = () => {
-    if (y0 === null) return;
-    f.style.transition = 'transform .2s'; f.style.transform = ''; y0 = null;
-    if (dy > 90) fechar('modalDetalhes');
-  };
-  v.addEventListener('pointerup', fim); v.addEventListener('pointercancel', fim);
-})();
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
@@ -570,17 +544,17 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
+  if (!e.target.closest('.card') && !e.target.closest('#menu')) fecharDetalhes();
   if (!el) return;
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
-  if (['perfil','editar','excluir','denunciar'].includes(a) && !$('modalDetalhes').hidden) fechar('modalDetalhes');
   switch (a){
     case 'novo': abrirPublicar(); break;
     case 'menu': abrirMenu(el, id); break;
     case 'detalhes': abrirDetalhes(id); break;
     case 'copiar': copiarLink(id); break;
     case 'compartilhar': compartilhar(id); break;
-    case 'nav': navegarFicha(+el.dataset.dir); break;
+    case 'fechardet': fecharDetalhes(); break;
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
