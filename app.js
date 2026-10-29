@@ -4,11 +4,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 
-const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash';
+const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle';
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
 const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
-            itens:[], meus:[], token:'', hash:'', total:0 };
+            itens:[], meus:[], token:'', hash:'', total:0, perfil:null };
 let imagemBase64 = '', editId = null;
 
 /* ---------- utilidades ---------- */
@@ -236,6 +236,7 @@ function criarCard(item, i){
     </div>
     <div class="body">
       <h3>${esc(item.brand_name)}</h3>
+      ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : ''}
       <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
       <button class="more" type="button">Ver mais</button>
       <small class="meta"><i class="fa-regular fa-eye"></i> ${n} ${n === 1 ? 'acesso' : 'acessos'}</small>
@@ -268,10 +269,18 @@ async function buscarMural(reset){
   const meu = ++S.seq;
   if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
   try{
-    let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5);
+    let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
     if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
-    const t = S.busca.replace(/[%,()*\\]/g, ' ').trim();
-    if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%`);
+    const porArroba = S.busca.startsWith('@');
+    if (porArroba){
+      const h = normArroba(S.busca);
+      q = q.ilike('handle', (h || '-').replace(/_/g, '\\_') + '%');
+      if (reset) mostrarPerfil(h);
+    }else{
+      const t = S.busca.replace(/[%,()*\\]/g, ' ').trim();
+      if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%,handle.ilike.%${t}%`);
+      if (reset) $('perfilBox').hidden = true;
+    }
     q = S.ordem === 'acessos'
       ? q.order('cliques', { ascending:false }).order('id', { ascending:false })
       : q.order('created_at', { ascending:false }).order('id', { ascending:false });
@@ -341,19 +350,92 @@ async function excluirTodos(){
 
 /* ---------- denúncia e cliques ---------- */
 function jaDenunciou(id){ try{ return JSON.parse(lerLS('bl_den') || '[]').includes(String(id)); }catch(_){ return false; } }
-async function denunciar(id){
+let denId = null;
+function denunciar(id){
   if (jaDenunciou(id)){ aviso('Você já denunciou este site.'); return; }
-  if (!await confirmar({ titulo:'Denunciar este site?', texto:'Use para links perigosos, golpes ou conteúdo que não deveria estar aqui. Sites muito denunciados saem do mural.', botao:'Denunciar' })) return;
-  const { error } = await _supabase.rpc('denunciar_site', { p_id:String(id) });
-  if (error){ aviso('Não foi possível enviar a denúncia.'); return; }
-  try{ const l = JSON.parse(lerLS('bl_den') || '[]'); l.push(String(id)); gravarLS('bl_den', JSON.stringify(l)); }catch(_){}
-  aviso('Denúncia enviada. Obrigado.');
+  denId = String(id); $('dnMotivo').value = 'golpe'; $('dnDetalhe').value = ''; abrir('modalDenuncia');
 }
+$('dnNo').addEventListener('click', () => fechar('modalDenuncia'));
+$('dnOk').addEventListener('click', async () => {
+  const btn = $('dnOk'); btn.disabled = true;
+  const { error } = await _supabase.rpc('denunciar_site', { p_id:denId, p_motivo:$('dnMotivo').value, p_detalhe:$('dnDetalhe').value.trim() || null });
+  btn.disabled = false; fechar('modalDenuncia');
+  if (error){ aviso('Não foi possível enviar a denúncia.'); return; }
+  try{ const l = JSON.parse(lerLS('bl_den') || '[]'); l.push(denId); gravarLS('bl_den', JSON.stringify(l)); }catch(_){}
+  aviso('Denúncia enviada. Obrigado.');
+});
+
 function registrarClique(id){
   const k = 'bl_c_' + id;
   try{ if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1'); }catch(_){}
   _supabase.rpc('registrar_clique', { p_id:String(id) }).then(() => {}, () => {});
 }
+
+/* ---------- @ (perfil) ---------- */
+const normArroba = v => String(v || '').replace(/^@/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+async function carregarPerfil(){
+  try{ const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token }); S.perfil = data || null; }
+  catch(_){ S.perfil = null; }
+  atualizarPerfilUI();
+}
+function atualizarPerfilUI(){
+  const p = S.perfil;
+  $('meuArroba').textContent = p?.handle ? '@' + p.handle + (p.suspenso ? ' (suspenso)' : '') : 'Você ainda não tem um @';
+  $('btnArroba').innerHTML = '<i class="fa-solid fa-at"></i> ' + (p?.handle ? 'Trocar @' : 'Reservar @');
+}
+async function mostrarPerfil(h){
+  const box = $('perfilBox');
+  if (!h || h.length < 3){ box.hidden = true; return; }
+  let data = null;
+  try{ ({ data } = await _supabase.rpc('perfil_publico', { p_handle:h })); }catch(_){}
+  if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
+  if (!data){ box.hidden = true; return; }
+  const s = data.sites, a = data.acessos;
+  $('pfHandle').textContent = '@' + data.handle;
+  $('pfInfo').textContent = `${s} ${s === 1 ? 'site' : 'sites'} · ${a} ${a === 1 ? 'acesso' : 'acessos'} · no mural desde ${new Date(data.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' })}`;
+  box.hidden = false;
+}
+function resetChips(){ S.cat = 'Todas'; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.cat === 'Todas')); }
+function irParaPerfil(h){
+  S.busca = '@' + h; $('busca').value = S.busca; resetChips();
+  scrollTo({ top:0, behavior:'smooth' });
+  if (S.aba !== 'mural') trocarAba('mural'); else buscarMural(true);
+}
+$('pfLimpar').addEventListener('click', () => { S.busca = ''; $('busca').value = ''; buscarMural(true); });
+$('arrobaInput').addEventListener('input', e => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, '').replace(/@/g, ''); });
+
+$('btnArroba').addEventListener('click', () => {
+  const p = S.perfil; $('arrobaErro').hidden = true;
+  $('arrobaInput').value = p?.handle || '';
+  $('btnSalvarArroba').textContent = p?.handle ? 'Trocar @' : 'Reservar @';
+  $('btnLiberarArroba').hidden = !p?.handle;
+  const info = $('arrobaInfo');
+  if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString('pt-BR');
+  else info.textContent = '';
+  abrir('modalArroba'); setTimeout(() => $('arrobaInput').focus(), 60);
+});
+function erroArroba(m){ const e = $('arrobaErro'); e.textContent = m; e.hidden = false; }
+$('btnSalvarArroba').addEventListener('click', async () => {
+  const h = normArroba($('arrobaInput').value), btn = $('btnSalvarArroba'); $('arrobaErro').hidden = true;
+  if (h.length < 3) return erroArroba('Use pelo menos 3 caracteres.');
+  if (!S.meus.length) return erroArroba('Publique pelo menos 1 site antes de reservar um @.');
+  btn.disabled = true;
+  try{
+    const { error } = await _supabase.rpc('reservar_arroba', { p_handle:h, p_token:S.token });
+    if (error) throw error;
+    await carregarPerfil(); await buscarMeus(); atualizarMeusUI();
+    fechar('modalArroba'); aviso('@' + h + ' agora é seu');
+    if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
+  }catch(err){ erroArroba(err.message || 'Não foi possível reservar.'); }
+  finally{ btn.disabled = false; }
+});
+$('btnLiberarArroba').addEventListener('click', async () => {
+  if (!await confirmar({ titulo:'Liberar seu @?', texto:'Qualquer pessoa poderá pegar esse nome e seus sites ficam sem @.', botao:'Liberar' })) return;
+  const { data, error } = await _supabase.rpc('liberar_arroba', { p_token:S.token });
+  if (error || !data){ erroArroba('Não foi possível liberar.'); return; }
+  await carregarPerfil(); await buscarMeus(); atualizarMeusUI(); fechar('modalArroba'); aviso('@ liberado');
+  if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
+});
 
 /* ---------- chave ---------- */
 $('btnChave').addEventListener('click', () => {
@@ -373,7 +455,7 @@ $('btnUsarChave').addEventListener('click', async () => {
   if (S.meus.length && !await confirmar({ titulo:'Trocar de chave?', texto:'Os sites desta chave atual só serão gerenciáveis de novo se você tiver guardado ela. Copie antes se precisar.', botao:'Trocar' })) return;
   gravarLS('bl_chave', nova); await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  fechar('modalChave'); atualizarMeusUI(); aviso(`Chave restaurada: ${S.meus.length} ${S.meus.length === 1 ? 'site encontrado' : 'sites encontrados'}`);
+  await carregarPerfil(); fechar('modalChave'); atualizarMeusUI(); aviso(`Chave restaurada: ${S.meus.length} ${S.meus.length === 1 ? 'site encontrado' : 'sites encontrados'}`);
   if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
 });
 $('btnExcluirTodos').addEventListener('click', excluirTodos);
@@ -388,6 +470,7 @@ document.addEventListener('click', e => {
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
     case 'visitar': registrarClique(id); break;
+    case 'perfil': irParaPerfil(el.dataset.h); break;
   }
 });
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
@@ -406,5 +489,5 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true);
+  atualizarMeusUI(); buscarMural(true); carregarPerfil();
 })();

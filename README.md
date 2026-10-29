@@ -1,22 +1,20 @@
 # BLACKE LAVEX — mural anônimo
 
-Site estático (HTML + CSS + JS) com Supabase.
+Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública) continua em `app.js`.
 
 ## Como atualizar (nesta ordem)
-1. Supabase > **SQL Editor** > New query > cole o conteúdo de `supabase.sql` > **Run** (só uma vez).
-2. Suba os arquivos para o GitHub (Vercel publica sozinho).
-
-> Se subir o site antes do SQL, o mural mostra "O banco ainda não foi atualizado".
+1. Supabase > **SQL Editor**:
+   - se ainda não rodou nada da v5: rode `supabase-1-base.sql` e depois `supabase-2-arroba.sql`;
+   - se já rodou o da v5: rode só `supabase-2-arroba.sql`.
+2. Suba os arquivos para o GitHub (a Vercel publica sozinha).
 
 ## Recursos
-- Meus sites: cada navegador recebe uma chave secreta (sem login). Só quem tem a chave edita/exclui os próprios sites.
-- Chave de acesso: copiar e restaurar em outro aparelho (botão "Minha chave").
-- Editar, excluir um ou excluir todos.
-- Categorias, busca, ordenar por recentes/mais acessados, "Carregar mais".
-- Contador de acessos por site, denúncia (5 denúncias tiram do mural).
-- Limite de 10 sites por chave e validação no servidor.
+- **Meus sites** sem login: cada navegador tem uma chave secreta. Só ela edita/exclui os sites.
+- **@ de perfil**: nome único ligado à chave. Busque `@nome` para ver todos os sites daquele perfil.
+  - só reserva quem tem 1 site; troca a cada 30 dias (1h de tolerância); libera após 90 dias sem sites.
+- **Denúncias com motivo** (golpe, impróprio, link quebrado, outro). 5 denúncias tiram o site do mural.
+- Categorias, ordenar por acessos, contador de acessos, "Carregar mais", limite de 10 sites por chave.
 
-## Moderação (você, dono do projeto)
-No SQL Editor:
-- apagar: `delete from public.sites_publicos where id = 123;`
-- devolver denunciado: `update public.sites_publicos set denuncias = 0 where id = 123;`
+## Preparado para o painel admin (ainda não incluído)
+O banco já tem: `denuncias` (motivo, detalhe, data, resolvida), `perfis.suspenso` e `sites_publicos.oculto`.
+Moderação manual por enquanto: veja os comandos no final do `supabase-2-arroba.sql`.

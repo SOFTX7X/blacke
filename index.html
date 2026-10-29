@@ -34,7 +34,7 @@
       </div>
       <div class="searchbar" id="searchbar">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input id="busca" type="search" placeholder="Buscar por nome ou legenda" autocomplete="off">
+        <input id="busca" type="search" placeholder="Buscar por nome, legenda ou @perfil" autocomplete="off">
         <span id="contador" class="count"></span>
       </div>
     </section>
@@ -53,12 +53,24 @@
       </div>
     </div>
 
+    <!-- Cabeçalho de perfil (busca por @) -->
+    <section class="perfil" id="perfilBox" hidden>
+      <div class="pf-avatar"><i class="fa-solid fa-at"></i></div>
+      <div class="pf-txt"><b id="pfHandle"></b><span id="pfInfo"></span></div>
+      <button class="btn-ghost" id="pfLimpar"><i class="fa-solid fa-xmark"></i> Limpar</button>
+    </section>
+
     <!-- Painel "Meus sites" -->
     <section class="panel" id="painelMeus" hidden>
       <div class="stats">
         <div class="stat"><b id="stSites">0</b><span>sites</span></div>
         <div class="stat"><b id="stAcessos">0</b><span>acessos</span></div>
         <div class="stat"><b id="stLimite">10</b><span>vagas livres</span></div>
+      </div>
+      <div class="arroba-row">
+        <i class="fa-solid fa-at"></i>
+        <span id="meuArroba" class="meu-arroba">Você ainda não tem um @</span>
+        <button class="btn-ghost" id="btnArroba">Reservar @</button>
       </div>
       <div class="panel-btns">
         <button class="btn-ghost" id="btnChave"><i class="fa-solid fa-key"></i> Minha chave</button>
@@ -144,6 +156,50 @@
         <button class="btn-ghost" id="btnUsarChave">Usar</button>
       </div>
       <div id="chaveErro" class="erro" hidden></div>
+    </div>
+  </div>
+
+  <!-- @ -->
+  <div id="modalArroba" class="modal" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="arTitulo">
+      <div class="sheet-head">
+        <h3 id="arTitulo">Seu @</h3>
+        <button class="icon-btn" onclick="fechar('modalArroba')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="sheet-text">O @ é só seu: ninguém mais pode usar esse nome e ele aparece nos seus sites. Quem busca por @seunome vê todos os seus sites juntos.</p>
+      <label class="field-label" for="arrobaInput">Escolha o nome</label>
+      <div class="at-field"><span>@</span><input class="field" id="arrobaInput" maxlength="20" autocomplete="off" spellcheck="false" placeholder="seunome"></div>
+      <ul class="rules">
+        <li>3 a 20 caracteres: letras, números ou _</li>
+        <li>Só quem já tem 1 site publicado pode reservar</li>
+        <li>Dá para trocar a cada 30 dias</li>
+        <li>Sem nenhum site por 90 dias, o @ volta a ficar livre</li>
+        <li>Perdeu a chave, perdeu o @ (copie a chave em "Minha chave")</li>
+      </ul>
+      <div id="arrobaInfo" class="hint left"></div>
+      <div id="arrobaErro" class="erro" hidden></div>
+      <button class="btn-primary wide" id="btnSalvarArroba">Reservar @</button>
+      <button class="btn-ghost wide-ghost" id="btnLiberarArroba" hidden>Liberar meu @</button>
+    </div>
+  </div>
+
+  <!-- Denúncia -->
+  <div id="modalDenuncia" class="modal" hidden>
+    <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="dnTitulo">
+      <h3 id="dnTitulo">Denunciar este site</h3>
+      <label class="field-label" for="dnMotivo">Motivo</label>
+      <select class="field" id="dnMotivo">
+        <option value="golpe">Golpe ou link perigoso</option>
+        <option value="impróprio">Conteúdo impróprio</option>
+        <option value="link quebrado">Link quebrado</option>
+        <option value="outro">Outro</option>
+      </select>
+      <label class="field-label" for="dnDetalhe">Detalhes (opcional)</label>
+      <textarea class="field" id="dnDetalhe" rows="3" maxlength="200" placeholder="O que há de errado?"></textarea>
+      <div class="sheet-btns">
+        <button class="btn-ghost" id="dnNo">Cancelar</button>
+        <button class="btn-primary" id="dnOk">Enviar denúncia</button>
+      </div>
     </div>
   </div>
 
