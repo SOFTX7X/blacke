@@ -293,12 +293,11 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 }
 @keyframes slideup{from{transform:translateY(100%)}}
 
-/* ===== v11: balão da legenda ===== */
-.card .cap{cursor:pointer}
-#pop{position:fixed;z-index:72;padding:14px 8px 14px 16px;border:1px solid #3a3f87;border-radius:14px;background:#0d1020;box-shadow:0 24px 54px -12px rgba(0,0,0,.85),0 0 0 1px rgba(123,108,255,.1);animation:popIn .16s ease-out}
-@keyframes popIn{from{opacity:0;transform:translateY(6px)}}
-#pop::before{content:"";position:absolute;left:var(--ax,50%);top:-6px;width:11px;height:11px;margin-left:-5px;background:#0d1020;border-left:1px solid #3a3f87;border-top:1px solid #3a3f87;transform:rotate(45deg)}
-#pop.up::before{top:auto;bottom:-6px;transform:rotate(225deg)}
-.pop-txt{max-height:min(38vh,250px);overflow-y:auto;padding-right:10px;font-size:14px;line-height:1.65;color:#dcdff2;white-space:pre-wrap;overflow-wrap:anywhere;overscroll-behavior:contain}
-.pop-txt::-webkit-scrollbar{width:4px}
-@media (max-width:640px){.pop-txt{font-size:13.5px}}
+/* ===== v12: legenda com rolagem dentro do próprio card ===== */
+.card .cap{display:block;-webkit-line-clamp:unset;-webkit-box-orient:unset;height:5.8em;overflow-y:auto;overflow-x:hidden;margin-right:-6px;padding-right:8px;cursor:auto;
+  scrollbar-width:thin;scrollbar-color:#4a4fa8 transparent;overscroll-behavior:contain;outline:0}
+.card .cap::-webkit-scrollbar{width:4px}
+.card .cap::-webkit-scrollbar-track{background:transparent}
+.card .cap::-webkit-scrollbar-thumb{background:#4a4fa8;border-radius:4px}
+.card .cap:hover::-webkit-scrollbar-thumb,.card .cap:focus::-webkit-scrollbar-thumb{background:var(--violet)}
+.card .body{padding-bottom:2px}

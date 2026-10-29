@@ -91,7 +91,6 @@ function fecharTopo(m){
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('menu').hidden){ fecharMenu(); return; }
-  if (!$('pop').hidden){ fecharPop(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
   if (abertos.length) fecharTopo(abertos[abertos.length-1]);
 });
@@ -241,7 +240,6 @@ const ehDono = item => !!S.hash && item.owner_hash === S.hash;
 function acharItem(id){ return S.itens.concat(S.meus).find(s => String(s.id) === String(id)); }
 function acoesDe(item){
   const l = [
-    { act:'detalhes', ic:'fa-regular fa-message', txt:'Ler legenda' },
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
   ];
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
@@ -266,8 +264,7 @@ function criarCard(item, i){
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
         <span class="meta" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
       </div>
-      <p class="cap" data-act="detalhes">${esc(item.caption) || 'Sem legenda.'}</p>
-      <button class="ver" type="button" data-act="detalhes">Ler legenda <i class="fa-solid fa-angle-right"></i></button>
+      <p class="cap" tabindex="0">${esc(item.caption) || 'Sem legenda.'}</p>
     </div>
     <div class="foot">
       <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
@@ -279,7 +276,7 @@ function criarCard(item, i){
   return card;
 }
 function anexar(lista, reset){
-  const grid = $('muralGrid'); if (reset){ grid.innerHTML = ''; fecharPop(); }
+  const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
   lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
 }
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
@@ -318,41 +315,6 @@ async function copiarLink(id){
   catch(_){ const t = document.createElement('textarea'); t.value = it.link_url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
   aviso('Link copiado');
 }
-/* Balão da legenda: flutua ao lado do card, não mexe em nada do layout nem na imagem */
-let popId = null;
-const cardDe = id => document.querySelector(`.card[data-id="${CSS.escape(String(id))}"]`);
-function fecharPop(){ $('pop').hidden = true; popId = null; }
-function posicionarPop(card){
-  const p = $('pop'), r = card.getBoundingClientRect(), vw = innerWidth, vh = innerHeight;
-  const w = Math.min(Math.max(r.width, 280), 360, vw - 16);
-  p.style.width = w + 'px';
-  const h = p.offsetHeight;
-  let left = Math.min(Math.max(8, r.left + r.width/2 - w/2), vw - w - 8);
-  const abaixo = vh - r.bottom, acima = r.top;
-  const embaixo = abaixo >= h + 16 || abaixo >= acima;
-  let top = embaixo ? r.bottom + 10 : r.top - h - 10;
-  top = Math.min(Math.max(8, top), vh - h - 8);
-  p.style.left = left + 'px'; p.style.top = top + 'px';
-  p.style.setProperty('--ax', Math.min(Math.max(22, r.left + r.width/2 - left), w - 22) + 'px');
-  p.classList.toggle('up', !embaixo);
-}
-function abrirDetalhes(id){
-  if (popId === String(id) && !$('pop').hidden){ fecharPop(); return; }
-  const card = cardDe(id), it = acharItem(id); if (!card || !it) return;
-  $('popTxt').textContent = it.caption || 'Sem legenda.'; $('popTxt').scrollTop = 0;
-  popId = String(id); $('pop').hidden = false; posicionarPop(card);
-}
-let _pr;
-function seguirPop(){
-  if ($('pop').hidden) return;
-  cancelAnimationFrame(_pr);
-  _pr = requestAnimationFrame(() => {
-    const card = cardDe(popId); if (!card) return fecharPop();
-    const r = card.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return fecharPop();
-    posicionarPop(card);
-  });
-}
-addEventListener('scroll', seguirPop, { passive:true }); addEventListener('resize', seguirPop);
 async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
@@ -558,14 +520,12 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
-  if (!e.target.closest('#pop') && !(el && el.dataset.act === 'detalhes')) fecharPop();
   if (!el) return;
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
   switch (a){
     case 'novo': abrirPublicar(); break;
     case 'menu': abrirMenu(el, id); break;
-    case 'detalhes': abrirDetalhes(id); break;
     case 'copiar': copiarLink(id); break;
     case 'compartilhar': compartilhar(id); break;
     case 'editar': abrirEditar(id); break;
