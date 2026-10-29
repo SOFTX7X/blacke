@@ -21,3 +21,5 @@ Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública)
 ## Preparado para o painel admin (ainda não incluído)
 O banco já tem: `denuncias` (motivo, detalhe, data, resolvida), `perfis.suspenso` e `sites_publicos.oculto`.
 Moderação manual por enquanto: veja os comandos no final do `supabase-2-arroba.sql`.
+
+- Botão **Comunidade** no topo, ao lado de "Publicar link", leva ao Telegram (https://t.me/BlackeLavex). No celular aparece só o ícone.

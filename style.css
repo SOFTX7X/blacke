@@ -301,3 +301,14 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 .card .cap::-webkit-scrollbar-thumb{background:#4a4fa8;border-radius:4px}
 .card .cap:hover::-webkit-scrollbar-thumb,.card .cap:focus::-webkit-scrollbar-thumb{background:var(--violet)}
 .card .body{padding-bottom:2px}
+
+/* ===== v14: botão Comunidade (Telegram) ao lado de Publicar ===== */
+.top-actions{display:flex;align-items:center;gap:10px}
+.top-actions .btn-ghost{padding:11px 18px;font-size:14px;border-radius:12px;text-decoration:none}
+.top-actions .btn-ghost i{font-size:17px;color:var(--ice);transition:transform .25s}
+.top-actions .btn-ghost:hover i{transform:translateX(2px) rotate(-8deg)}
+@media (max-width:640px){
+  .top-actions{gap:8px}
+  .top-actions .btn-ghost span{display:none}
+  .top-actions .btn-ghost{padding:11px 13px}
+}
