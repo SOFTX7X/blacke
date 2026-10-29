@@ -15,7 +15,7 @@ Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública)
   - só reserva quem tem 1 site; troca a cada 30 dias (1h de tolerância); libera após 90 dias sem sites.
 - **Denúncias com motivo** (golpe, impróprio, link quebrado, outro). 5 denúncias tiram o site do mural.
 - **Posição da foto**: ao publicar/editar, arraste a imagem dentro da prévia para escolher o enquadramento.
-- Editar/excluir só aparecem na aba "Meus sites".
+- Cards de altura fixa; "Ver detalhes" abre a ficha do site (capa inteira, estatísticas, link, setas ←/→ para trocar de site, arrastar para baixo fecha no celular); o menu ⋯ concentra copiar link, denunciar e (em "Meus sites") editar/excluir.
 - Categorias, ordenar por acessos, contador de acessos, "Carregar mais", limite de 10 sites por chave.
 
 ## Preparado para o painel admin (ainda não incluído)

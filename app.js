@@ -243,6 +243,7 @@ function acoesDe(item){
     { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
   ];
+  if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
   if (ehDono(item)){
     if (S.aba === 'meus') l.push({ act:'editar', ic:'fa-solid fa-pen', txt:'Editar' }, { act:'excluir', ic:'fa-solid fa-trash', txt:'Excluir', danger:true });
   } else l.push({ act:'denunciar', ic:'fa-regular fa-flag', txt:'Denunciar' });
@@ -316,22 +317,58 @@ async function copiarLink(id){
   catch(_){ const t = document.createElement('textarea'); t.value = it.link_url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
   aviso('Link copiado');
 }
+let detId = null;
+const listaAtual = () => S.aba === 'meus' ? S.meus : S.itens;
+function hostDe(u){ try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } }
 function abrirDetalhes(id){
   const it = acharItem(id); if (!it) return;
+  detId = String(it.id);
   const n = it.cliques || 0;
-  $('dtImg').src = it.image_url; $('dtImg').style.objectPosition = posSegura(it.img_pos);
+  $('dtBg').src = $('dtImg').src = it.image_url;
   $('dtCat').textContent = it.categoria || 'Outros'; $('dtNome').textContent = it.brand_name;
   const ar = $('dtArroba'); ar.hidden = !it.handle; ar.textContent = it.handle ? '@' + it.handle : ''; ar.dataset.h = it.handle || '';
-  $('dtAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
-  $('dtData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString('pt-BR') : '';
+  $('dtAcessos').textContent = n;
+  $('dtData').textContent = it.created_at ? new Date(it.created_at).toLocaleDateString('pt-BR') : '—';
   $('dtLegenda').textContent = it.caption || 'Sem legenda.';
-  $('dtUrl').textContent = it.link_url;
-  const outras = acoesDe(it).filter(a => a.act !== 'detalhes');
+  $('dtHost').textContent = hostDe(it.link_url); $('dtUrl').textContent = it.link_url;
+  $('dtCopy').dataset.id = it.id; $('dtScroll').scrollTop = 0;
+  const outras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
   $('dtFoot').innerHTML = `
     <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-    <div class="dt-acts">${outras.map(a => `<button class="btn-ghost${a.danger ? ' btn-danger' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}"><i class="${a.ic}"></i> ${a.txt}</button>`).join('')}</div>`;
+    ${outras.map(a => `<button class="sq${a.danger ? ' del' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" title="${a.txt}" aria-label="${a.txt}"><i class="${a.ic}"></i></button>`).join('')}`;
+  const l = listaAtual(), i = l.findIndex(s => String(s.id) === detId);
+  $('dtPrev').hidden = $('dtNext').hidden = l.length < 2 || i < 0;
+  $('dtPrev').disabled = i <= 0; $('dtNext').disabled = i < 0 || i >= l.length - 1;
+  $('dtPos').textContent = l.length > 1 && i >= 0 ? `${i + 1} / ${l.length}` : '';
   abrir('modalDetalhes');
 }
+function navegarFicha(dir){
+  const l = listaAtual(), i = l.findIndex(s => String(s.id) === detId), p = l[i + dir];
+  if (p) abrirDetalhes(p.id);
+}
+async function compartilhar(id){
+  const it = acharItem(id); if (!it) return;
+  try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
+}
+addEventListener('keydown', e => {
+  if ($('modalDetalhes').hidden || document.querySelector('.modal:not([hidden]):not(#modalDetalhes)')) return;
+  if (e.key === 'ArrowLeft') navegarFicha(-1); else if (e.key === 'ArrowRight') navegarFicha(1);
+});
+/* Celular: arrastar a capa para baixo fecha a ficha */
+(function arrastarFicha(){
+  const v = $('dtVisual'), f = document.querySelector('.ficha'); let y0 = null, dy = 0;
+  v.addEventListener('pointerdown', e => {
+    if (innerWidth > 760 || e.pointerType === 'mouse' || e.target.closest('button')) return;
+    y0 = e.clientY; dy = 0; v.setPointerCapture(e.pointerId); f.style.transition = 'none';
+  });
+  v.addEventListener('pointermove', e => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); f.style.transform = `translateY(${dy}px)`; });
+  const fim = () => {
+    if (y0 === null) return;
+    f.style.transition = 'transform .2s'; f.style.transform = ''; y0 = null;
+    if (dy > 90) fechar('modalDetalhes');
+  };
+  v.addEventListener('pointerup', fim); v.addEventListener('pointercancel', fim);
+})();
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
@@ -542,6 +579,8 @@ document.addEventListener('click', e => {
     case 'menu': abrirMenu(el, id); break;
     case 'detalhes': abrirDetalhes(id); break;
     case 'copiar': copiarLink(id); break;
+    case 'compartilhar': compartilhar(id); break;
+    case 'nav': navegarFicha(+el.dataset.dir); break;
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
