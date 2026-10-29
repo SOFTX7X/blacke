@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BLACKE LAVEX — Mural anônimo</title>
   <meta name="theme-color" content="#06070d">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,7 +21,7 @@
       <span class="logo-ring"><img id="logoImg" src="logo.png" alt="Logo BLACKE LAVEX"></span>
       <span class="brand-name">BLACKE <b>LAVEX</b></span>
     </a>
-    <button class="btn-primary" onclick="abrirModal()">
+    <button class="btn-primary" data-act="novo">
       <i class="fa-solid fa-plus"></i><span>Publicar link</span>
     </button>
   </header>
@@ -33,21 +32,49 @@
         <h1 id="heroTitle" data-text="Mural de sites e marcas">Mural de sites e marcas</h1>
         <p class="hero-sub">Publique seu link com capa e legenda. Sem conta, sem cadastro.</p>
       </div>
-      <div class="searchbar">
+      <div class="searchbar" id="searchbar">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="busca" type="search" placeholder="Buscar por nome ou legenda" autocomplete="off">
         <span id="contador" class="count"></span>
       </div>
     </section>
 
-    <section id="muralGrid" class="grid" aria-live="polite"></section>
+    <div class="toolbar">
+      <div class="tabs" role="tablist">
+        <button class="tab on" id="tabMural" role="tab" data-aba="mural">Mural</button>
+        <button class="tab" id="tabMeus" role="tab" data-aba="meus">Meus sites <span class="n" id="nMeus">0</span></button>
+      </div>
+      <div class="filtros" id="filtros">
+        <div class="chips" id="chips"></div>
+        <select id="ordem" class="select" aria-label="Ordenar">
+          <option value="recentes">Mais recentes</option>
+          <option value="acessos">Mais acessados</option>
+        </select>
+      </div>
+    </div>
 
+    <!-- Painel "Meus sites" -->
+    <section class="panel" id="painelMeus" hidden>
+      <div class="stats">
+        <div class="stat"><b id="stSites">0</b><span>sites</span></div>
+        <div class="stat"><b id="stAcessos">0</b><span>acessos</span></div>
+        <div class="stat"><b id="stLimite">10</b><span>vagas livres</span></div>
+      </div>
+      <div class="panel-btns">
+        <button class="btn-ghost" id="btnChave"><i class="fa-solid fa-key"></i> Minha chave</button>
+        <button class="btn-ghost btn-danger" id="btnExcluirTodos"><i class="fa-solid fa-trash-can"></i> Excluir todos</button>
+      </div>
+      <p class="panel-note">Seus sites são ligados a este navegador por uma chave secreta, não a uma conta. Guarde a chave para gerenciá-los em outro aparelho.</p>
+    </section>
+
+    <section id="muralGrid" class="grid" aria-live="polite"></section>
     <div id="estado" class="estado"></div>
+    <button id="maisBtn" class="btn-ghost mais" hidden>Carregar mais</button>
   </main>
 
   <footer>BLACKE LAVEX · rede privada</footer>
 
-  <!-- Modal -->
+  <!-- Publicar / editar -->
   <div id="modalCadastro" class="modal" hidden>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
       <div class="sheet-head">
@@ -59,31 +86,68 @@
       <div id="uploadArea" class="upload" onclick="document.getElementById('fileInput').click()" tabindex="0">
         <i class="fa-solid fa-image"></i>
         <span>Clique para escolher a imagem de capa</span>
-        <small>até 5 MB</small>
+        <small>a imagem é reduzida automaticamente</small>
       </div>
       <input type="file" id="fileInput" accept="image/*" hidden onchange="processarImagem(event)">
       <div id="previewContainer" class="preview" hidden>
         <img id="imagePreview" src="" alt="Prévia da capa">
-        <button class="icon-btn trash" onclick="removerImagem()" aria-label="Remover imagem"><i class="fa-solid fa-trash"></i></button>
+        <button class="icon-btn trash" onclick="removerImagem()" aria-label="Trocar imagem"><i class="fa-solid fa-trash"></i></button>
       </div>
 
       <label class="field-label" for="inputNome">Nome da marca ou site</label>
       <input class="field" type="text" id="inputNome" placeholder="Ex: Anonymous BR" maxlength="60">
 
       <label class="field-label" for="inputLink">Link</label>
-      <input class="field" type="url" id="inputLink" placeholder="https://">
+      <input class="field" type="url" id="inputLink" placeholder="https://" maxlength="500">
+
+      <label class="field-label" for="inputCat">Categoria</label>
+      <select class="field" id="inputCat"></select>
 
       <label class="field-label" for="inputLegenda">Legenda</label>
       <textarea class="field" id="inputLegenda" rows="3" placeholder="Em uma ou duas frases, o que as pessoas encontram aí?" maxlength="200"></textarea>
+      <div class="hint"><span id="legCount">0</span>/200</div>
 
       <div id="formErro" class="erro" hidden></div>
-
       <button class="btn-primary wide" id="btnSalvar" onclick="salvarSite()">Publicar</button>
     </div>
   </div>
 
-  <div id="toast" class="toast" role="status"></div>
+  <!-- Confirmação -->
+  <div id="modalConfirma" class="modal" hidden>
+    <div class="sheet small" role="alertdialog" aria-modal="true" aria-labelledby="cfTitulo">
+      <h3 id="cfTitulo"></h3>
+      <p id="cfTexto" class="sheet-text"></p>
+      <div class="sheet-btns">
+        <button class="btn-ghost" id="cfNo">Cancelar</button>
+        <button class="btn-primary" id="cfOk">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Chave -->
+  <div id="modalChave" class="modal" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="chTitulo">
+      <div class="sheet-head">
+        <h3 id="chTitulo">Minha chave</h3>
+        <button class="icon-btn" onclick="fechar('modalChave')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="sheet-text">É ela que prova que os sites são seus. Quem tiver essa chave consegue editar e excluir seus sites, então não compartilhe. Se limpar os dados do navegador, você perde o acesso, a menos que tenha guardado a chave.</p>
+      <label class="field-label" for="chaveAtual">Chave deste navegador</label>
+      <div class="key-row">
+        <input class="field mono" id="chaveAtual" type="password" readonly>
+        <button class="btn-ghost" id="btnVerChave" aria-label="Mostrar chave"><i class="fa-solid fa-eye"></i></button>
+        <button class="btn-ghost" id="btnCopiarChave"><i class="fa-regular fa-copy"></i> Copiar</button>
+      </div>
+      <label class="field-label" for="chaveNova">Já tem uma chave? Cole aqui para recuperar seus sites</label>
+      <div class="key-row">
+        <input class="field mono" id="chaveNova" type="text" placeholder="64 caracteres" autocomplete="off" spellcheck="false">
+        <button class="btn-ghost" id="btnUsarChave">Usar</button>
+      </div>
+      <div id="chaveErro" class="erro" hidden></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
 </html>

@@ -2,21 +2,33 @@ const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let imagemBase64 = "";
-let registros = [];
-
 const $ = id => document.getElementById(id);
 
-/* Segurança: nunca injetar texto de usuário como HTML */
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function urlSegura(u){ return /^https?:\/\//i.test(u) ? esc(u) : '#'; }
+const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash';
+const PAGE = 24, LIMITE = 10;
+const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
+const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
+            itens:[], meus:[], token:'', hash:'', total:0 };
+let imagemBase64 = '', editId = null;
 
-/* Toast */
+/* ---------- utilidades ---------- */
+function esc(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function urlSegura(u){ return /^https?:\/\//i.test(u) ? esc(u) : '#'; }
+function lerLS(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+function gravarLS(k,v){ try{ localStorage.setItem(k,v); }catch(_){} }
 function aviso(msg){
   const t = $('toast'); t.textContent = msg; t.classList.add('on');
-  clearTimeout(aviso._t); aviso._t = setTimeout(() => t.classList.remove('on'), 2800);
+  clearTimeout(aviso._t); aviso._t = setTimeout(() => t.classList.remove('on'), 3000);
+}
+const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('');
+async function sha256(t){ return hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t))); }
+
+/* ---------- chave do dono (sem login) ---------- */
+async function iniciarChave(){
+  let t = lerLS('bl_chave');
+  if (!/^[0-9a-f]{64}$/.test(t || '')){ t = hex(crypto.getRandomValues(new Uint8Array(32))); gravarLS('bl_chave', t); }
+  S.token = t;
+  try{ S.hash = await sha256(t); }catch(_){ S.hash = ''; }
 }
 
 /* Título que "decodifica" ao carregar */
@@ -63,14 +75,64 @@ function aviso(msg){
   requestAnimationFrame(draw);
 })();
 
-/* Modal */
-function abrirModal(){ document.body.classList.add('modal-open'); $('modalCadastro').hidden = false; setTimeout(() => $('inputNome').focus(), 60); }
-function fecharModal(){ document.body.classList.remove('modal-open'); $('modalCadastro').hidden = true; $('formErro').hidden = true; removerImagem(); }
-addEventListener('keydown', e => { if (e.key === 'Escape' && !$('modalCadastro').hidden) fecharModal(); });
-$('modalCadastro').addEventListener('mousedown', e => { if (e.target.id === 'modalCadastro') fecharModal(); });
-$('uploadArea').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
 
-/* Reduz a imagem antes de enviar (900px, JPEG) — deixa o mural muito mais leve */
+/* ---------- modais ---------- */
+function abrir(id){ $(id).hidden = false; document.body.classList.add('modal-open'); }
+function fechar(id){
+  $(id).hidden = true;
+  if (!document.querySelector('.modal:not([hidden])')) document.body.classList.remove('modal-open');
+}
+function fecharTopo(m){
+  if (m.id === 'modalConfirma' && confirmar._fim) return confirmar._fim(false);
+  if (m.id === 'modalCadastro') return fecharModal();
+  fechar(m.id);
+}
+addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
+  if (abertos.length) fecharTopo(abertos[abertos.length-1]);
+});
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) fecharTopo(m); }));
+
+function confirmar({titulo, texto, botao}){
+  return new Promise(res => {
+    $('cfTitulo').textContent = titulo; $('cfTexto').textContent = texto; $('cfOk').textContent = botao || 'Confirmar';
+    abrir('modalConfirma');
+    const fim = v => { fechar('modalConfirma'); $('cfOk').onclick = $('cfNo').onclick = null; confirmar._fim = null; res(v); };
+    confirmar._fim = fim; $('cfOk').onclick = () => fim(true); $('cfNo').onclick = () => fim(false);
+    setTimeout(() => $('cfNo').focus(), 50);
+  });
+}
+
+/* ---------- formulário publicar / editar ---------- */
+$('inputCat').innerHTML = CATEGORIAS.map(c => `<option>${c}</option>`).join('');
+$('uploadArea').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
+$('inputLegenda').addEventListener('input', () => { $('legCount').textContent = $('inputLegenda').value.length; });
+function mostrarErro(m){ const d = $('formErro'); d.textContent = m; d.hidden = false; }
+
+function limparForm(){
+  ['inputNome','inputLink','inputLegenda'].forEach(id => $(id).value = '');
+  $('inputCat').value = 'Outros'; $('legCount').textContent = '0'; $('formErro').hidden = true; removerImagem();
+}
+function abrirPublicar(){
+  if (S.meus.length >= LIMITE){ aviso(`Você já tem ${LIMITE} sites. Exclua um para publicar outro.`); return; }
+  editId = null; limparForm();
+  $('modalTitulo').textContent = 'Publicar no mural'; $('btnSalvar').textContent = 'Publicar';
+  abrir('modalCadastro'); setTimeout(() => $('inputNome').focus(), 60);
+}
+function abrirEditar(id){
+  const it = S.meus.find(s => String(s.id) === String(id)); if (!it) return;
+  limparForm(); editId = String(it.id);
+  $('inputNome').value = it.brand_name || ''; $('inputLink').value = it.link_url || '';
+  $('inputLegenda').value = it.caption || ''; $('legCount').textContent = ($('inputLegenda').value).length;
+  $('inputCat').value = CATEGORIAS.includes(it.categoria) ? it.categoria : 'Outros';
+  $('imagePreview').src = it.image_url; $('previewContainer').hidden = false; $('uploadArea').hidden = true;
+  $('modalTitulo').textContent = 'Editar site'; $('btnSalvar').textContent = 'Salvar alterações';
+  abrir('modalCadastro');
+}
+function fecharModal(){ fechar('modalCadastro'); editId = null; $('formErro').hidden = true; removerImagem(); }
+
+/* Reduz a imagem antes de enviar (900px, JPEG) */
 function comprimir(file){
   return new Promise((ok, falha) => {
     const url = URL.createObjectURL(file), img = new Image();
@@ -95,16 +157,43 @@ async function processarImagem(event){
   }catch(_){ mostrarErro('Não foi possível ler essa imagem. Tente outra.'); }
 }
 function removerImagem(){
-  imagemBase64 = ""; $('fileInput').value = ""; $('imagePreview').src = "";
+  imagemBase64 = ''; $('fileInput').value = ''; $('imagePreview').src = '';
   $('previewContainer').hidden = true; $('uploadArea').hidden = false;
 }
-function mostrarErro(m){ const d = $('formErro'); d.textContent = m; d.hidden = false; }
 
-/* Cards */
+async function salvarSite(){
+  const nome = $('inputNome').value.trim(), link = $('inputLink').value.trim();
+  const legenda = $('inputLegenda').value.trim(), cat = $('inputCat').value;
+  const editando = !!editId, btn = $('btnSalvar'); $('formErro').hidden = true;
+
+  if (!editando && !imagemBase64) return mostrarErro('Escolha uma imagem de capa.');
+  if (!nome || !link) return mostrarErro('Preencha o nome e o link.');
+  if (!/^https?:\/\/\S+$/i.test(link)) return mostrarErro('O link precisa começar com http:// ou https://');
+
+  btn.disabled = true; btn.textContent = editando ? 'Salvando...' : 'Publicando...';
+  try{
+    if (editando){
+      const { data, error } = await _supabase.rpc('editar_meu_site', { p_id:editId, p_token:S.token, p_nome:nome, p_link:link, p_legenda:legenda, p_categoria:cat, p_imagem:imagemBase64 || null });
+      if (error) throw error;
+      if (!data) throw new Error('Esse site não pertence a esta chave.');
+    }else{
+      const { error } = await _supabase.rpc('publicar_site', { p_nome:nome, p_link:link, p_legenda:legenda, p_imagem:imagemBase64, p_categoria:cat, p_token:S.token });
+      if (error) throw error;
+    }
+    fecharModal(); aviso(editando ? 'Alterações salvas' : 'Publicado no mural');
+    await buscarMeus(); atualizarMeusUI();
+    if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
+  }catch(err){
+    mostrarErro('Não foi possível salvar: ' + (err.message || 'erro desconhecido'));
+  }finally{
+    btn.disabled = false; btn.textContent = editando ? 'Salvar alterações' : 'Publicar';
+  }
+}
+
+/* ---------- cards ---------- */
 function efeitoCard(card){
   card.addEventListener('pointermove', e => {
-    const r = card.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
     if (e.pointerType === 'mouse'){
       const rx = ((y/r.height) - .5) * -4, ry = ((x/r.width) - .5) * 5;
@@ -113,14 +202,9 @@ function efeitoCard(card){
   });
   card.addEventListener('pointerleave', () => { card.style.transform = ''; });
 }
-
-/* Legenda longa: "Ver mais / Ver menos" (ou toque na própria legenda) */
 function ligarLegenda(card){
   const p = card.querySelector('.cap'), b = card.querySelector('.more');
-  const alternar = () => {
-    const aberto = p.classList.toggle('open');
-    b.textContent = aberto ? 'Ver menos' : 'Ver mais';
-  };
+  const alternar = () => { const a = p.classList.toggle('open'); b.textContent = a ? 'Ver menos' : 'Ver mais'; };
   b.addEventListener('click', alternar);
   p.addEventListener('click', () => { if (p.classList.contains('can')) alternar(); });
 }
@@ -134,74 +218,193 @@ function medirLegendas(){
 }
 let _rz; addEventListener('resize', () => { clearTimeout(_rz); _rz = setTimeout(medirLegendas, 150); });
 
-function desenhar(lista){
-  const grid = $('muralGrid'); grid.innerHTML = '';
-  lista.forEach((item, i) => {
-    const card = document.createElement('article');
-    card.className = 'card'; card.style.setProperty('--i', Math.min(i, 12));
-    card.innerHTML = `
-      <div class="cover">
-        <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async"
-             onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
-      </div>
-      <div class="body">
-        <h3>${esc(item.brand_name)}</h3>
-        <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
-        <button class="more" type="button">Ver mais</button>
-      </div>
-      <a class="visit" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
+function criarCard(item, i){
+  const dono = !!S.hash && item.owner_hash === S.hash;
+  const n = item.cliques || 0;
+  const card = document.createElement('article');
+  card.className = 'card'; card.dataset.id = item.id; card.style.setProperty('--i', Math.min(i, 12));
+  const acoes = dono
+    ? `<button class="sq" data-act="editar" aria-label="Editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
+       <button class="sq del" data-act="excluir" aria-label="Excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>`
+    : `<button class="sq" data-act="denunciar" aria-label="Denunciar" title="Denunciar"><i class="fa-regular fa-flag"></i></button>`;
+  card.innerHTML = `
+    <div class="cover">
+      <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async"
+           onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
+      <span class="tag">${esc(item.categoria || 'Outros')}</span>
+      ${dono ? '<span class="mine">Seu</span>' : ''}
+    </div>
+    <div class="body">
+      <h3>${esc(item.brand_name)}</h3>
+      <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
+      <button class="more" type="button">Ver mais</button>
+      <small class="meta"><i class="fa-regular fa-eye"></i> ${n} ${n === 1 ? 'acesso' : 'acessos'}</small>
+    </div>
+    <div class="foot">
+      <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
         <span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-      </a>`;
-    efeitoCard(card); ligarLegenda(card); grid.appendChild(card);
-  });
+      </a>${acoes}
+    </div>`;
+  efeitoCard(card); ligarLegenda(card);
+  return card;
+}
+function anexar(lista, reset){
+  const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
+  lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
   requestAnimationFrame(medirLegendas);
-  const total = registros.length;
-  $('contador').textContent = lista.length === total ? `${total} ${total === 1 ? 'site' : 'sites'}` : `${lista.length} de ${total}`;
-  const est = $('estado'); est.className = 'estado';
-  est.innerHTML = lista.length ? '' : (total ? 'Nada encontrado para essa busca.' : 'O mural está vazio. Seja o primeiro a publicar.');
+}
+function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
+const BTN_NOVO = '<br><button class="btn-primary" data-act="novo" style="margin-top:14px"><i class="fa-solid fa-plus"></i> Publicar link</button>';
+function skeleton(){ $('muralGrid').innerHTML = '<div class="skeleton"></div>'.repeat(4); setEstado(''); $('maisBtn').hidden = true; }
+function erroCarga(err){
+  console.error(err);
+  $('muralGrid').innerHTML = ''; $('maisBtn').hidden = true;
+  const desatualizado = err && (err.code === '42703' || /column|function/i.test(err.message || ''));
+  setEstado(desatualizado ? 'O banco ainda não foi atualizado. Rode o arquivo supabase.sql no Supabase.' : 'Não foi possível carregar. Atualize a página em instantes.', true);
 }
 
-$('busca').addEventListener('input', e => {
-  const q = e.target.value.trim().toLowerCase();
-  desenhar(!q ? registros : registros.filter(r => (r.brand_name + ' ' + (r.caption || '')).toLowerCase().includes(q)));
+/* ---------- Mural ---------- */
+async function buscarMural(reset){
+  const meu = ++S.seq;
+  if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
+  try{
+    let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5);
+    if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
+    const t = S.busca.replace(/[%,()*\\]/g, ' ').trim();
+    if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%`);
+    q = S.ordem === 'acessos'
+      ? q.order('cliques', { ascending:false }).order('id', { ascending:false })
+      : q.order('created_at', { ascending:false }).order('id', { ascending:false });
+    const de = S.pagina * PAGE;
+    const { data, error, count } = await q.range(de, de + PAGE);
+    if (meu !== S.seq) return;            // chegou uma busca mais nova
+    if (error) throw error;
+    const lote = (data || []).slice(0, PAGE);
+    S.temMais = (data || []).length > PAGE; S.total = count ?? lote.length;
+    S.itens = S.itens.concat(lote);
+    anexar(lote, reset);
+    $('contador').textContent = `${S.total} ${S.total === 1 ? 'site' : 'sites'}`;
+    $('maisBtn').hidden = !S.temMais; $('maisBtn').disabled = false; $('maisBtn').textContent = 'Carregar mais';
+    if (!S.itens.length){
+      const filtrando = S.busca || S.cat !== 'Todas';
+      setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
+    } else setEstado('');
+  }catch(err){ if (meu === S.seq) erroCarga(err); }
+}
+
+/* ---------- Meus sites ---------- */
+async function buscarMeus(){
+  if (!S.hash){ S.meus = []; return; }
+  const { data, error } = await _supabase.from('sites_publicos').select(COLS).eq('owner_hash', S.hash)
+    .order('created_at', { ascending:false }).order('id', { ascending:false });
+  if (error) throw error;
+  S.meus = data || [];
+}
+function atualizarMeusUI(){
+  const n = S.meus.length, acessos = S.meus.reduce((a, s) => a + (s.cliques || 0), 0);
+  $('nMeus').textContent = n; $('stSites').textContent = n; $('stAcessos').textContent = acessos;
+  $('stLimite').textContent = Math.max(0, LIMITE - n); $('btnExcluirTodos').disabled = n === 0;
+}
+function desenharMeus(){
+  $('maisBtn').hidden = true; anexar(S.meus, true); atualizarMeusUI();
+  setEstado(S.meus.length ? '' : (S.hash ? 'Você ainda não publicou nenhum site neste navegador.' + BTN_NOVO : 'Seu navegador bloqueou o recurso de chave. Abra o site em https.'), !S.hash);
+}
+
+async function trocarAba(aba){
+  S.aba = aba;
+  $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus');
+  $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = aba !== 'meus';
+  if (aba === 'mural'){ buscarMural(true); return; }
+  skeleton();
+  try{ await buscarMeus(); desenharMeus(); }catch(err){ erroCarga(err); }
+}
+
+async function excluirUm(id){
+  const it = S.meus.find(s => String(s.id) === String(id)); if (!it) return;
+  if (!await confirmar({ titulo:'Excluir este site?', texto:`"${it.brand_name}" sai do mural para todo mundo. Não dá para desfazer.`, botao:'Excluir' })) return;
+  const { data, error } = await _supabase.rpc('excluir_meu_site', { p_id:String(id), p_token:S.token });
+  if (error || !data){ aviso('Não foi possível excluir. Tente de novo.'); return; }
+  aviso('Site excluído');
+  S.meus = S.meus.filter(s => String(s.id) !== String(id)); S.itens = S.itens.filter(s => String(s.id) !== String(id));
+  document.querySelector(`.card[data-id="${CSS.escape(String(id))}"]`)?.remove();
+  atualizarMeusUI();
+  if (S.aba === 'meus') desenharMeus();
+}
+async function excluirTodos(){
+  const n = S.meus.length; if (!n) return;
+  if (!await confirmar({ titulo:`Excluir ${n === 1 ? 'seu site' : 'todos os seus ' + n + ' sites'}?`, texto:'Tudo que você publicou com esta chave sai do mural. Não dá para desfazer.', botao:'Excluir tudo' })) return;
+  const { data, error } = await _supabase.rpc('excluir_meus_sites', { p_token:S.token });
+  if (error){ aviso('Não foi possível excluir. Tente de novo.'); return; }
+  aviso(`${data} ${data === 1 ? 'site excluído' : 'sites excluídos'}`);
+  S.meus = []; S.itens = S.itens.filter(s => s.owner_hash !== S.hash); desenharMeus();
+}
+
+/* ---------- denúncia e cliques ---------- */
+function jaDenunciou(id){ try{ return JSON.parse(lerLS('bl_den') || '[]').includes(String(id)); }catch(_){ return false; } }
+async function denunciar(id){
+  if (jaDenunciou(id)){ aviso('Você já denunciou este site.'); return; }
+  if (!await confirmar({ titulo:'Denunciar este site?', texto:'Use para links perigosos, golpes ou conteúdo que não deveria estar aqui. Sites muito denunciados saem do mural.', botao:'Denunciar' })) return;
+  const { error } = await _supabase.rpc('denunciar_site', { p_id:String(id) });
+  if (error){ aviso('Não foi possível enviar a denúncia.'); return; }
+  try{ const l = JSON.parse(lerLS('bl_den') || '[]'); l.push(String(id)); gravarLS('bl_den', JSON.stringify(l)); }catch(_){}
+  aviso('Denúncia enviada. Obrigado.');
+}
+function registrarClique(id){
+  const k = 'bl_c_' + id;
+  try{ if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1'); }catch(_){}
+  _supabase.rpc('registrar_clique', { p_id:String(id) }).then(() => {}, () => {});
+}
+
+/* ---------- chave ---------- */
+$('btnChave').addEventListener('click', () => {
+  $('chaveAtual').value = S.token; $('chaveAtual').type = 'password'; $('chaveNova').value = ''; $('chaveErro').hidden = true;
+  abrir('modalChave');
 });
+$('btnVerChave').addEventListener('click', () => { const i = $('chaveAtual'); i.type = i.type === 'password' ? 'text' : 'password'; });
+$('btnCopiarChave').addEventListener('click', async () => {
+  try{ await navigator.clipboard.writeText(S.token); }
+  catch(_){ const i = $('chaveAtual'); i.type = 'text'; i.select(); document.execCommand('copy'); i.type = 'password'; }
+  aviso('Chave copiada. Guarde em um lugar seguro.');
+});
+$('btnUsarChave').addEventListener('click', async () => {
+  const nova = $('chaveNova').value.trim().toLowerCase(), erro = $('chaveErro');
+  if (!/^[0-9a-f]{64}$/.test(nova)){ erro.textContent = 'Chave inválida. Ela tem 64 caracteres (0-9 e a-f).'; erro.hidden = false; return; }
+  if (nova === S.token){ erro.textContent = 'Essa já é a chave deste navegador.'; erro.hidden = false; return; }
+  if (S.meus.length && !await confirmar({ titulo:'Trocar de chave?', texto:'Os sites desta chave atual só serão gerenciáveis de novo se você tiver guardado ela. Copie antes se precisar.', botao:'Trocar' })) return;
+  gravarLS('bl_chave', nova); await iniciarChave();
+  try{ await buscarMeus(); }catch(_){ S.meus = []; }
+  fechar('modalChave'); atualizarMeusUI(); aviso(`Chave restaurada: ${S.meus.length} ${S.meus.length === 1 ? 'site encontrado' : 'sites encontrados'}`);
+  if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
+});
+$('btnExcluirTodos').addEventListener('click', excluirTodos);
 
-async function carregarMural(){
-  const grid = $('muralGrid');
-  grid.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
-  try{
-    const { data, error } = await _supabase.from('sites_publicos').select('*').order('id', { ascending:false });
-    if (error) throw error;
-    registros = data || [];
-    desenhar(registros);
-  }catch(err){
-    grid.innerHTML = '';
-    const est = $('estado'); est.className = 'estado warn';
-    est.textContent = 'Não foi possível carregar o mural. Atualize a página em instantes.';
+/* ---------- eventos gerais ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const id = el.closest('.card')?.dataset.id;
+  switch (el.dataset.act){
+    case 'novo': abrirPublicar(); break;
+    case 'editar': abrirEditar(id); break;
+    case 'excluir': excluirUm(id); break;
+    case 'denunciar': denunciar(id); break;
+    case 'visitar': registrarClique(id); break;
   }
-}
+});
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
-async function salvarSite(){
-  const nome = $('inputNome').value.trim(), link = $('inputLink').value.trim(), legenda = $('inputLegenda').value.trim();
-  const btn = $('btnSalvar'); $('formErro').hidden = true;
+$('chips').innerHTML = ['Todas', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c}</button>`).join('');
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
+  S.cat = b.dataset.cat; buscarMural(true);
+});
+$('ordem').addEventListener('change', e => { S.ordem = e.target.value; buscarMural(true); });
+let _bt; $('busca').addEventListener('input', e => { clearTimeout(_bt); _bt = setTimeout(() => { S.busca = e.target.value.trim(); buscarMural(true); }, 350); });
+$('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('maisBtn').textContent = 'Carregando...'; S.pagina++; buscarMural(false); });
 
-  if (!imagemBase64) return mostrarErro('Escolha uma imagem de capa.');
-  if (!nome || !link) return mostrarErro('Preencha o nome e o link.');
-  if (!/^https?:\/\//i.test(link)) return mostrarErro('O link precisa começar com http:// ou https://');
-
-  btn.disabled = true; btn.textContent = 'Publicando...';
-  try{
-    const { error } = await _supabase.from('sites_publicos').insert([{ brand_name:nome, image_url:imagemBase64, link_url:link, caption:legenda }]);
-    if (error) throw error;
-    fecharModal();
-    ['inputNome','inputLink','inputLegenda'].forEach(id => $(id).value = '');
-    aviso('Publicado no mural');
-    carregarMural();
-  }catch(err){
-    mostrarErro('Não foi possível publicar: ' + err.message);
-  }finally{
-    btn.disabled = false; btn.textContent = 'Publicar';
-  }
-}
-
-carregarMural();
+/* ---------- início ---------- */
+(async function iniciar(){
+  await iniciarChave();
+  try{ await buscarMeus(); }catch(_){ S.meus = []; }
+  atualizarMeusUI(); buscarMural(true);
+})();
