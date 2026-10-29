@@ -234,3 +234,16 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
   .pf-avatar{width:40px;height:40px}
   #pfLimpar{padding:9px 11px}#pfLimpar{font-size:0}#pfLimpar i{font-size:14px}
 }
+
+/* ===== v7: arrastar a foto ===== */
+.preview{height:auto;aspect-ratio:16/11;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.preview.drag{cursor:grabbing}
+.preview img{pointer-events:none;-webkit-user-drag:none;object-position:50% 50%}
+.dica{position:absolute;left:10px;bottom:10px;z-index:2;font:500 12px var(--mono);padding:5px 10px;border-radius:99px;background:rgba(6,7,13,.82);border:1px solid var(--line);color:var(--text);transition:opacity .3s;pointer-events:none}
+.dica.off{opacity:0}
+.centra{position:absolute;right:10px;bottom:10px;z-index:2;font:600 12px var(--display);padding:6px 11px;border-radius:99px;background:rgba(6,7,13,.82);border:1px solid var(--line);color:var(--text);cursor:pointer}
+.centra:hover{border-color:var(--violet)}
+.visit span{white-space:nowrap}
+.sq{width:38px}
+.foot{gap:6px}
+@media (max-width:640px){.sq{width:36px}}

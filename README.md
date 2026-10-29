@@ -5,7 +5,8 @@ Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública)
 ## Como atualizar (nesta ordem)
 1. Supabase > **SQL Editor**:
    - se ainda não rodou nada da v5: rode `supabase-1-base.sql` e depois `supabase-2-arroba.sql`;
-   - se já rodou o da v5: rode só `supabase-2-arroba.sql`.
+   - se já rodou o da v5: rode só `supabase-2-arroba.sql`;
+   - depois rode `supabase-3-posicao-foto.sql` (posição da foto de capa).
 2. Suba os arquivos para o GitHub (a Vercel publica sozinha).
 
 ## Recursos
@@ -13,6 +14,8 @@ Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública)
 - **@ de perfil**: nome único ligado à chave. Busque `@nome` para ver todos os sites daquele perfil.
   - só reserva quem tem 1 site; troca a cada 30 dias (1h de tolerância); libera após 90 dias sem sites.
 - **Denúncias com motivo** (golpe, impróprio, link quebrado, outro). 5 denúncias tiram o site do mural.
+- **Posição da foto**: ao publicar/editar, arraste a imagem dentro da prévia para escolher o enquadramento.
+- Editar/excluir só aparecem na aba "Meus sites".
 - Categorias, ordenar por acessos, contador de acessos, "Carregar mais", limite de 10 sites por chave.
 
 ## Preparado para o painel admin (ainda não incluído)

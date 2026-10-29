@@ -4,12 +4,13 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 
-const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle';
+const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos';
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
 const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
             itens:[], meus:[], token:'', hash:'', total:0, perfil:null };
 let imagemBase64 = '', editId = null;
+let pos = { x:50, y:50 };   // posição da foto de capa (object-position, em %)
 
 /* ---------- utilidades ---------- */
 function esc(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -126,11 +127,37 @@ function abrirEditar(id){
   $('inputNome').value = it.brand_name || ''; $('inputLink').value = it.link_url || '';
   $('inputLegenda').value = it.caption || ''; $('legCount').textContent = ($('inputLegenda').value).length;
   $('inputCat').value = CATEGORIAS.includes(it.categoria) ? it.categoria : 'Outros';
-  $('imagePreview').src = it.image_url; $('previewContainer').hidden = false; $('uploadArea').hidden = true;
+  $('imagePreview').src = it.image_url; pos = lerPos(it.img_pos); aplicarPos(); $('dicaPos').classList.remove('off');
+  $('previewContainer').hidden = false; $('uploadArea').hidden = true;
   $('modalTitulo').textContent = 'Editar site'; $('btnSalvar').textContent = 'Salvar alterações';
   abrir('modalCadastro');
 }
 function fecharModal(){ fechar('modalCadastro'); editId = null; $('formErro').hidden = true; removerImagem(); }
+
+/* Posição da foto: arraste dentro da prévia (mouse segurando, ou dedo no celular) */
+const posStr = () => `${Math.round(pos.x)}% ${Math.round(pos.y)}%`;
+function aplicarPos(){ $('imagePreview').style.objectPosition = posStr(); }
+function lerPos(s){ const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m ? { x:Math.min(100, +m[1]), y:Math.min(100, +m[2]) } : { x:50, y:50 }; }
+(function arrastarFoto(){
+  const f = $('previewContainer'), img = $('imagePreview'); let d = null;
+  const lim = v => Math.max(0, Math.min(100, v));
+  f.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    const W = f.clientWidth, H = f.clientHeight, nw = img.naturalWidth, nh = img.naturalHeight; if (!nw) return;
+    const s = Math.max(W/nw, H/nh);
+    d = { x:e.clientX, y:e.clientY, p:{ ...pos }, ox:nw*s - W, oy:nh*s - H };
+    f.setPointerCapture(e.pointerId); f.classList.add('drag'); $('dicaPos').classList.add('off');
+  });
+  f.addEventListener('pointermove', e => {
+    if (!d) return;
+    if (d.ox > 1) pos.x = lim(d.p.x - (e.clientX - d.x) / d.ox * 100);
+    if (d.oy > 1) pos.y = lim(d.p.y - (e.clientY - d.y) / d.oy * 100);
+    aplicarPos();
+  });
+  const fim = () => { d = null; f.classList.remove('drag'); };
+  f.addEventListener('pointerup', fim); f.addEventListener('pointercancel', fim);
+  $('btnCentralizar').addEventListener('click', () => { pos = { x:50, y:50 }; aplicarPos(); });
+})();
 
 /* Reduz a imagem antes de enviar (900px, JPEG) */
 function comprimir(file){
@@ -152,12 +179,13 @@ async function processarImagem(event){
   if (file.size > 15*1024*1024){ mostrarErro('A imagem passa de 15 MB. Escolha uma menor.'); return; }
   try{
     imagemBase64 = await comprimir(file);
+    pos = { x:50, y:50 }; aplicarPos(); $('dicaPos').classList.remove('off');
     $('imagePreview').src = imagemBase64;
     $('previewContainer').hidden = false; $('uploadArea').hidden = true; $('formErro').hidden = true;
   }catch(_){ mostrarErro('Não foi possível ler essa imagem. Tente outra.'); }
 }
 function removerImagem(){
-  imagemBase64 = ''; $('fileInput').value = ''; $('imagePreview').src = '';
+  imagemBase64 = ''; $('fileInput').value = ''; $('imagePreview').src = ''; pos = { x:50, y:50 }; aplicarPos();
   $('previewContainer').hidden = true; $('uploadArea').hidden = false;
 }
 
@@ -176,9 +204,11 @@ async function salvarSite(){
       const { data, error } = await _supabase.rpc('editar_meu_site', { p_id:editId, p_token:S.token, p_nome:nome, p_link:link, p_legenda:legenda, p_categoria:cat, p_imagem:imagemBase64 || null });
       if (error) throw error;
       if (!data) throw new Error('Esse site não pertence a esta chave.');
+      await _supabase.rpc('ajustar_posicao_foto', { p_id:editId, p_token:S.token, p_pos:posStr() });
     }else{
-      const { error } = await _supabase.rpc('publicar_site', { p_nome:nome, p_link:link, p_legenda:legenda, p_imagem:imagemBase64, p_categoria:cat, p_token:S.token });
+      const { data: novoId, error } = await _supabase.rpc('publicar_site', { p_nome:nome, p_link:link, p_legenda:legenda, p_imagem:imagemBase64, p_categoria:cat, p_token:S.token });
       if (error) throw error;
+      if (novoId && posStr() !== '50% 50%') await _supabase.rpc('ajustar_posicao_foto', { p_id:String(novoId), p_token:S.token, p_pos:posStr() });
     }
     fecharModal(); aviso(editando ? 'Alterações salvas' : 'Publicado no mural');
     await buscarMeus(); atualizarMeusUI();
@@ -218,21 +248,21 @@ function medirLegendas(){
 }
 let _rz; addEventListener('resize', () => { clearTimeout(_rz); _rz = setTimeout(medirLegendas, 150); });
 
-function criarCard(item, i){
+const posSegura = s => /^(100|\d{1,2})% (100|\d{1,2})%$/.test(s || '') ? s : '50% 50%';
+function criarCard(item, i, modo){
   const dono = !!S.hash && item.owner_hash === S.hash;
   const n = item.cliques || 0;
   const card = document.createElement('article');
   card.className = 'card'; card.dataset.id = item.id; card.style.setProperty('--i', Math.min(i, 12));
-  const acoes = dono
+  const acoes = (modo === 'meus' && dono)
     ? `<button class="sq" data-act="editar" aria-label="Editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
        <button class="sq del" data-act="excluir" aria-label="Excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>`
-    : `<button class="sq" data-act="denunciar" aria-label="Denunciar" title="Denunciar"><i class="fa-regular fa-flag"></i></button>`;
+    : (dono ? '' : `<button class="sq" data-act="denunciar" aria-label="Denunciar" title="Denunciar"><i class="fa-regular fa-flag"></i></button>`);
   card.innerHTML = `
     <div class="cover">
-      <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async"
+      <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
-      ${dono ? '<span class="mine">Seu</span>' : ''}
     </div>
     <div class="body">
       <h3>${esc(item.brand_name)}</h3>
@@ -251,7 +281,7 @@ function criarCard(item, i){
 }
 function anexar(lista, reset){
   const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
-  lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
+  lista.forEach((it, i) => grid.appendChild(criarCard(it, i, S.aba)));
   requestAnimationFrame(medirLegendas);
 }
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
