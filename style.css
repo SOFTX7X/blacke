@@ -247,3 +247,69 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 .sq{width:38px}
 .foot{gap:6px}
 @media (max-width:640px){.sq{width:36px}}
+
+/* ===== v8: cards de altura fixa, menu ⋯ e detalhes ===== */
+.grid{align-items:stretch}
+.card{height:100%}
+.card .cover{aspect-ratio:16/10;cursor:pointer}
+.card .body{flex:1;display:flex;flex-direction:column;gap:0;padding:2px 14px 0;margin-top:-20px;cursor:pointer}
+.card .body h3{font-size:16.5px;line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line2{display:flex;align-items:center;justify-content:space-between;gap:8px;height:20px;margin-bottom:6px}
+.line2 .arroba{margin:0;min-width:0}
+.anon{font:400 12px var(--mono);color:#59608a}
+.line2 .meta{margin:0;flex:none}
+.card .cap{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.9em;font-size:13.5px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.ver{align-self:flex-start;height:18px;margin-top:6px;padding:0;background:none;border:0;color:var(--ice);font:600 12.5px var(--display);cursor:pointer}
+.ver i{font-size:10px;margin-left:2px;transition:transform .2s}
+.card:hover .ver i{transform:translateX(3px)}
+.card .foot{height:42px;margin:12px 14px 14px;flex:none}
+.card .foot .visit,.card .sq{height:42px}
+.card .foot .visit{padding:0 14px}
+
+/* menu ⋯ : popover no PC, folha de baixo no celular */
+#menuBack{position:fixed;inset:0;z-index:70}
+#menu{position:fixed;z-index:71;width:220px;padding:6px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 24px 60px -12px rgba(0,0,0,.8),0 0 0 1px rgba(123,108,255,.12);animation:pop .16s ease-out}
+.mi{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;color:var(--text);font:500 14px var(--display);padding:11px 12px;border-radius:9px;cursor:pointer;text-align:left}
+.mi i{width:18px;text-align:center;color:var(--muted)}
+.mi:hover,.mi:focus-visible{background:var(--panel-2);outline:0}
+.mi.danger,.mi.danger i{color:var(--amber)}
+
+/* detalhes */
+.sheet.det{position:relative;display:flex;flex-direction:column;max-width:480px;padding:0;overflow:hidden}
+.dt-close{position:absolute;top:12px;right:12px;z-index:3;background:rgba(6,7,13,.8)}
+.dt-cover{position:relative;flex:none;aspect-ratio:16/10;background:var(--panel-2)}
+.dt-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.dt-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,var(--panel))}
+.dt-cover .tag{left:14px;top:14px}
+.dt-body{padding:4px 22px 6px;overflow:auto;min-height:0;margin-top:-18px;position:relative;z-index:1}
+.dt-body h3{font-size:22px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.dt-meta{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;margin:8px 0 14px;font:400 12.5px var(--mono);color:var(--muted)}
+.dt-meta .arroba{margin:0;font-size:13px}
+.dt-body p{font-size:15px;line-height:1.6;color:#d3d6ea;white-space:pre-wrap;overflow-wrap:anywhere}
+.dt-link{display:flex;align-items:center;gap:9px;margin-top:16px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);font:400 12px var(--mono);color:var(--muted)}
+.dt-link span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dt-foot{flex:none;display:flex;flex-direction:column;gap:10px;padding:14px 22px 22px}
+.dt-foot .btn-primary{width:100%;padding:14px;text-decoration:none}
+.dt-acts{display:flex;gap:8px;flex-wrap:wrap}
+.dt-acts .btn-ghost{flex:1;min-width:110px}
+
+@media (max-width:640px){
+  .card .cover{aspect-ratio:4/3}
+  .card .body{padding:2px 10px 0;margin-top:-16px}
+  .card .body h3{font-size:14px}
+  .line2{height:18px;margin-bottom:4px}
+  .anon{font-size:11px}
+  .card .cap{font-size:12px}
+  .ver{height:16px;margin-top:4px;font-size:12px}
+  .card .foot{height:38px;margin:8px 10px 10px}
+  .card .foot .visit,.card .sq{height:38px}
+  .card .foot .visit{padding:0 8px}
+
+  #menuBack{background:rgba(3,4,10,.72)}
+  #menu{left:0!important;right:0;top:auto!important;bottom:0;width:auto;border-radius:22px 22px 0 0;padding:12px 10px calc(16px + env(safe-area-inset-bottom));animation:slideup .25s cubic-bezier(.2,.9,.3,1)}
+  #menu::before{content:"";display:block;width:38px;height:4px;border-radius:4px;background:#2c3266;margin:0 auto 10px}
+  .mi{padding:15px 14px;font-size:15.5px}
+  .sheet.det{max-height:94vh}
+  .dt-body{padding:4px 18px 6px}.dt-foot{padding:12px 18px 20px}
+}
+@keyframes slideup{from{transform:translateY(100%)}}

@@ -4,7 +4,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 
-const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos';
+const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos,created_at';
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
 const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
@@ -90,6 +90,7 @@ function fecharTopo(m){
 }
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (!$('menu').hidden){ fecharMenu(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
   if (abertos.length) fecharTopo(abertos[abertos.length-1]);
 });
@@ -232,57 +233,52 @@ function efeitoCard(card){
   });
   card.addEventListener('pointerleave', () => { card.style.transform = ''; });
 }
-function ligarLegenda(card){
-  const p = card.querySelector('.cap'), b = card.querySelector('.more');
-  const alternar = () => { const a = p.classList.toggle('open'); b.textContent = a ? 'Ver menos' : 'Ver mais'; };
-  b.addEventListener('click', alternar);
-  p.addEventListener('click', () => { if (p.classList.contains('can')) alternar(); });
-}
-function medirLegendas(){
-  document.querySelectorAll('.card').forEach(card => {
-    const p = card.querySelector('.cap'), b = card.querySelector('.more');
-    if (p.classList.contains('open')) return;
-    const longa = p.scrollHeight > p.clientHeight + 1;
-    p.classList.toggle('can', longa); b.classList.toggle('show', longa);
-  });
-}
-let _rz; addEventListener('resize', () => { clearTimeout(_rz); _rz = setTimeout(medirLegendas, 150); });
+
 
 const posSegura = s => /^(100|\d{1,2})% (100|\d{1,2})%$/.test(s || '') ? s : '50% 50%';
-function criarCard(item, i, modo){
-  const dono = !!S.hash && item.owner_hash === S.hash;
+const ehDono = item => !!S.hash && item.owner_hash === S.hash;
+function acharItem(id){ return S.itens.concat(S.meus).find(s => String(s.id) === String(id)); }
+function acoesDe(item){
+  const l = [
+    { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
+    { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
+  ];
+  if (ehDono(item)){
+    if (S.aba === 'meus') l.push({ act:'editar', ic:'fa-solid fa-pen', txt:'Editar' }, { act:'excluir', ic:'fa-solid fa-trash', txt:'Excluir', danger:true });
+  } else l.push({ act:'denunciar', ic:'fa-regular fa-flag', txt:'Denunciar' });
+  return l;
+}
+function criarCard(item, i){
   const n = item.cliques || 0;
   const card = document.createElement('article');
   card.className = 'card'; card.dataset.id = item.id; card.style.setProperty('--i', Math.min(i, 12));
-  const acoes = (modo === 'meus' && dono)
-    ? `<button class="sq" data-act="editar" aria-label="Editar" title="Editar"><i class="fa-solid fa-pen"></i></button>
-       <button class="sq del" data-act="excluir" aria-label="Excluir" title="Excluir"><i class="fa-solid fa-trash"></i></button>`
-    : (dono ? '' : `<button class="sq" data-act="denunciar" aria-label="Denunciar" title="Denunciar"><i class="fa-regular fa-flag"></i></button>`);
   card.innerHTML = `
-    <div class="cover">
+    <div class="cover" data-act="detalhes">
       <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
     </div>
-    <div class="body">
+    <div class="body" data-act="detalhes">
       <h3>${esc(item.brand_name)}</h3>
-      ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : ''}
+      <div class="line2">
+        ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
+        <span class="meta" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
+      </div>
       <p class="cap">${esc(item.caption) || 'Sem legenda.'}</p>
-      <button class="more" type="button">Ver mais</button>
-      <small class="meta"><i class="fa-regular fa-eye"></i> ${n} ${n === 1 ? 'acesso' : 'acessos'}</small>
+      <button class="ver" type="button" data-act="detalhes">Ver detalhes <i class="fa-solid fa-angle-right"></i></button>
     </div>
     <div class="foot">
       <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
         <span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-      </a>${acoes}
+      </a>
+      <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
-  efeitoCard(card); ligarLegenda(card);
+  efeitoCard(card);
   return card;
 }
 function anexar(lista, reset){
   const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
-  lista.forEach((it, i) => grid.appendChild(criarCard(it, i, S.aba)));
-  requestAnimationFrame(medirLegendas);
+  lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
 }
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
 const BTN_NOVO = '<br><button class="btn-primary" data-act="novo" style="margin-top:14px"><i class="fa-solid fa-plus"></i> Publicar link</button>';
@@ -292,6 +288,49 @@ function erroCarga(err){
   $('muralGrid').innerHTML = ''; $('maisBtn').hidden = true;
   const desatualizado = err && (err.code === '42703' || /column|function/i.test(err.message || ''));
   setEstado(desatualizado ? 'O banco ainda não foi atualizado. Rode o arquivo supabase.sql no Supabase.' : 'Não foi possível carregar. Atualize a página em instantes.', true);
+}
+
+/* ---------- menu ⋯, detalhes e copiar ---------- */
+let menuId = null;
+function fecharMenu(){ $('menu').hidden = true; $('menuBack').hidden = true; menuId = null; }
+function abrirMenu(btn, id){
+  if (menuId === String(id) && !$('menu').hidden){ fecharMenu(); return; }
+  const it = acharItem(id); if (!it) return;
+  const m = $('menu');
+  m.innerHTML = acoesDe(it).map(a => `<button class="mi${a.danger ? ' danger' : ''}" role="menuitem" data-act="${a.act}" data-id="${esc(id)}"><i class="${a.ic}"></i>${a.txt}</button>`).join('');
+  menuId = String(id); $('menuBack').hidden = false; m.hidden = false;
+  if (innerWidth > 640){
+    const r = btn.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+    m.style.left = Math.min(Math.max(8, r.right - w), innerWidth - w - 8) + 'px';
+    let top = r.bottom + 6; if (top + h > innerHeight - 8) top = Math.max(8, r.top - h - 6);
+    m.style.top = top + 'px';
+  }
+  m.querySelector('.mi')?.focus();
+}
+addEventListener('scroll', () => { if (!$('menu').hidden) fecharMenu(); }, { passive:true });
+addEventListener('resize', () => { if (!$('menu').hidden) fecharMenu(); });
+
+async function copiarLink(id){
+  const it = acharItem(id); if (!it) return;
+  try{ await navigator.clipboard.writeText(it.link_url); }
+  catch(_){ const t = document.createElement('textarea'); t.value = it.link_url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  aviso('Link copiado');
+}
+function abrirDetalhes(id){
+  const it = acharItem(id); if (!it) return;
+  const n = it.cliques || 0;
+  $('dtImg').src = it.image_url; $('dtImg').style.objectPosition = posSegura(it.img_pos);
+  $('dtCat').textContent = it.categoria || 'Outros'; $('dtNome').textContent = it.brand_name;
+  const ar = $('dtArroba'); ar.hidden = !it.handle; ar.textContent = it.handle ? '@' + it.handle : ''; ar.dataset.h = it.handle || '';
+  $('dtAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
+  $('dtData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString('pt-BR') : '';
+  $('dtLegenda').textContent = it.caption || 'Sem legenda.';
+  $('dtUrl').textContent = it.link_url;
+  const outras = acoesDe(it).filter(a => a.act !== 'detalhes');
+  $('dtFoot').innerHTML = `
+    <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    <div class="dt-acts">${outras.map(a => `<button class="btn-ghost${a.danger ? ' btn-danger' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}"><i class="${a.ic}"></i> ${a.txt}</button>`).join('')}</div>`;
+  abrir('modalDetalhes');
 }
 
 /* ---------- Mural ---------- */
@@ -492,10 +531,17 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 
 /* ---------- eventos gerais ---------- */
 document.addEventListener('click', e => {
-  const el = e.target.closest('[data-act]'); if (!el) return;
-  const id = el.closest('.card')?.dataset.id;
-  switch (el.dataset.act){
+  const el = e.target.closest('[data-act]');
+  if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
+  if (!el) return;
+  const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
+  if (el.closest('#menu')) fecharMenu();
+  if (['perfil','editar','excluir','denunciar'].includes(a) && !$('modalDetalhes').hidden) fechar('modalDetalhes');
+  switch (a){
     case 'novo': abrirPublicar(); break;
+    case 'menu': abrirMenu(el, id); break;
+    case 'detalhes': abrirDetalhes(id); break;
+    case 'copiar': copiarLink(id); break;
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;

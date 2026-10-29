@@ -205,6 +205,28 @@
     </div>
   </div>
 
+  <!-- Detalhes do site -->
+  <div id="modalDetalhes" class="modal" hidden>
+    <div class="sheet det" role="dialog" aria-modal="true" aria-labelledby="dtNome">
+      <button class="icon-btn dt-close" onclick="fechar('modalDetalhes')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      <div class="dt-cover"><img id="dtImg" alt=""><span class="tag" id="dtCat"></span></div>
+      <div class="dt-body">
+        <h3 id="dtNome"></h3>
+        <div class="dt-meta">
+          <button class="arroba" id="dtArroba" data-act="perfil" type="button" hidden></button>
+          <span id="dtAcessos"></span><span id="dtData"></span>
+        </div>
+        <p id="dtLegenda"></p>
+        <div class="dt-link"><i class="fa-solid fa-link"></i><span id="dtUrl"></span></div>
+      </div>
+      <div class="dt-foot" id="dtFoot"></div>
+    </div>
+  </div>
+
+  <!-- Menu ⋯ -->
+  <div id="menuBack" hidden></div>
+  <div id="menu" role="menu" hidden></div>
+
   <div id="toast" class="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
