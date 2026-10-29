@@ -210,6 +210,38 @@
     </div>
   </div>
 
+  <!-- Ficha do site (abre ao tocar no card) -->
+  <div id="ficha" class="ficha-wrap" hidden>
+    <div class="ficha-back" data-act="fecharficha"></div>
+    <aside class="ficha" id="fichaBox" role="dialog" aria-modal="true" aria-labelledby="fcNome" tabindex="-1">
+      <button class="fc-x" id="fcX" type="button" data-act="fecharficha" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      <div class="fc-scroll" id="fcScroll">
+        <div class="fc-hero" id="fcHero">
+          <img id="fcImg" alt="">
+          <span class="fc-tag" id="fcCat"></span>
+        </div>
+        <div class="fc-body">
+          <h2 id="fcNome" class="rise" style="--d:0"></h2>
+          <button class="arroba rise" id="fcArroba" data-act="perfil" type="button" style="--d:1" hidden></button>
+          <div class="fc-stats rise" style="--d:2">
+            <div><b id="fcAcessos"></b><span>acessos</span></div>
+            <div><b id="fcData"></b><span>publicado</span></div>
+            <div><b id="fcCat2"></b><span>categoria</span></div>
+          </div>
+          <h4 class="fc-sub rise" style="--d:3">Sobre</h4>
+          <p id="fcLegenda" class="rise" style="--d:3"></p>
+          <h4 class="fc-sub rise" style="--d:4">Endereço</h4>
+          <div class="fc-link rise" style="--d:4">
+            <i class="fa-solid fa-link"></i>
+            <div class="fc-url"><b id="fcHost"></b><small id="fcUrl"></small></div>
+            <button class="sq" id="fcCopy" data-act="copiar" type="button" aria-label="Copiar link" title="Copiar link"><i class="fa-regular fa-copy"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="fc-bar" id="fcBar"></div>
+    </aside>
+  </div>
+
   <!-- Menu ⋯ -->
   <div id="menuBack" hidden></div>
   <div id="menu" role="menu" hidden></div>

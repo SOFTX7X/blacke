@@ -61,7 +61,7 @@ async function iniciarChave(){
   let last = 0;
   function draw(t){
     requestAnimationFrame(draw);
-    if (document.hidden || document.body.classList.contains('modal-open') || t - last < 90) return;
+    if (document.hidden || document.body.classList.contains('modal-open') || document.body.classList.contains('ficha-open') || t - last < 90) return;
     last = t;
     ctx.fillStyle = 'rgba(6,7,13,.16)'; ctx.fillRect(0,0,cv.width,cv.height);
     for (let i=0;i<cols;i++){
@@ -93,7 +93,8 @@ addEventListener('keydown', e => {
   if (confirmar._fim){ confirmar._fim(false); return; }
   if (!$('menu').hidden){ fecharMenu(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
-  if (abertos.length) fecharTopo(abertos[abertos.length-1]);
+  if (abertos.length){ fecharTopo(abertos[abertos.length-1]); return; }
+  fecharFicha();
 });
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) fecharTopo(m); }));
 
@@ -241,6 +242,7 @@ const ehDono = item => !!S.hash && item.owner_hash === S.hash;
 function acharItem(id){ return S.itens.concat(S.meus).find(s => String(s.id) === String(id)); }
 function acoesDe(item){
   const l = [
+    { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
   ];
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
@@ -273,6 +275,8 @@ function criarCard(item, i){
       </a>
       <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
+  card.tabIndex = 0; card.setAttribute('aria-label', 'Abrir detalhes de ' + item.brand_name);
+  card.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target === card){ ev.preventDefault(); abrirFicha(item.id); } });
   efeitoCard(card);
   return card;
 }
@@ -320,6 +324,68 @@ async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
 }
+
+/* ---------- Ficha do site ---------- */
+let fichaTimer = null, fichaFoco = null;
+const hostDe = u => { try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } };
+function abrirFicha(id){
+  const it = acharItem(id); if (!it) return;
+  const w = $('ficha'), n = it.cliques || 0;
+  const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
+  img.src = it.image_url; img.style.objectPosition = posSegura(it.img_pos);
+  $('fcCat').textContent = it.categoria || 'Outros'; $('fcCat2').textContent = it.categoria || 'Outros';
+  $('fcNome').textContent = it.brand_name;
+  const ar = $('fcArroba'); ar.hidden = !it.handle; ar.textContent = it.handle ? '@' + it.handle : ''; ar.dataset.h = it.handle || '';
+  $('fcAcessos').textContent = n;
+  $('fcData').textContent = it.created_at ? new Date(it.created_at).toLocaleDateString('pt-BR') : '—';
+  const leg = $('fcLegenda'); leg.textContent = it.caption || 'Sem legenda.'; leg.classList.toggle('vazia', !it.caption);
+  $('fcHost').textContent = hostDe(it.link_url); $('fcUrl').textContent = it.link_url; $('fcCopy').dataset.id = it.id;
+  const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
+  $('fcBar').innerHTML = `<a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` +
+    extras.map(a => `<button class="sq${a.danger ? ' del' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" title="${a.txt}" aria-label="${a.txt}"><i class="${a.ic}"></i></button>`).join('');
+
+  const aberta = !w.hidden && w.classList.contains('on');
+  clearTimeout(fichaTimer);
+  if (!aberta){
+    fichaFoco = document.activeElement;
+    w.classList.remove('sai'); w.hidden = false; document.body.classList.add('ficha-open');
+    $('fcScroll').scrollTop = 0;
+    void w.offsetWidth;                                   // reinicia as animações
+    requestAnimationFrame(() => { w.classList.add('on'); $('fcX').focus({ preventScroll:true }); });
+    try{ history.pushState({ ficha:true }, ''); }catch(_){}
+  }
+}
+function fecharFicha(voltar = true){
+  const w = $('ficha'); if (w.hidden || !w.classList.contains('on')) return;
+  w.classList.add('sai'); w.classList.remove('on'); document.body.classList.remove('ficha-open');
+  clearTimeout(fichaTimer);
+  fichaTimer = setTimeout(() => { w.hidden = true; try{ fichaFoco?.focus({ preventScroll:true }); }catch(_){} }, 420);
+  if (voltar && history.state && history.state.ficha){ try{ history.back(); }catch(_){} }
+}
+addEventListener('popstate', () => fecharFicha(false));          // botão "voltar" do celular fecha a ficha
+addEventListener('keydown', e => {                                // Tab não escapa da ficha
+  if (e.key !== 'Tab' || $('ficha').hidden || document.querySelector('.modal:not([hidden])')) return;
+  const f = [...$('fichaBox').querySelectorAll('a[href],button:not([disabled])')].filter(x => !x.hidden && x.offsetParent !== null);
+  if (!f.length) return;
+  const p = f[0], u = f[f.length - 1];
+  if (e.shiftKey && (document.activeElement === p || document.activeElement === $('fichaBox'))){ e.preventDefault(); u.focus(); }
+  else if (!e.shiftKey && document.activeElement === u){ e.preventDefault(); p.focus(); }
+});
+/* Celular: arrastar a foto para baixo fecha a ficha */
+(function arrastarFicha(){
+  const hero = $('fcHero'), box = $('fichaBox'); let y0 = null, dy = 0;
+  hero.addEventListener('pointerdown', e => {
+    if (innerWidth > 700 || e.pointerType === 'mouse') return;
+    y0 = e.clientY; dy = 0; hero.setPointerCapture(e.pointerId); box.style.transition = 'none';
+  });
+  hero.addEventListener('pointermove', e => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); box.style.transform = `translateY(${dy}px)`; });
+  const fim = () => {
+    if (y0 === null) return; y0 = null;
+    box.style.transition = ''; box.style.transform = '';
+    if (dy > 90) fecharFicha();
+  };
+  hero.addEventListener('pointerup', fim); hero.addEventListener('pointercancel', fim);
+})();
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
@@ -521,12 +587,19 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
-  if (!el) return;
+  if (!el){
+    const card = e.target.closest('.card');
+    if (card && !String(getSelection()).trim()) abrirFicha(card.dataset.id);
+    return;
+  }
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
+  if (['perfil','editar','excluir','denunciar'].includes(a)) fecharFicha();
   switch (a){
     case 'novo': abrirPublicar(); break;
     case 'menu': abrirMenu(el, id); break;
+    case 'detalhes': abrirFicha(id); break;
+    case 'fecharficha': fecharFicha(); break;
     case 'copiar': copiarLink(id); break;
     case 'compartilhar': compartilhar(id); break;
     case 'editar': abrirEditar(id); break;
