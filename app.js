@@ -267,12 +267,9 @@ function criarCard(item, i){
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
         <span class="meta" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
       </div>
-      <p class="cap" tabindex="0">${esc(item.caption) || 'Sem legenda.'}</p>
     </div>
     <div class="foot">
-      <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
-        <span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
-      </a>
+      <button class="visit" type="button" data-act="detalhes"><span>Visualizar</span><i class="fa-solid fa-arrow-right"></i></button>
       <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   card.tabIndex = 0; card.setAttribute('aria-label', 'Abrir detalhes de ' + item.brand_name);
@@ -325,33 +322,58 @@ async function compartilhar(id){
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
 }
 
-/* ---------- Ficha do site ---------- */
+/* ---------- Painel completo do site ---------- */
 let fichaTimer = null, fichaFoco = null;
 const hostDe = u => { try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } };
+function relacionados(it){
+  const mapa = new Map(); S.itens.concat(S.meus).forEach(s => { if (String(s.id) !== String(it.id)) mapa.set(String(s.id), s); });
+  const todos = [...mapa.values()];
+  const pts = s => (it.handle && s.handle === it.handle ? 2 : 0) + (s.categoria === it.categoria ? 1 : 0);
+  const afins = todos.filter(s => pts(s) > 0).sort((a, b) => pts(b) - pts(a));
+  return afins.concat(todos.filter(s => !afins.includes(s))).slice(0, 4);
+}
+function recomecarAnimacao(){
+  document.querySelectorAll('#ficha .rise').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
+}
 function abrirFicha(id){
   const it = acharItem(id); if (!it) return;
   const w = $('ficha'), n = it.cliques || 0;
   const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
   img.src = it.image_url; img.style.objectPosition = posSegura(it.img_pos);
-  $('fcCat').textContent = it.categoria || 'Outros'; $('fcCat2').textContent = it.categoria || 'Outros';
+  $('fcCat').textContent = it.categoria || 'Outros'; $('mCat').textContent = it.categoria || 'Outros';
   $('fcNome').textContent = it.brand_name;
-  const ar = $('fcArroba'); ar.hidden = !it.handle; ar.textContent = it.handle ? '@' + it.handle : ''; ar.dataset.h = it.handle || '';
-  $('fcAcessos').textContent = n;
-  $('fcData').textContent = it.created_at ? new Date(it.created_at).toLocaleDateString('pt-BR') : '—';
-  const leg = $('fcLegenda'); leg.textContent = it.caption || 'Sem legenda.'; leg.classList.toggle('vazia', !it.caption);
+  $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
+  $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString('pt-BR') : 'Data não informada';
+  $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : 'anônimo';
+  const leg = $('fcLegenda'); leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
   $('fcHost').textContent = hostDe(it.link_url); $('fcUrl').textContent = it.link_url; $('fcCopy').dataset.id = it.id;
+
   const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
-  $('fcBar').innerHTML = `<a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` +
-    extras.map(a => `<button class="sq${a.danger ? ' del' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" title="${a.txt}" aria-label="${a.txt}"><i class="${a.ic}"></i></button>`).join('');
+  $('pnBox').innerHTML = `
+    <a class="btn-primary pn-go" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer"><span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    <div class="pn-sec">
+      <button class="btn-ghost" type="button" data-act="copiar" data-id="${esc(it.id)}"><i class="fa-regular fa-copy"></i><span>Copiar link</span></button>
+      ${extras.map(a => `<button class="btn-ghost${a.danger ? ' btn-danger' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" aria-label="${a.txt}"><i class="${a.ic}"></i><span>${a.txt}</span></button>`).join('')}
+    </div>
+    <p class="pn-note">O site abre em uma nova aba. O BLACKE LAVEX não controla o conteúdo dos links publicados.</p>`;
+
+  const rel = relacionados(it);
+  $('pnVeja').hidden = !rel.length;
+  $('pnRel').innerHTML = rel.map(s => `
+    <button class="rel" type="button" data-act="detalhes" data-id="${esc(s.id)}">
+      <span class="rel-img"><img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}"></span>
+      <b>${esc(s.brand_name)}</b><small>${esc(s.categoria || 'Outros')}</small>
+    </button>`).join('');
 
   const aberta = !w.hidden && w.classList.contains('on');
   clearTimeout(fichaTimer);
-  if (!aberta){
+  if (aberta){                                           // trocou de site com o painel já aberto
+    $('pnScroll').scrollTo({ top:0, behavior:'smooth' }); recomecarAnimacao();
+  }else{
     fichaFoco = document.activeElement;
     w.classList.remove('sai'); w.hidden = false; document.body.classList.add('ficha-open');
-    $('fcScroll').scrollTop = 0;
-    void w.offsetWidth;                                   // reinicia as animações
-    requestAnimationFrame(() => { w.classList.add('on'); $('fcX').focus({ preventScroll:true }); });
+    $('pnScroll').scrollTop = 0; void w.offsetWidth;     // reinicia as animações
+    requestAnimationFrame(() => { w.classList.add('on'); $('pnBack').focus({ preventScroll:true }); });
     try{ history.pushState({ ficha:true }, ''); }catch(_){}
   }
 }
@@ -359,33 +381,18 @@ function fecharFicha(voltar = true){
   const w = $('ficha'); if (w.hidden || !w.classList.contains('on')) return;
   w.classList.add('sai'); w.classList.remove('on'); document.body.classList.remove('ficha-open');
   clearTimeout(fichaTimer);
-  fichaTimer = setTimeout(() => { w.hidden = true; try{ fichaFoco?.focus({ preventScroll:true }); }catch(_){} }, 420);
+  fichaTimer = setTimeout(() => { w.hidden = true; try{ fichaFoco?.focus({ preventScroll:true }); }catch(_){} }, 460);
   if (voltar && history.state && history.state.ficha){ try{ history.back(); }catch(_){} }
 }
-addEventListener('popstate', () => fecharFicha(false));          // botão "voltar" do celular fecha a ficha
-addEventListener('keydown', e => {                                // Tab não escapa da ficha
+addEventListener('popstate', () => fecharFicha(false));          // botão "voltar" do celular fecha o painel
+addEventListener('keydown', e => {                                // Tab não escapa do painel
   if (e.key !== 'Tab' || $('ficha').hidden || document.querySelector('.modal:not([hidden])')) return;
-  const f = [...$('fichaBox').querySelectorAll('a[href],button:not([disabled])')].filter(x => !x.hidden && x.offsetParent !== null);
+  const f = [...$('ficha').querySelectorAll('a[href],button:not([disabled])')].filter(x => x.getClientRects().length);
   if (!f.length) return;
   const p = f[0], u = f[f.length - 1];
-  if (e.shiftKey && (document.activeElement === p || document.activeElement === $('fichaBox'))){ e.preventDefault(); u.focus(); }
+  if (e.shiftKey && document.activeElement === p){ e.preventDefault(); u.focus(); }
   else if (!e.shiftKey && document.activeElement === u){ e.preventDefault(); p.focus(); }
 });
-/* Celular: arrastar a foto para baixo fecha a ficha */
-(function arrastarFicha(){
-  const hero = $('fcHero'), box = $('fichaBox'); let y0 = null, dy = 0;
-  hero.addEventListener('pointerdown', e => {
-    if (innerWidth > 700 || e.pointerType === 'mouse') return;
-    y0 = e.clientY; dy = 0; hero.setPointerCapture(e.pointerId); box.style.transition = 'none';
-  });
-  hero.addEventListener('pointermove', e => { if (y0 === null) return; dy = Math.max(0, e.clientY - y0); box.style.transform = `translateY(${dy}px)`; });
-  const fim = () => {
-    if (y0 === null) return; y0 = null;
-    box.style.transition = ''; box.style.transform = '';
-    if (dy > 90) fecharFicha();
-  };
-  hero.addEventListener('pointerup', fim); hero.addEventListener('pointercancel', fim);
-})();
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){

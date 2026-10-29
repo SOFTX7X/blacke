@@ -210,36 +210,50 @@
     </div>
   </div>
 
-  <!-- Ficha do site (abre ao tocar no card) -->
-  <div id="ficha" class="ficha-wrap" hidden>
-    <div class="ficha-back" data-act="fecharficha"></div>
-    <aside class="ficha" id="fichaBox" role="dialog" aria-modal="true" aria-labelledby="fcNome" tabindex="-1">
-      <button class="fc-x" id="fcX" type="button" data-act="fecharficha" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-      <div class="fc-scroll" id="fcScroll">
-        <div class="fc-hero" id="fcHero">
-          <img id="fcImg" alt="">
-          <span class="fc-tag" id="fcCat"></span>
-        </div>
-        <div class="fc-body">
-          <h2 id="fcNome" class="rise" style="--d:0"></h2>
-          <button class="arroba rise" id="fcArroba" data-act="perfil" type="button" style="--d:1" hidden></button>
-          <div class="fc-stats rise" style="--d:2">
-            <div><b id="fcAcessos"></b><span>acessos</span></div>
-            <div><b id="fcData"></b><span>publicado</span></div>
-            <div><b id="fcCat2"></b><span>categoria</span></div>
+  <!-- Painel completo do site (abre ao tocar no card) -->
+  <div id="ficha" class="painel" role="dialog" aria-modal="true" aria-labelledby="fcNome" hidden>
+    <div class="pn-aurora" aria-hidden="true"></div>
+    <header class="pn-top">
+      <button class="pn-back" id="pnBack" type="button" data-act="fecharficha"><i class="fa-solid fa-arrow-left"></i><span>Voltar ao mural</span></button>
+      <span class="pn-brand">BLACKE <b>LAVEX</b></span>
+      <button class="pn-x" type="button" data-act="fecharficha" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="pn-scroll" id="pnScroll">
+      <div class="pn-wrap">
+        <main class="pn-main">
+          <div class="pn-hero rise" style="--d:0">
+            <img id="fcImg" alt="">
+            <span class="fc-tag" id="fcCat"></span>
           </div>
-          <h4 class="fc-sub rise" style="--d:3">Sobre</h4>
-          <p id="fcLegenda" class="rise" style="--d:3"></p>
-          <h4 class="fc-sub rise" style="--d:4">Endereço</h4>
-          <div class="fc-link rise" style="--d:4">
-            <i class="fa-solid fa-link"></i>
-            <div class="fc-url"><b id="fcHost"></b><small id="fcUrl"></small></div>
-            <button class="sq" id="fcCopy" data-act="copiar" type="button" aria-label="Copiar link" title="Copiar link"><i class="fa-regular fa-copy"></i></button>
-          </div>
-        </div>
+          <h1 id="fcNome" class="rise" style="--d:1"></h1>
+          <ul class="pn-meta rise" style="--d:2">
+            <li><i class="fa-solid fa-shapes"></i><span id="mCat"></span></li>
+            <li><i class="fa-regular fa-eye"></i><span id="mAcessos"></span></li>
+            <li><i class="fa-regular fa-calendar"></i><span id="mData"></span></li>
+            <li><i class="fa-solid fa-at"></i><span id="mPerfil"></span></li>
+          </ul>
+          <section class="pn-card rise" style="--d:3">
+            <h2 class="pn-sub">Sobre este site</h2>
+            <p id="fcLegenda"></p>
+          </section>
+          <section class="pn-card rise" style="--d:4">
+            <h2 class="pn-sub">Endereço</h2>
+            <div class="fc-link">
+              <i class="fa-solid fa-link"></i>
+              <div class="fc-url"><b id="fcHost"></b><small id="fcUrl"></small></div>
+              <button class="sq" id="fcCopy" data-act="copiar" type="button" aria-label="Copiar link" title="Copiar link"><i class="fa-regular fa-copy"></i></button>
+            </div>
+          </section>
+          <section id="pnVeja" class="pn-veja rise" style="--d:5" hidden>
+            <h2 class="pn-sub">Veja também</h2>
+            <div class="pn-rel" id="pnRel"></div>
+          </section>
+        </main>
+        <aside class="pn-side">
+          <div class="pn-box rise" id="pnBox" style="--d:2"></div>
+        </aside>
       </div>
-      <div class="fc-bar" id="fcBar"></div>
-    </aside>
+    </div>
   </div>
 
   <!-- Menu ⋯ -->
