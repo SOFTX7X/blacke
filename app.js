@@ -90,6 +90,7 @@ function fecharTopo(m){
 }
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (confirmar._fim){ confirmar._fim(false); return; }
   if (!$('menu').hidden){ fecharMenu(); return; }
   const abertos = [...document.querySelectorAll('.modal:not([hidden])')];
   if (abertos.length) fecharTopo(abertos[abertos.length-1]);

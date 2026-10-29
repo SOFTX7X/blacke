@@ -312,3 +312,6 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
   .top-actions .btn-ghost span{display:none}
   .top-actions .btn-ghost{padding:11px 13px}
 }
+
+/* ===== v15: a confirmação sempre abre na frente de qualquer outra janela ===== */
+#modalConfirma{z-index:90}
