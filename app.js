@@ -342,13 +342,12 @@ function abrirFicha(id){
   const w = $('ficha'), n = it.cliques || 0;
   const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
   img.src = it.image_url; img.style.objectPosition = posSegura(it.img_pos);
-  $('fcCat').textContent = it.categoria || 'Outros'; $('mCat').textContent = it.categoria || 'Outros';
+  $('fcCat').textContent = it.categoria || 'Outros';
   $('fcNome').textContent = it.brand_name;
   $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
   $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString('pt-BR') : 'Data não informada';
-  $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : 'anônimo';
+  $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : '<span class="anon">anônimo</span>';
   const leg = $('fcLegenda'); leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
-  $('fcHost').textContent = hostDe(it.link_url); $('fcUrl').textContent = it.link_url; $('fcCopy').dataset.id = it.id;
 
   const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
   $('pnBox').innerHTML = `
