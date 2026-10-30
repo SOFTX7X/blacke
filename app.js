@@ -260,16 +260,18 @@ function criarCard(item, i){
       <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
+      <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
       <h3>${esc(item.brand_name)}</h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
-        <span class="meta" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
       </div>
     </div>
     <div class="foot">
-      <button class="visit" type="button" data-act="detalhes"><span>Visualizar</span><i class="fa-solid fa-arrow-right"></i></button>
+      <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
+        <span>Acessar site</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </a>
       <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   card.tabIndex = 0; card.setAttribute('aria-label', 'Abrir detalhes de ' + item.brand_name);
