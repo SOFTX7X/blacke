@@ -374,7 +374,7 @@ function abrirFicha(id){
     fichaFoco = document.activeElement;
     w.classList.remove('sai'); w.hidden = false; document.body.classList.add('ficha-open');
     $('pnScroll').scrollTop = 0; void w.offsetWidth;     // reinicia as animações
-    requestAnimationFrame(() => { w.classList.add('on'); $('pnBack').focus({ preventScroll:true }); });
+    requestAnimationFrame(() => { w.classList.add('on'); w.focus({ preventScroll:true }); });
     try{ history.pushState({ ficha:true }, ''); }catch(_){}
   }
 }
@@ -391,9 +391,21 @@ addEventListener('keydown', e => {                                // Tab não es
   const f = [...$('ficha').querySelectorAll('a[href],button:not([disabled])')].filter(x => x.getClientRects().length);
   if (!f.length) return;
   const p = f[0], u = f[f.length - 1];
-  if (e.shiftKey && document.activeElement === p){ e.preventDefault(); u.focus(); }
+  if (e.shiftKey && (document.activeElement === p || document.activeElement === $('ficha'))){ e.preventDefault(); u.focus(); }
   else if (!e.shiftKey && document.activeElement === u){ e.preventDefault(); p.focus(); }
 });
+
+/* ---------- Tela de carregamento ---------- */
+const splash = { t0: performance.now(), feito: false };
+function fecharSplash(){
+  if (splash.feito) return; splash.feito = true;
+  const el = $('splash'); if (!el) return;
+  setTimeout(() => {
+    el.classList.add('sai'); document.body.classList.remove('carregando');
+    setTimeout(() => el.remove(), 800);
+  }, Math.max(0, 1200 - (performance.now() - splash.t0)));      // fica pelo menos ~1,2 s para não piscar
+}
+setTimeout(fecharSplash, 7000);
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
@@ -429,7 +441,8 @@ async function buscarMural(reset){
       const filtrando = S.busca || S.cat !== 'Todas';
       setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
     } else setEstado('');
-  }catch(err){ if (meu === S.seq) erroCarga(err); }
+    fecharSplash();
+  }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
 }
 
 /* ---------- Meus sites ---------- */

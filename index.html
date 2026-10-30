@@ -12,7 +12,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="carregando">
+  <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
+  <!-- Tela de carregamento -->
+  <div id="splash" aria-hidden="true">
+    <div class="sp-center">
+      <div class="sp-logo"><img src="logo.png" alt=""></div>
+      <div class="sp-name">BLACKE <b>LAVEX</b></div>
+      <div class="sp-bar"><i></i></div>
+      <div class="sp-status"><span>carregando mural</span><em>...</em></div>
+    </div>
+    <div class="sp-code">01000010 01001100 01000001 01000011 01001011 01000101</div>
+  </div>
+  <script>
+    /* segurança: se algo falhar, a tela de carregamento nunca fica presa */
+    setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.add('sai');document.body.classList.remove('carregando');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s)},800)}},8000);
+  </script>
   <canvas id="rain" aria-hidden="true"></canvas>
   <div class="aurora" aria-hidden="true"></div>
 
@@ -211,12 +226,11 @@
   </div>
 
   <!-- Painel completo do site (abre ao tocar no card) -->
-  <div id="ficha" class="painel" role="dialog" aria-modal="true" aria-labelledby="fcNome" hidden>
+  <div id="ficha" class="painel" role="dialog" aria-modal="true" aria-labelledby="fcNome" tabindex="-1" hidden>
     <div class="pn-aurora" aria-hidden="true"></div>
     <header class="pn-top">
       <button class="pn-back" id="pnBack" type="button" data-act="fecharficha"><i class="fa-solid fa-arrow-left"></i><span>Voltar ao mural</span></button>
       <span class="pn-brand">BLACKE <b>LAVEX</b></span>
-      <button class="pn-x" type="button" data-act="fecharficha" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
     </header>
     <div class="pn-scroll" id="pnScroll">
       <div class="pn-wrap">
