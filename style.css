@@ -880,3 +880,14 @@ body.carregando{overflow:hidden}
   .top-actions > :not(.lang){display:none!important}
   .lang-btn{width:auto!important;height:36px!important;padding:0 11px!important}
 }
+
+/* barra de ações da ficha no celular: 5 ícones + botão principal sem quebrar */
+@media (max-width:640px){
+  .pn-box{gap:6px;padding-left:10px;padding-right:10px}
+  .pn-sec .btn-ghost{width:38px;height:38px}
+  .pn-go{flex:1 1 0;min-width:0;white-space:nowrap;padding:12px 10px;font-size:14px;gap:6px}
+  .pn-go span{white-space:nowrap}
+  .pn-go i{display:none}
+  .pn-box .pn-go span{display:inline}
+}
+@media (max-width:340px){.pn-sec .btn-ghost{width:34px;height:34px}.pn-go{font-size:13px;padding:12px 6px}.pn-box{gap:5px}}
