@@ -611,6 +611,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
   S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0);
+  if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   document.querySelector('#bnav .bn-pub').classList.toggle('on', aba === 'publicar');
