@@ -1034,3 +1034,29 @@ body.carregando{overflow:hidden}
 /* título do mural só na aba Mural */
 body[data-aba="meus"] .hero,body[data-aba="destaques"] .hero{display:none}
 body[data-aba="meus"] #meuPerfil{margin-top:22px}
+
+/* Meus sites: sem painel; insights na grade */
+#painelMeus{display:none!important}
+.pc-btn.perigo:hover{border-color:#ff5c7a;color:#ff8da1}
+.pc-btn:disabled{opacity:.4;cursor:not-allowed}
+.tend{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:99px;font:700 11px var(--mono);white-space:nowrap}
+.tend.sobe{color:#3ddc97;background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.35)}
+.tend.desce{color:#ff5c7a;background:rgba(255,92,122,.12);border:1px solid rgba(255,92,122,.35)}
+.tend.igual{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.pc-nums .tend{align-self:center;margin-top:5px;font-size:10px;padding:1px 6px}
+body[data-aba="meus"] .card .vistas{display:none}
+.card .ins{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:22px 12px 10px;
+  background:linear-gradient(180deg,transparent,rgba(6,7,13,.92) 55%);font:500 11.5px var(--mono);color:#c9cde8;pointer-events:none}
+.card .ins b{font:700 15px var(--display);color:#fff;margin-right:3px}
+.card .ins .ins-n{display:flex;align-items:baseline;gap:4px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.card .ins .tend{border-radius:99px!important}
+@media (max-width:640px){.card .ins{padding:18px 8px 7px;font-size:10px}.card .ins b{font-size:13px}.card .ins .tend{font-size:10px;padding:1px 6px}}
+body[data-aba="meus"] .card .fav-btn{display:none}
+.pc-tools{display:flex;gap:6px;margin-left:auto;flex:none}
+.pc-ic{width:34px;height:34px;display:grid;place-items:center;border:1px solid #262b58;border-radius:50%;background:#12152f;color:#c7cbe6;font-size:13px;cursor:pointer;transition:border-color .2s,color .2s,transform .15s}
+.pc-ic:hover{border-color:var(--violet);color:#fff}.pc-ic:active{transform:scale(.94)}
+.pc-ic.perigo:hover{border-color:#ff5c7a;color:#ff8da1}.pc-ic:disabled{opacity:.4;cursor:not-allowed}
+.card .ins i{color:var(--ice);font-size:11px;margin-right:2px}
+.card .ins em{font-style:normal;margin-left:3px}
+@media (max-width:640px){.card .ins em{display:none}.pc-ic{width:32px;height:32px;font-size:12px}}
+@media (max-width:640px){.pc-tools{gap:4px}.pc-ic{width:30px;height:30px}}

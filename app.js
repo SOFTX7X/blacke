@@ -515,10 +515,10 @@ function atualizarMeusUI(){
   const n = S.meus.length, acessos = S.meus.reduce((a, s) => a + (s.cliques || 0), 0);
   $('nMeus').textContent = n; $('stSites').textContent = n; $('stAcessos').textContent = acessos;
   $('stLimite').textContent = Math.max(0, LIMITE - n); $('btnExcluirTodos').disabled = n === 0;
-  if (!S.perfil || !S.perfil.handle) desenharMeuPerfil();
+  desenharMeuPerfil();
 }
 function desenharMeus(){
-  $('maisBtn').hidden = true; anexar(S.meus, true); atualizarMeusUI();
+  $('maisBtn').hidden = true; anexar(S.meus, true); atualizarMeusUI(); marcarInsights();
   setEstado(S.meus.length ? '' : (S.hash ? 'Você ainda não publicou nenhum site neste navegador.' + BTN_NOVO : 'Seu navegador bloqueou o recurso de chave. Abra o site em https.'), !S.hash);
 }
 
@@ -623,9 +623,10 @@ function cartaoPerfil(p, dono){
     return `<div class="pc pc-vz">
       <div class="pc-top"><div class="pc-av"><span class="pc-ini"><i class="fa-solid fa-at"></i></span></div>
         <div class="pc-nums"><div><b>${fmtN(n)}</b><span>${n === 1 ? 'site' : 'sites'}</span></div><div><b>${fmtN(ac)}</b><span>${ac === 1 ? 'acesso' : 'acessos'}</span></div><div><b>${fmtN(Math.max(0, LIMITE - n))}</b><span>vagas livres</span></div></div></div>
-      <div class="pc-nome">Seu perfil</div>
+      <div class="pc-nome"><span>Seu perfil</span><span class="pc-tools"><button class="pc-ic" type="button" data-pc="chave" title="Minha chave" aria-label="Minha chave"><i class="fa-solid fa-key"></i></button><button class="pc-ic perigo" type="button" data-pc="excluir" title="Excluir todos os meus sites" aria-label="Excluir todos os meus sites"${n ? '' : ' disabled'}><i class="fa-solid fa-trash-can"></i></button></span></div>
       <p class="pc-bio dim">Reserve um @ para ter um perfil público com foto, bio e botões de contato.</p>
-      <div class="pc-acts"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button></div>
+      <div class="pc-acts"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button>
+</div>
     </div>`;
   }
   const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
@@ -635,11 +636,11 @@ function cartaoPerfil(p, dono){
       <div class="pc-av">${avatarHTML(p)}</div>
       <div class="pc-nums">
         <div><b>${fmtN(p.sites)}</b><span>${p.sites === 1 ? 'site' : 'sites'}</span></div>
-        <div><b>${fmtN(p.acessos)}</b><span>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
+        <div><b>${fmtN(p.acessos)}</b><span>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span>${dono && TREND ? chipTendencia(TREND.hj, TREND.ontem) : ''}</div>
         <div><b>${fmtN(p.salvos)}</b><span>${+p.salvos === 1 ? 'salvo' : 'salvos'}</span></div>
       </div>
     </div>
-    <div class="pc-nome"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}</div>
+    <div class="pc-nome"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}${dono ? `<span class="pc-tools"><button class="pc-ic" type="button" data-pc="chave" title="Minha chave" aria-label="Minha chave"><i class="fa-solid fa-key"></i></button><button class="pc-ic perigo" type="button" data-pc="excluir" title="Excluir todos os meus sites" aria-label="Excluir todos os meus sites"${S.meus.length ? '' : ' disabled'}><i class="fa-solid fa-trash-can"></i></button><button class="pc-ic" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" title="Compartilhar perfil" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i></button></span>` : ''}</div>
     ${p.bio ? `<p class="pc-bio" translate="no">${esc(p.bio)}</p>` : (dono ? '<p class="pc-bio dim">Adicione uma bio em "Editar perfil".</p>' : '')}
     ${desde ? `<div class="pc-meta"><i class="fa-regular fa-calendar"></i> <span>No mural desde ${esc(desde)}</span></div>` : ''}
     ${dono && p.pendente ? `<div class="pc-pend"><i class="fa-regular fa-clock"></i> <span>Troca para @${esc(p.pendente)} em análise</span></div>` : ''}
@@ -648,7 +649,7 @@ function cartaoPerfil(p, dono){
     <div class="pc-acts">
       ${dono ? `<button class="pc-btn pri" type="button" data-pc="editar"><i class="fa-solid fa-pen"></i> Editar perfil</button>
       <button class="pc-btn" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Trocar @</button>` : ''}
-      <button class="pc-btn${dono ? ' ico' : ''}" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i>${dono ? '' : ' <span>Compartilhar</span>'}</button>
+      ${dono ? '' : `<button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
     </div>
   </div>`;
 }
@@ -661,6 +662,8 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-pc]'); if (!b) return;
   if (b.dataset.pc === 'arroba') $('btnArroba').click();
   else if (b.dataset.pc === 'editar') abrirEditarPerfil();
+  else if (b.dataset.pc === 'chave') $('btnChave').click();
+  else if (b.dataset.pc === 'excluir') $('btnExcluirTodos').click();
 });
 
 /* ---------- editar perfil ---------- */
@@ -942,24 +945,30 @@ $('destaques').addEventListener('click', e => {
 });
 
 /* ---------- Desempenho dos meus sites (últimos 14 dias) ---------- */
+const STATS = new Map(); let TREND = null;
 async function carregarStats(){
-  const box = $('statsBox'); box.hidden = true;
   if (!S.token || !S.meus.length) return;
   try{
     const { data, error } = await _supabase.rpc('meus_stats', { p_token:S.token });
-    if (error || !data || !data.dias) return;                 // banco sem a atualização: a caixa fica oculta
-    const dias = data.dias, max = Math.max(1, ...dias.map(x => x.n)), tot = dias.reduce((a, x) => a + x.n, 0);
-    const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
-    $('sbChart').innerHTML = dias.map(x => `<i style="height:${Math.max(4, Math.round(x.n / max * 100))}%" class="${x.n ? 'on' : ''}" title="${fmt(x.d)}: ${x.n} ${x.n === 1 ? 'acesso' : 'acessos'}"></i>`).join('');
-    $('sbIni').textContent = fmt(dias[0].d); $('sbFim').textContent = 'hoje';
-    $('sbResumo').textContent = `${tot} ${tot === 1 ? 'acesso' : 'acessos'} em 14 dias`;
-    const sites = (data.sites || []).slice(0, 5), mx = Math.max(1, ...sites.map(s => s.total));
-    $('sbChart').classList.toggle('vazio', tot === 0);
-    $('sbAviso').textContent = tot === 0 ? 'O gráfico conta os acessos de hoje em diante. Os acessos anteriores aparecem só no total de cada site.' : '';
-    $('sbTop').innerHTML = sites.length ? sites.map((s, i) => `
-      <div class="sb-row"><span class="sb-nome">${i === 0 && s.total ? '<em title="Mais clicado">★</em> ' : ''}${esc(s.nome)}</span>
-        <span class="sb-num">${s.total} ${s.total === 1 ? 'acesso' : 'acessos'}${s.n14 ? ` · <b>${s.n14}</b> em 14 dias` : ''}</span>
-        <span class="sb-bar"><i style="width:${Math.round(s.total / mx * 100)}%"></i></span></div>`).join('') : '';
-    box.hidden = false;
+    if (error || !data) return;
+    STATS.clear(); (data.sites || []).forEach(s => STATS.set(String(s.id), s));
+    const d = data.dias || []; TREND = d.length >= 2 ? { hj:d[d.length - 1].n, ontem:d[d.length - 2].n } : null;
+    if (S.aba === 'meus'){ marcarInsights(); desenharMeuPerfil(); }
   }catch(_){}
+}
+function chipTendencia(hj, ontem){
+  if (hj == null || ontem == null) return '';
+  const d = hj - ontem;
+  if (d > 0) return `<span class="tend sobe" title="Hoje ${hj} · Ontem ${ontem}">▲ ${fmtN(d)}</span>`;
+  if (d < 0) return `<span class="tend desce" title="Hoje ${hj} · Ontem ${ontem}">▼ ${fmtN(-d)}</span>`;
+  return `<span class="tend igual" title="Hoje ${hj} · Ontem ${ontem}">= 0</span>`;
+}
+function marcarInsights(){
+  if (S.aba !== 'meus') return;
+  document.querySelectorAll('#muralGrid .card').forEach(c => {
+    const s = STATS.get(String(c.dataset.id)), it = S.meus.find(x => String(x.id) === String(c.dataset.id));
+    const total = s ? s.total : (it ? it.cliques || 0 : 0);
+    let el = c.querySelector('.ins'); if (!el){ el = document.createElement('div'); el.className = 'ins'; c.querySelector('.cover').appendChild(el); }
+    el.innerHTML = `<span class="ins-n"><i class="fa-regular fa-eye"></i><b>${fmtN(total)}</b><em>${total === 1 ? 'visualização' : 'visualizações'}</em></span>${s ? chipTendencia(s.hj, s.ontem) : ''}`;
+  });
 }
