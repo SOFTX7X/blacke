@@ -1060,3 +1060,4 @@ body[data-aba="meus"] .card .fav-btn{display:none}
 .card .ins em{font-style:normal;margin-left:3px}
 @media (max-width:640px){.card .ins em{display:none}.pc-ic{width:32px;height:32px;font-size:12px}}
 @media (max-width:640px){.pc-tools{gap:4px}.pc-ic{width:30px;height:30px}}
+#meuPerfil.pc-ok .pc{animation:none}

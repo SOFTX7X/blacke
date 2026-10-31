@@ -531,8 +531,14 @@ async function trocarAba(aba){
   ['muralGrid','estado'].forEach(id => $(id).hidden = aba === 'destaques');
   if (aba === 'destaques'){ $('maisBtn').hidden = true; $('perfilBox').hidden = true; abrirDestaques(); return; }
   if (aba === 'mural'){ buscarMural(true); return; }
-  skeleton();
-  try{ await buscarMeus(); desenharMeus(); }catch(err){ erroCarga(err); }
+  const assinatura = () => S.meus.map(s => s.id + ':' + (s.cliques || 0) + ':' + (s.handle || '') + ':' + (s.verificado ? 1 : 0) + ':' + s.image_url).join('|');
+  const ja = S._meusOk ? assinatura() : null;
+  if (S._meusOk) desenharMeus(); else skeleton();
+  try{
+    await buscarMeus(); S._meusOk = true;
+    if (S.aba !== 'meus') return;
+    if (assinatura() !== ja) desenharMeus();
+  }catch(err){ if (!ja) erroCarga(err); }
   carregarStats();
 }
 
@@ -656,7 +662,10 @@ function cartaoPerfil(p, dono){
 function desenharMeuPerfil(){
   const el = $('meuPerfil'); if (!el) return;
   const p = S.perfil;
-  el.innerHTML = cartaoPerfil(p && p.handle ? p : null, true);
+  const html = cartaoPerfil(p && p.handle ? p : null, true);
+  if (el._html === html) return;
+  if (el._html) el.classList.add('pc-ok');
+  el._html = html; el.innerHTML = html;
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-pc]'); if (!b) return;
