@@ -1225,3 +1225,13 @@ body[data-aba="publicar"] .hero{display:none}
 @media (max-width:640px){.pt-prev{width:min(72%,270px)}}
 /* modo de segurança (banco reserva) */
 .aviso-reserva{position:sticky;top:0;z-index:60;padding:9px 16px;text-align:center;font:600 12.5px var(--display);color:#1a1300;background:linear-gradient(90deg,#f2b84b,#ffd479)}
+/* logo limpa: sem fundo, sem moldura e sem brilho */
+.logo-ring{padding:0;background:none!important;box-shadow:none!important;border-radius:0}
+.brand:hover .logo-ring{animation:none}
+.logo-ring img{object-fit:contain;border-radius:0;background:none}
+.sp-logo{padding:0;box-shadow:none!important;overflow:visible}
+.sp-logo::before{display:none}
+.sp-logo img{object-fit:contain;background:none}
+.logo-ring{width:46px;height:30px}
+.sp-logo{width:150px;height:96px}
+@media (max-width:640px){.logo-ring{width:40px;height:26px}}
