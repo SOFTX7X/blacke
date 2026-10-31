@@ -523,7 +523,11 @@ function desenharMeus(){
 }
 
 async function trocarAba(aba){
-  S.aba = aba; document.body.dataset.aba = aba; if (aba !== 'mural') modoPerfil(false);
+  if (document.body.classList.contains('modo-perfil')){
+    if (aba === 'mural'){ sairPerfil(true); return; }
+    modoPerfil(false); S.busca = ''; $('busca').value = ''; try{ history.pushState(null, '', '/'); }catch(_){}
+  }
+  S.aba = aba; document.body.dataset.aba = aba;
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = $('meuPerfil').hidden = aba !== 'meus';
@@ -624,40 +628,42 @@ function avatarHTML(p){
   return p && p.foto ? `<img src="${esc(p.foto)}" alt="" loading="lazy" decoding="async">` : `<span class="pc-ini">${ini}</span>`;
 }
 function cartaoPerfil(p, dono){
+  const TOOLS = h => `<span class="pc-tools"><button class="pc-ic" type="button" data-pc="chave" title="Minha chave" aria-label="Minha chave"><i class="fa-solid fa-key"></i></button><button class="pc-ic perigo" type="button" data-pc="excluir" title="Excluir todos os meus sites" aria-label="Excluir todos os meus sites"${S.meus.length ? '' : ' disabled'}><i class="fa-solid fa-trash-can"></i></button>${h ? `<button class="pc-ic" type="button" data-act="linkperfil" data-h="${esc(h)}" title="Compartilhar perfil" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i></button>` : ''}</span>`;
+  const num = (v, um, varios, extra) => `<li><b>${fmtN(v)}</b> <span>${+v === 1 ? um : varios}</span>${extra || ''}</li>`;
   if (!p || !p.handle){
     const n = S.meus.length, ac = S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
-    return `<div class="pc pc-vz">
-      <div class="pc-top"><div class="pc-av"><span class="pc-ini"><i class="fa-solid fa-at"></i></span></div>
-        <div class="pc-nums"><div><b>${fmtN(n)}</b><span>${n === 1 ? 'site' : 'sites'}</span></div><div><b>${fmtN(ac)}</b><span>${ac === 1 ? 'acesso' : 'acessos'}</span></div><div><b>${fmtN(Math.max(0, LIMITE - n))}</b><span>vagas livres</span></div></div></div>
-      <div class="pc-nome"><span>Seu perfil</span><span class="pc-tools"><button class="pc-ic" type="button" data-pc="chave" title="Minha chave" aria-label="Minha chave"><i class="fa-solid fa-key"></i></button><button class="pc-ic perigo" type="button" data-pc="excluir" title="Excluir todos os meus sites" aria-label="Excluir todos os meus sites"${n ? '' : ' disabled'}><i class="fa-solid fa-trash-can"></i></button></span></div>
-      <p class="pc-bio dim">Reserve um @ para ter um perfil público com foto, bio e botões de contato.</p>
-      <div class="pc-acts"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button>
-</div>
+    return `<div class="ig ig-vz">
+      <div class="ig-av"><span class="pc-ini"><i class="fa-solid fa-at"></i></span></div>
+      <div class="ig-nome"><h2>Seu perfil</h2>${dono ? TOOLS('') : ''}</div>
+      <ul class="ig-nums">${num(n, 'site', 'sites')}${num(ac, 'acesso', 'acessos')}${num(Math.max(0, LIMITE - n), 'vaga livre', 'vagas livres')}</ul>
+      <div class="ig-bio"><p class="dim">Reserve um @ para ter um perfil público com foto, bio e botões de contato.</p></div>
+      <div class="ig-btns"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button></div>
     </div>`;
   }
   const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
   const desde = p.desde ? new Date(p.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '';
-  return `<div class="pc${p.verificado ? ' pc-ver' : ''}">
-    <div class="pc-top">
-      <div class="pc-av">${avatarHTML(p)}</div>
-      <div class="pc-nums">
-        <div><b>${fmtN(p.sites)}</b><span>${p.sites === 1 ? 'site' : 'sites'}</span></div>
-        <div><b>${fmtN(p.acessos)}</b><span>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span>${dono && TREND ? chipTendencia(TREND.hj, TREND.ontem) : ''}</div>
-        <div><b>${fmtN(p.salvos)}</b><span>${+p.salvos === 1 ? 'salvo' : 'salvos'}</span></div>
-      </div>
+  return `<div class="ig${p.verificado ? ' pc-ver' : ''}">
+    <div class="ig-av">${avatarHTML(p)}</div>
+    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
+    <ul class="ig-nums">
+      ${num(p.sites, 'site', 'sites')}
+      ${num(p.acessos, 'acesso', 'acessos', dono && TREND ? ' ' + chipTendencia(TREND.hj, TREND.ontem) : '')}
+      ${num(p.salvos, 'salvo', 'salvos')}
+    </ul>
+    <div class="ig-bio">
+      ${p.bio ? `<p translate="no">${esc(p.bio)}</p>` : (dono ? '<p class="dim">Adicione uma bio em "Editar perfil".</p>' : '')}
+      ${desde ? `<div class="pc-meta"><span>No mural desde ${esc(desde)}</span></div>` : ''}
+      ${dono && p.pendente ? `<div class="pc-pend"><i class="fa-regular fa-clock"></i> <span>Troca para @${esc(p.pendente)} em análise</span></div>` : ''}
+      ${dono && p.suspenso ? '<div class="pc-pend"><span>Perfil suspenso</span></div>' : ''}
     </div>
-    <div class="pc-nome"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}${dono ? `<span class="pc-tools"><button class="pc-ic" type="button" data-pc="chave" title="Minha chave" aria-label="Minha chave"><i class="fa-solid fa-key"></i></button><button class="pc-ic perigo" type="button" data-pc="excluir" title="Excluir todos os meus sites" aria-label="Excluir todos os meus sites"${S.meus.length ? '' : ' disabled'}><i class="fa-solid fa-trash-can"></i></button><button class="pc-ic" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" title="Compartilhar perfil" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i></button></span>` : ''}</div>
-    ${p.bio ? `<p class="pc-bio" translate="no">${esc(p.bio)}</p>` : (dono ? '<p class="pc-bio dim">Adicione uma bio em "Editar perfil".</p>' : '')}
-    ${desde ? `<div class="pc-meta"><i class="fa-regular fa-calendar"></i> <span>No mural desde ${esc(desde)}</span></div>` : ''}
-    ${dono && p.pendente ? `<div class="pc-pend"><i class="fa-regular fa-clock"></i> <span>Troca para @${esc(p.pendente)} em análise</span></div>` : ''}
-    ${dono && p.suspenso ? '<div class="pc-pend"><span>Perfil suspenso</span></div>' : ''}
-    ${ct.length ? `<div class="pc-ct">${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}</div>` : ''}
-    <div class="pc-acts">
-      ${dono ? `<button class="pc-btn pri" type="button" data-pc="editar"><i class="fa-solid fa-pen"></i> Editar perfil</button>
-      <button class="pc-btn" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Trocar @</button>` : ''}
-      ${dono ? '' : `<button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
+    <div class="ig-btns">
+      ${dono ? `<button class="pc-btn" type="button" data-pc="editar">Editar perfil</button>
+      <button class="pc-btn" type="button" data-pc="arroba">Trocar @</button><span class="so-m">${TOOLS(p.handle)}</span>${ct.length ? '<i class="ig-quebra"></i>' : ''}` : ''}
+      ${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}
+      ${dono ? '' : `<button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
     </div>
-  </div>`;
+  </div>
+  <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
 }
 function desenharMeuPerfil(){
   const el = $('meuPerfil'); if (!el) return;
@@ -769,12 +775,13 @@ function modoPerfil(on){ document.body.classList.toggle('modo-perfil', !!on); }
 function irParaPerfil(h, semHistorico){
   if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
   S.busca = '@' + h; $('busca').value = S.busca; resetChips(); modoPerfil(true);
-  if (!semHistorico){ try{ if (!(history.state && history.state.perfil === h)) history.pushState({ perfil:h }, '', '?p=' + encodeURIComponent(h)); }catch(_){} }
+  if (!semHistorico){ try{ if (!(history.state && history.state.perfil === h)) history.pushState({ perfil:h }, '', '/@' + h); }catch(_){} }
   scrollTo({ top:0 });
   if (S.aba !== 'mural') trocarAba('mural'); else buscarMural(true);
 }
-function sairPerfil(){
+function sairPerfil(trocarUrl){
   modoPerfil(false); S.busca = ''; $('busca').value = ''; buscarMural(true);
+  if (trocarUrl){ try{ history.pushState(null, '', '/'); }catch(_){} }
   const y = S.voltar && S.voltar.scroll; S.voltar = null;
   if (y) setTimeout(() => scrollTo({ top:y }), 350);
 }
@@ -879,7 +886,7 @@ document.addEventListener('click', e => {
         // veio da ficha: fecha sem voltar no histórico e troca a entrada da ficha pela do perfil
         const daFicha = history.state && history.state.ficha;
         fecharFicha(false);
-        if (daFicha){ try{ history.replaceState({ perfil:h }, '', '?p=' + encodeURIComponent(h)); }catch(_){} irParaPerfil(h, true); break; }
+        if (daFicha){ try{ history.replaceState({ perfil:h }, '', '/@' + h); }catch(_){} irParaPerfil(h, true); break; }
       }
       irParaPerfil(h); break;
     }
@@ -888,7 +895,7 @@ document.addEventListener('click', e => {
 const _pubAberto = () => !$('modalCadastro').hidden;
 $('bnav').addEventListener('click', e => { if (_pubAberto() && e.target.closest('.bn-pub')) e.stopPropagation(); }, true);
 document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('click', () => {
-  if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
+  if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil')) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
 $('chips').innerHTML = ['Todas', 'Salvos', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c}</button>`).join('');
@@ -937,7 +944,7 @@ async function abrirLinkDireto(){
   const q = new URLSearchParams(location.search), s = q.get('s'), p = q.get('p');
   if (!s && !p) return;
   try{ history.replaceState(null, '', location.pathname); }catch(_){}
-  if (p && /^[a-z0-9_]{3,30}$/i.test(p)){ irParaPerfil(p.toLowerCase()); return; }
+  if (p && /^[a-z0-9_]{3,30}$/i.test(p)){ const h = p.toLowerCase(); try{ history.replaceState({ perfil:h }, '', '/@' + h); }catch(_){} irParaPerfil(h, true); return; }
   if (s && /^\d{1,12}$/.test(s)){
     try{
       let it = acharItem(s);
