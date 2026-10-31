@@ -651,3 +651,14 @@ body.carregando{overflow:hidden}
   body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
   .toast{bottom:calc(72px + env(safe-area-inset-bottom))}
 }
+
+/* celular: sem repetição (a barra inferior já tem Publicar, Comunidade e abas) */
+@media (max-width:640px){
+  .top-actions,.toolbar .tabs,footer{display:none}
+  .filtros[hidden]{display:none}
+  .toolbar{flex-wrap:nowrap;align-items:center;padding-top:6px;gap:8px}
+  #ordem{order:1;width:122px;flex:none}
+  .chips{order:2;flex:1 1 0;min-width:0}
+  .topbar{justify-content:center}
+  .hero{padding-top:8px}
+}
