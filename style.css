@@ -771,3 +771,13 @@ body.carregando{overflow:hidden}
   body:has(#modalCadastro:not([hidden])) .bnav{height:54px;top:calc(var(--h0, 100dvh) - 62px - env(safe-area-inset-bottom))}
   body:has(#modalCadastro:not([hidden])) .pub-bar{top:calc(var(--h0, 100dvh) - 146px - env(safe-area-inset-bottom))}
 }
+
+/* sem barras de rolagem em todo o site (a rolagem continua funcionando) */
+*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* Publicar com teclado aberto: botão logo após o formulário, sem flutuar */
+@media (max-width:640px){
+  body.kb:has(#modalCadastro:not([hidden])) .pub-bar{position:static;height:auto;padding:14px 0 0;background:none}
+  body.kb #modalCadastro .sheet.pub{padding-bottom:24px}
+}

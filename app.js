@@ -670,3 +670,16 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 })();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+
+/* Publicar: com o teclado aberto, o botão Publicar aparece logo abaixo do formulário (visível e sem cobrir os campos) */
+(() => {
+  const vv = window.visualViewport;
+  const checar = () => {
+    const h0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--h0')) || innerHeight;
+    const aberto = !$('modalCadastro').hidden && (vv ? vv.height : innerHeight) < h0 - 150;
+    document.body.classList.toggle('kb', aberto);
+    if (aberto){ const f = document.activeElement; if (f && f.scrollIntoView && f.closest('#modalCadastro')) setTimeout(() => f.scrollIntoView({ block:'center', behavior:'smooth' }), 120); }
+  };
+  addEventListener('resize', checar); if (vv) vv.addEventListener('resize', checar);
+  new MutationObserver(checar).observe($('modalCadastro'), { attributes:true, attributeFilter:['hidden'] });
+})();
