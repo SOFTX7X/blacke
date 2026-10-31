@@ -785,8 +785,13 @@ async function carregarStats(){
     $('sbChart').innerHTML = dias.map(x => `<i style="height:${Math.max(4, Math.round(x.n / max * 100))}%" class="${x.n ? 'on' : ''}" title="${fmt(x.d)}: ${x.n} ${x.n === 1 ? 'acesso' : 'acessos'}"></i>`).join('');
     $('sbIni').textContent = fmt(dias[0].d); $('sbFim').textContent = 'hoje';
     $('sbResumo').textContent = `${tot} ${tot === 1 ? 'acesso' : 'acessos'} em 14 dias`;
-    const top = (data.sites || [])[0];
-    $('sbTop').innerHTML = top && top.total ? `Mais clicado: <b>${esc(top.nome)}</b> · ${top.total} ${top.total === 1 ? 'acesso' : 'acessos'} no total` : 'Ainda sem acessos registrados.';
+    const sites = (data.sites || []).slice(0, 5), mx = Math.max(1, ...sites.map(s => s.total));
+    $('sbChart').classList.toggle('vazio', tot === 0);
+    $('sbAviso').textContent = tot === 0 ? 'O gráfico conta os acessos de hoje em diante. Os acessos anteriores aparecem só no total de cada site.' : '';
+    $('sbTop').innerHTML = sites.length ? sites.map((s, i) => `
+      <div class="sb-row"><span class="sb-nome">${i === 0 && s.total ? '<em title="Mais clicado">★</em> ' : ''}${esc(s.nome)}</span>
+        <span class="sb-num">${s.total} ${s.total === 1 ? 'acesso' : 'acessos'}${s.n14 ? ` · <b>${s.n14}</b> em 14 dias` : ''}</span>
+        <span class="sb-bar"><i style="width:${Math.round(s.total / mx * 100)}%"></i></span></div>`).join('') : '';
     box.hidden = false;
   }catch(_){}
 }
