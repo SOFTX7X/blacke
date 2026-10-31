@@ -1240,3 +1240,16 @@ body[data-aba="publicar"] .hero{display:none}
   html:not(.pronto) .bnav{width:62px!important;transition:none!important}
   html:not(.pronto) .bnav span{opacity:0!important;transition:none!important}
 }
+
+/* ===== Efeitos mais leves e profissionais ===== */
+/* cards: sem inclinação 3D e sem neon; só um leve levantar */
+.card{transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-3px)!important;box-shadow:0 16px 34px -18px rgba(0,0,0,.9)}
+.card .tag,.card .vistas{box-shadow:none!important}
+.card:hover .cover img{transform:scale(1.03)}
+/* tela de carregamento rápida */
+#splash{transition:opacity .35s ease,visibility 0s .35s}
+#splash.sai{transform:none}
+/* cliques: resposta tátil leve em botões */
+button:not(:disabled):active,.btn-primary:active,.btn-ghost:active,.pc-btn:active,.chip:active{transform:scale(.97)}
+.brand:hover .brand-name{animation:none}

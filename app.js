@@ -69,48 +69,7 @@ async function iniciarChave(){
 }
 
 /* Título que "decodifica" ao carregar */
-(function scramble(){
-  const el = $('heroTitle'), final = el.dataset.text;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const chars = '01#$%&*<>/\\|=+';
-  let frame = 0; const total = 28;
-  const id = setInterval(() => {
-    frame++;
-    el.textContent = final.split('').map((c,i) =>
-      c === ' ' ? ' ' : (i < (frame/total)*final.length ? c : chars[Math.floor(Math.random()*chars.length)])
-    ).join('');
-    if (frame >= total){ clearInterval(id); el.textContent = final; }
-  }, 40);
-})();
 
-/* Chuva binária de fundo (leve: poucas colunas, ~11 quadros/s, pausa fora da tela) */
-(function rain(){
-  const cv = $('rain'); if (!cv || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const ctx = cv.getContext('2d'); let size, cols, drops;
-  function resize(){
-    size = innerWidth < 700 ? 26 : 20;
-    cv.width = innerWidth; cv.height = innerHeight;
-    cols = Math.ceil(cv.width/size); drops = Array.from({length:cols}, () => Math.random()*-40);
-    ctx.font = (size-6) + 'px IBM Plex Mono, monospace';
-  }
-  resize(); addEventListener('resize', resize);
-  let last = 0;
-  function draw(t){
-    requestAnimationFrame(draw);
-    if (document.hidden || document.body.classList.contains('modal-open') || document.body.classList.contains('ficha-open') || t - last < (innerWidth < 700 ? 140 : 90)) return;
-    last = t;
-    ctx.fillStyle = 'rgba(6,7,13,.16)'; ctx.fillRect(0,0,cv.width,cv.height);
-    for (let i=0;i<cols;i++){
-      if (drops[i] < 0){ drops[i]++; continue; }
-      const y = drops[i]*size;
-      ctx.fillStyle = Math.random() > .95 ? 'rgba(111,214,255,.9)' : 'rgba(123,108,255,.5)';
-      ctx.fillText(Math.random() > .5 ? '1' : '0', i*size, y);
-      if (y > cv.height && Math.random() > .97) drops[i] = 0;
-      drops[i] += 1;
-    }
-  }
-  requestAnimationFrame(draw);
-})();
 
 
 /* ---------- modais ---------- */
@@ -347,10 +306,7 @@ function efeitoCard(card){
   card.addEventListener('pointermove', e => {
     const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
     card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
-    if (e.pointerType === 'mouse'){
-      const rx = ((y/r.height) - .5) * -4, ry = ((x/r.width) - .5) * 5;
-      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-3px)`;
-    }
+
   });
   card.addEventListener('pointerleave', () => { card.style.transform = ''; });
 }
@@ -584,7 +540,7 @@ function fecharSplash(){
   setTimeout(() => {
     el.classList.add('sai'); document.body.classList.remove('carregando');
     setTimeout(() => el.remove(), 800);
-  }, Math.max(0, 1200 - (performance.now() - splash.t0)));      // fica pelo menos ~1,2 s para não piscar
+  }, Math.max(0, 350 - (performance.now() - splash.t0)));       // rápida: só o suficiente para não piscar
 }
 setTimeout(fecharSplash, 7000);
 
