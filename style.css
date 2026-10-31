@@ -1313,3 +1313,5 @@ body.ficha-open::before{display:none}
   .card .tag,.card .vistas{font-size:11px}
   .card .ins{padding:22px 12px 10px;font-size:11.5px}.card .ins b{font-size:15px}.card .ins em{display:inline}
 }
+/* lupa só onde faz sentido (fora de Publicar e Conta) */
+body[data-aba="publicar"] .tb-busca,body[data-aba="meus"] .tb-busca,body[data-aba="publicar"] .topbar .searchbar,body[data-aba="meus"] .topbar .searchbar{display:none!important}
