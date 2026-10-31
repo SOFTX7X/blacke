@@ -466,7 +466,7 @@ async function buscarMural(reset){
       const filtrando = S.busca || S.cat !== 'Todas';
       setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
     } else setEstado('');
-    desenharDestaques(); fecharSplash();
+    fecharSplash();
   }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
 }
 
@@ -490,10 +490,12 @@ function desenharMeus(){
 
 async function trocarAba(aba){
   S.aba = aba;
-  $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus');
+  $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = aba !== 'meus';
-  desenharDestaques();
+  $('destaques').hidden = aba !== 'destaques';
+  ['muralGrid','estado'].forEach(id => $(id).hidden = aba === 'destaques');
+  if (aba === 'destaques'){ $('maisBtn').hidden = true; $('perfilBox').hidden = true; abrirDestaques(); return; }
   if (aba === 'mural'){ buscarMural(true); return; }
   skeleton();
   try{ await buscarMeus(); desenharMeus(); }catch(err){ erroCarga(err); }
@@ -718,29 +720,27 @@ async function abrirLinkDireto(){
   }
 }
 
-/* ---------- Em destaque: mais acessados e novos ---------- */
+/* ---------- Destaques: seção própria (mais acessados e novos) ---------- */
 function desenharDestaques(){
-  const box = $('destaques'), lista = S.dest[S.destAba] || [];
-  const visivel = S.aba === 'mural' && !S.busca && S.cat === 'Todas' && (S.dest.top.length || S.dest.novos.length);
-  box.hidden = !visivel; if (!visivel) return;
+  const lista = S.dest[S.destAba] || [], g = $('destLista');
   document.querySelectorAll('#destaques [data-d]').forEach(b => b.classList.toggle('on', b.dataset.d === S.destAba));
-  $('destLista').innerHTML = lista.map((it, i) => {
-    const n = it.cliques || 0;
-    return `<button type="button" class="dest-card" data-act="detalhes" data-id="${esc(it.id)}" aria-label="${esc(it.brand_name)}">
-      <span class="dest-img"><img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">
-        ${S.destAba === 'top' ? `<i class="dest-rank">${i + 1}</i>` : '<i class="dest-rank novo">novo</i>'}</span>
-      <b>${esc(it.brand_name)}</b><small>${S.destAba === 'top' ? `${n} ${n === 1 ? 'acesso' : 'acessos'}` : esc(it.categoria || 'Outros')}</small>
-    </button>`;
-  }).join('') || '<p class="dest-vazio">Ainda não há sites aqui.</p>';
-  $('destLista').scrollLeft = 0;
+  g.innerHTML = '';
+  if (!lista.length){ g.innerHTML = '<p class="dest-vazio">Ainda não há sites aqui.</p>'; return; }
+  lista.forEach((it, i) => {
+    const c = criarCard(it, i);
+    if (S.destAba === 'top') c.querySelector('.cover').insertAdjacentHTML('beforeend', `<i class="dest-rank">${i + 1}</i>`);
+    g.appendChild(c);
+  });
 }
-async function carregarDestaques(){
+async function abrirDestaques(){
+  $('destLista').innerHTML = '<div class="skeleton"></div>'.repeat(4);
   try{
     const base = () => _supabase.from('sites_publicos').select(COLS).lt('denuncias', 5).eq('oculto', false);
     const [t, n] = await Promise.all([
-      base().gt('cliques', 0).order('cliques', { ascending:false }).order('id', { ascending:false }).limit(8),
-      base().order('created_at', { ascending:false }).order('id', { ascending:false }).limit(8)
+      base().gt('cliques', 0).order('cliques', { ascending:false }).order('id', { ascending:false }).limit(12),
+      base().order('created_at', { ascending:false }).order('id', { ascending:false }).limit(12)
     ]);
+    if (S.aba !== 'destaques') return;
     S.dest.top = t.data || []; S.dest.novos = n.data || [];
     if (!S.dest.top.length) S.destAba = 'novos';
   }catch(_){ S.dest = { top:[], novos:[] }; }
@@ -750,4 +750,3 @@ $('destaques').addEventListener('click', e => {
   const b = e.target.closest('[data-d]'); if (!b) return;
   S.destAba = b.dataset.d; desenharDestaques();
 });
-carregarDestaques();
