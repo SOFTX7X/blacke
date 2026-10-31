@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/s/:id", "destination": "/api/p?s=:id" },
+    { "source": "/:h(@[^/]+)", "destination": "/api/p?p=:h" }
+  ]
+}

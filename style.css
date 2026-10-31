@@ -788,3 +788,7 @@ body.carregando{overflow:hidden}
   #modalCadastro .sheet.pub,body.kb #modalCadastro .sheet.pub{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   body.kb #modalCadastro .sheet.pub{padding-bottom:24px}
 }
+
+/* compartilhar perfil */
+#pfShare{flex:none}
+@media (max-width:640px){#pfShare span,#pfLimpar{font-size:0}#pfShare,#pfLimpar{padding:0;width:40px;height:40px;border-radius:50%}#pfShare i,#pfLimpar i{font-size:15px}}

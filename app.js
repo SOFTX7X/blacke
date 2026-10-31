@@ -259,6 +259,7 @@ function acoesDe(item){
     { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
   ];
+  l.push({ act:'linkmural', ic:'fa-solid fa-link', txt:'Link no BLACKE' });
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
   if (ehDono(item)){
     if (S.aba === 'meus') l.push({ act:'editar', ic:'fa-solid fa-pen', txt:'Editar' }, { act:'excluir', ic:'fa-solid fa-trash', txt:'Excluir', danger:true });
@@ -336,6 +337,16 @@ async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
   try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
 }
+
+/* Links próprios do mural: /s/ID (site) e /@nome (perfil), com prévia no WhatsApp/Telegram */
+async function enviarLink(url, titulo, texto){
+  if (navigator.share){ try{ await navigator.share({ title:titulo, text:texto, url }); return; }catch(e){ if (e && e.name === 'AbortError') return; } }
+  try{ await navigator.clipboard.writeText(url); }
+  catch(_){ const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  aviso('Link copiado');
+}
+function linkMural(id){ const it = acharItem(id); if (it) enviarLink(`${location.origin}/s/${it.id}`, it.brand_name, it.brand_name + ' — BLACKE LAVEX'); }
+function linkPerfil(h){ enviarLink(`${location.origin}/@${h}`, '@' + h, '@' + h + ' no BLACKE LAVEX'); }
 
 /* ---------- Painel completo do site ---------- */
 let fichaTimer = null, fichaFoco = null;
@@ -550,7 +561,7 @@ async function mostrarPerfil(h){
   if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
   if (!data){ box.hidden = true; return; }
   const s = data.sites, a = data.acessos;
-  $('pfHandle').textContent = '@' + data.handle;
+  $('pfHandle').textContent = '@' + data.handle; $('pfShare').dataset.h = data.handle;
   $('pfInfo').textContent = `${s} ${s === 1 ? 'site' : 'sites'} · ${a} ${a === 1 ? 'acesso' : 'acessos'} · no mural desde ${new Date(data.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' })}`;
   box.hidden = false;
 }
@@ -634,6 +645,8 @@ document.addEventListener('click', e => {
     case 'fecharficha': fecharFicha(); break;
     case 'copiar': copiarLink(id); break;
     case 'compartilhar': compartilhar(id); break;
+    case 'linkmural': linkMural(id); break;
+    case 'linkperfil': linkPerfil(el.dataset.h); break;
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
@@ -667,6 +680,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil();
+  abrirLinkDireto();
 })();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
@@ -683,3 +697,22 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEv
   addEventListener('resize', checar); if (vv) vv.addEventListener('resize', checar);
   new MutationObserver(checar).observe($('modalCadastro'), { attributes:true, attributeFilter:['hidden'] });
 })();
+
+/* Abre direto o site (?s=ID) ou o perfil (?p=nome) vindos de um link compartilhado */
+async function abrirLinkDireto(){
+  const q = new URLSearchParams(location.search), s = q.get('s'), p = q.get('p');
+  if (!s && !p) return;
+  try{ history.replaceState(null, '', location.pathname); }catch(_){}
+  if (p && /^[a-z0-9_]{3,30}$/i.test(p)){ irParaPerfil(p.toLowerCase()); return; }
+  if (s && /^\d{1,12}$/.test(s)){
+    try{
+      let it = acharItem(s);
+      if (!it){
+        const { data } = await _supabase.from('sites_publicos').select(COLS).eq('id', s).lt('denuncias', 5).eq('oculto', false).maybeSingle();
+        if (!data){ aviso('Esse site não está mais no mural'); return; }
+        S.itens.push(data); it = data;
+      }
+      abrirFicha(it.id);
+    }catch(_){ aviso('Não foi possível abrir esse site'); }
+  }
+}
