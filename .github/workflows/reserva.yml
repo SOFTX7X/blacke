@@ -1,10 +1,10 @@
 name: Backup e banco reserva
 
-# Todo dia às 03:17 (Manaus) copia o banco principal e as capas para o projeto reserva
+# Todo domingo às 03:17 (Manaus) copia o banco principal e as capas para o projeto reserva
 # e guarda um backup criptografado (14 dias). Também dá para rodar na hora em Actions > Run workflow.
 on:
   schedule:
-    - cron: '17 7 * * *'
+    - cron: '17 7 * * 0'
   workflow_dispatch:
 
 permissions:
