@@ -449,6 +449,7 @@ async function buscarMural(reset){
     anexar(lote, reset);
     $('contador').textContent = `${S.total} ${S.total === 1 ? 'site' : 'sites'}`;
     $('maisBtn').hidden = !S.temMais; $('maisBtn').disabled = false; $('maisBtn').textContent = 'Carregar mais';
+    vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
       setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
@@ -650,6 +651,11 @@ $('chips').addEventListener('click', e => {
 });
 $('ordem').addEventListener('change', e => { S.ordem = e.target.value; buscarMural(true); });
 let _bt; $('busca').addEventListener('input', e => { clearTimeout(_bt); _bt = setTimeout(() => { S.busca = e.target.value.trim(); buscarMural(true); }, 350); });
+/* Rolagem infinita: ao chegar perto do fim, carrega o próximo lote (o botão segue como alternativa) */
+const _io = 'IntersectionObserver' in window ? new IntersectionObserver(es => {
+  const b = $('maisBtn'); if (es.some(e => e.isIntersecting) && !b.hidden && !b.disabled) b.click();
+}, { rootMargin:'700px 0px' }) : null;
+function vigiarFim(){ if (_io){ _io.unobserve($('maisBtn')); _io.observe($('maisBtn')); } }
 $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('maisBtn').textContent = 'Carregando...'; S.pagina++; buscarMural(false); });
 
 /* ---------- início ---------- */
