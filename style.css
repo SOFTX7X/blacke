@@ -662,3 +662,16 @@ body.carregando{overflow:hidden}
   .topbar{justify-content:center}
   .hero{padding-top:8px}
 }
+
+/* barra inferior em formato de bolha (celular) */
+@media (max-width:640px){
+  .bnav{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;gap:4px;border:1px solid rgba(255,255,255,.07);border-radius:999px!important;background:rgba(24,25,36,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 34px -8px rgba(0,0,0,.8),0 0 28px -10px rgba(123,108,255,.5)}
+  .bnav button,.bnav a{height:56px;border-radius:999px!important;gap:3px;font-size:10.5px;color:#c7cbe6;transition:background .25s,color .25s}
+  .bnav svg{width:24px;height:24px}
+  .bnav .on{box-shadow:none;background:rgba(123,108,255,.22);color:#a99bff}
+  .bnav .on i,.bnav .on svg{color:#a99bff}
+  .bnav .on svg{fill:currentColor;fill-opacity:.35}
+  .bnav button:active,.bnav a:active{transform:scale(.95)}
+  body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(98px + env(safe-area-inset-bottom))}
+}
