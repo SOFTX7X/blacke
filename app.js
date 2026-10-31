@@ -523,7 +523,7 @@ function desenharMeus(){
 }
 
 async function trocarAba(aba){
-  S.aba = aba; document.body.dataset.aba = aba;
+  S.aba = aba; document.body.dataset.aba = aba; if (aba !== 'mural') modoPerfil(false);
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = $('meuPerfil').hidden = aba !== 'meus';
@@ -764,12 +764,32 @@ $('peSalvar').addEventListener('click', async () => {
 });
 
 function resetChips(){ S.cat = 'Todas'; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.cat === 'Todas')); }
-function irParaPerfil(h){
-  S.busca = '@' + h; $('busca').value = S.busca; resetChips();
-  scrollTo({ top:0, behavior:'smooth' });
+/* Página de perfil: abre limpa (sem título, busca e filtros), com Voltar */
+function modoPerfil(on){ document.body.classList.toggle('modo-perfil', !!on); }
+function irParaPerfil(h, semHistorico){
+  if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
+  S.busca = '@' + h; $('busca').value = S.busca; resetChips(); modoPerfil(true);
+  if (!semHistorico){ try{ if (!(history.state && history.state.perfil === h)) history.pushState({ perfil:h }, '', '?p=' + encodeURIComponent(h)); }catch(_){} }
+  scrollTo({ top:0 });
   if (S.aba !== 'mural') trocarAba('mural'); else buscarMural(true);
 }
-$('pfLimpar').addEventListener('click', () => { S.busca = ''; $('busca').value = ''; buscarMural(true); });
+function sairPerfil(){
+  modoPerfil(false); S.busca = ''; $('busca').value = ''; buscarMural(true);
+  const y = S.voltar && S.voltar.scroll; S.voltar = null;
+  if (y) setTimeout(() => scrollTo({ top:y }), 350);
+}
+$('pfLimpar').addEventListener('click', () => {
+  if (history.state && history.state.perfil){ history.back(); return; }
+  sairPerfil();
+});
+addEventListener('popstate', e => {
+  const h = e.state && e.state.perfil;
+  if (h) irParaPerfil(h, true);
+  else if (document.body.classList.contains('modo-perfil')) sairPerfil();
+});
+// se a busca mudar ou o perfil sumir, sai do modo perfil
+$('busca').addEventListener('input', () => modoPerfil(false));
+new MutationObserver(() => { if ($('perfilBox').hidden && document.body.classList.contains('modo-perfil') && !S.busca.startsWith('@')) modoPerfil(false); }).observe($('perfilBox'), { attributes:true, attributeFilter:['hidden'] });
 $('arrobaInput').addEventListener('input', e => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, '').replace(/@/g, ''); });
 
 $('btnArroba').addEventListener('click', () => {

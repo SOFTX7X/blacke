@@ -85,6 +85,7 @@
     ['visualização','view','visualización'],['visualizações','views','visualizaciones'],
     ['Minha chave','My key','Mi clave'],
     ['Excluir todos os meus sites','Delete all my sites','Eliminar todos mis sitios'],
+    ['Voltar ao mural','Back to the wall','Volver al muro'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],
     ['Centralizar','Center','Centrar'],
