@@ -858,7 +858,7 @@ document.addEventListener('click', e => {
   if (!el) return;
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
-  if (['perfil','editar','excluir','denunciar'].includes(a)) fecharFicha();
+  if (['editar','excluir','denunciar'].includes(a)) fecharFicha();
   switch (a){
     case 'novo': abrirPublicar(); break;
     case 'menu': abrirMenu(el, id); break;
@@ -873,7 +873,16 @@ document.addEventListener('click', e => {
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;
     case 'visitar': registrarClique(id); break;
-    case 'perfil': irParaPerfil(el.dataset.h); break;
+    case 'perfil': {
+      const h = el.dataset.h;
+      if (!$('ficha').hidden && $('ficha').classList.contains('on')){
+        // veio da ficha: fecha sem voltar no histórico e troca a entrada da ficha pela do perfil
+        const daFicha = history.state && history.state.ficha;
+        fecharFicha(false);
+        if (daFicha){ try{ history.replaceState({ perfil:h }, '', '?p=' + encodeURIComponent(h)); }catch(_){} irParaPerfil(h, true); break; }
+      }
+      irParaPerfil(h); break;
+    }
   }
 });
 const _pubAberto = () => !$('modalCadastro').hidden;
