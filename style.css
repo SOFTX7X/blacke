@@ -435,7 +435,6 @@ button.visit{font-family:inherit;cursor:pointer;text-align:left}
 }
 
 /* ===== v19: estilo quadrado, nome centralizado, categoria no topo ===== */
-*,*::before,*::after{border-radius:0!important}
 ::-webkit-scrollbar-thumb{border-radius:0}
 
 /* categoria em cima (esquerda) e acessos em cima (direita), sobre a foto */
@@ -740,3 +739,17 @@ body.carregando{overflow:hidden}
   #modalCadastro .upload{padding:18px 14px}
   #modalCadastro .upload small{display:none}
 }
+
+/* ---- cantos arredondados no resto do site ---- */
+.vistas{border-radius:99px}
+.pn-back{border-radius:99px}
+.pn-foto,.pn-foto img{border-radius:22px}
+.pn-foto{overflow:hidden}
+.rel{border-radius:18px}
+.pn-go{border-radius:99px}
+.pn-box .btn-ghost,.pn-sec .btn-ghost{border-radius:16px}
+.panel,.stat{border-radius:18px}
+.searchbar{border-radius:18px}
+.field,.sheet{border-radius:16px}
+.sheet{border-radius:24px}
+@media (max-width:640px){.sheet{border-radius:24px 24px 0 0}.pn-sec .btn-ghost{border-radius:50%}}
