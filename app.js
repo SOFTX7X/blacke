@@ -465,6 +465,7 @@ function desenharMeus(){
 async function trocarAba(aba){
   S.aba = aba;
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus');
+  document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = aba !== 'meus';
   if (aba === 'mural'){ buscarMural(true); return; }
   skeleton();
@@ -625,6 +626,7 @@ document.addEventListener('click', e => {
     case 'perfil': irParaPerfil(el.dataset.h); break;
   }
 });
+document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.nav) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
 $('chips').innerHTML = ['Todas', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c}</button>`).join('');

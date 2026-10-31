@@ -638,3 +638,16 @@ body.carregando{overflow:hidden}
 /* foto e nome do card abrem os detalhes; o resto do card não */
 .card .cover,.card .body h3{cursor:pointer}
 .card .cover:focus-visible{outline:2px solid var(--ice);outline-offset:-2px}
+
+/* barra inferior (somente celular) */
+.bnav{display:none}
+@media (max-width:640px){
+  .bnav{position:fixed;left:0;right:0;bottom:0;z-index:35;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(6,7,13,.96);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .bnav button,.bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:54px;border:0;background:none;color:var(--muted);font:600 10.5px var(--display);text-decoration:none;cursor:pointer;border-radius:0}
+  .bnav i{font-size:17px}
+  .bnav .on{color:#fff;box-shadow:inset 0 2px 0 var(--ice)}
+  .bnav .on i{color:var(--ice)}
+  .bnav .bn-pub i{color:var(--violet)}
+  body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(72px + env(safe-area-inset-bottom))}
+}
