@@ -519,6 +519,7 @@ async function trocarAba(aba){
   if (aba === 'mural'){ buscarMural(true); return; }
   skeleton();
   try{ await buscarMeus(); desenharMeus(); }catch(err){ erroCarga(err); }
+  carregarStats();
 }
 
 async function excluirUm(id){
@@ -771,3 +772,21 @@ $('destaques').addEventListener('click', e => {
   const b = e.target.closest('[data-d]'); if (!b) return;
   S.destAba = b.dataset.d; desenharDestaques();
 });
+
+/* ---------- Desempenho dos meus sites (últimos 14 dias) ---------- */
+async function carregarStats(){
+  const box = $('statsBox'); box.hidden = true;
+  if (!S.token || !S.meus.length) return;
+  try{
+    const { data, error } = await _supabase.rpc('meus_stats', { p_token:S.token });
+    if (error || !data || !data.dias) return;                 // banco sem a atualização: a caixa fica oculta
+    const dias = data.dias, max = Math.max(1, ...dias.map(x => x.n)), tot = dias.reduce((a, x) => a + x.n, 0);
+    const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+    $('sbChart').innerHTML = dias.map(x => `<i style="height:${Math.max(4, Math.round(x.n / max * 100))}%" class="${x.n ? 'on' : ''}" title="${fmt(x.d)}: ${x.n} ${x.n === 1 ? 'acesso' : 'acessos'}"></i>`).join('');
+    $('sbIni').textContent = fmt(dias[0].d); $('sbFim').textContent = 'hoje';
+    $('sbResumo').textContent = `${tot} ${tot === 1 ? 'acesso' : 'acessos'} em 14 dias`;
+    const top = (data.sites || [])[0];
+    $('sbTop').innerHTML = top && top.total ? `Mais clicado: <b>${esc(top.nome)}</b> · ${top.total} ${top.total === 1 ? 'acesso' : 'acessos'} no total` : 'Ainda sem acessos registrados.';
+    box.hidden = false;
+  }catch(_){}
+}

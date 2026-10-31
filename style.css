@@ -840,3 +840,16 @@ body.carregando{overflow:hidden}
 .fav-btn.on{animation:favpop .35s cubic-bezier(.2,.9,.3,1.4)}
 @keyframes favpop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 @media (max-width:640px){.fav-btn{width:34px;height:34px;right:8px;bottom:8px}}
+
+/* Desempenho */
+.stats-box{flex:1 1 100%;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(6,7,13,.5)}
+.sb-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.sb-head b{font:700 14px var(--display)}
+.sb-head span{font:400 12px var(--mono);color:var(--muted)}
+.sb-chart{display:flex;align-items:flex-end;gap:5px;height:84px}
+.sb-chart i{flex:1;min-height:4px;border-radius:6px 6px 2px 2px;background:rgba(255,255,255,.08)}
+.sb-chart i.on{background:var(--grad)}
+.sb-eixo{display:flex;justify-content:space-between;margin-top:6px;font:400 11px var(--mono);color:#6a7099}
+.sb-top{margin-top:10px;font-size:13px;color:var(--muted)}
+.sb-top b{color:var(--text);font-weight:600}
+@media (max-width:640px){.stats-box{padding:12px 14px}.sb-chart{height:70px;gap:4px}}
