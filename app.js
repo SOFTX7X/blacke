@@ -444,8 +444,8 @@ function linkPerfil(h){ enviarLink(`${location.origin}/@${h}`, '@' + h, '@' + h 
 /* ---------- Painel completo do site ---------- */
 let fichaTimer = null, fichaFoco = null;
 const hostDe = u => { try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return u; } };
-function relacionados(it){
-  const mapa = new Map(); S.itens.concat(S.meus).forEach(s => { if (String(s.id) !== String(it.id)) mapa.set(String(s.id), s); });
+function relacionados(it, excluir){
+  const mapa = new Map(); S.itens.concat(S.meus).forEach(s => { if (String(s.id) !== String(it.id) && !(excluir && excluir.has(String(s.id)))) mapa.set(String(s.id), s); });
   const todos = [...mapa.values()];
   const pts = s => (it.handle && s.handle === it.handle ? 2 : 0) + (s.categoria === it.categoria ? 1 : 0);
   const afins = todos.filter(s => pts(s) > 0).sort((a, b) => pts(b) - pts(a));
@@ -492,7 +492,18 @@ function abrirFicha(id){
     </div>
     <p class="pn-note">O site abre em uma nova aba. O BLACKE LAVEX não controla o conteúdo dos links publicados.</p>`;
 
-  const rel = relacionados(it);
+  const cardRel = s => `
+    <button class="rel" type="button" data-act="detalhes" data-id="${esc(s.id)}">
+      <span class="rel-img"><img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}"></span>
+      <b>${esc(s.brand_name)}${selo(s)}</b><small>${esc(s.categoria || 'Outros')}</small>
+    </button>`;
+  // Mais deste perfil (mesmo @)
+  const mapaM = new Map(); S.itens.concat(S.meus, S.dest.top, S.dest.novos).forEach(s => { if (it.handle && s.handle === it.handle && String(s.id) !== String(it.id)) mapaM.set(String(s.id), s); });
+  const mais = [...mapaM.values()].slice(0, 4);
+  $('pnMais').hidden = !mais.length;
+  $('pnMaisT').innerHTML = it.handle ? `Mais de <span translate="no">@${esc(it.handle)}</span>` : '';
+  $('pnMaisRel').innerHTML = mais.map(cardRel).join('');
+  const rel = relacionados(it, new Set(mais.map(s => String(s.id))));
   $('pnVeja').hidden = !rel.length;
   $('pnRel').innerHTML = rel.map(s => `
     <button class="rel" type="button" data-act="detalhes" data-id="${esc(s.id)}">

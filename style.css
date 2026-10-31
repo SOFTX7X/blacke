@@ -1329,3 +1329,28 @@ body.carregando .card{animation-play-state:running}
   .toolbar.fixa .chip{flex:none}
   @keyframes barIn{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
 }
+
+/* ===== Página do site no PC: centralizada, capa grande, botões junto do nome ===== */
+@media (min-width:900px){
+  .pn-wrap{max-width:1100px!important;margin:0 auto!important;padding:40px 40px 100px!important;display:grid!important;
+    grid-template-columns:minmax(0,440px) minmax(0,1fr)!important;column-gap:48px!important;row-gap:0!important;
+    grid-template-areas:"foto info" "foto side" "sobre sobre" "mais mais" "veja veja"}
+  .pn-main,.pn-head{display:contents}
+  .pn-foto{grid-area:foto;align-self:start;width:100%}
+  .pn-foto img{width:100%!important;height:auto!important;max-width:none!important;max-height:none!important;aspect-ratio:6/5;object-fit:cover}
+  .pn-info{grid-area:info;align-self:end;padding-bottom:22px}
+  .pn-info h1{font-size:clamp(28px,2.6vw,40px)}
+  .pn-side{grid-area:side;position:static!important;align-self:start}
+  .pn-box{gap:10px}
+  .pn-sec{display:flex;flex-wrap:wrap;gap:8px}
+  .pn-sec .btn-ghost{flex:1 1 auto;width:auto}
+  .pn-note{margin-top:4px}
+  .pn-sec2{grid-area:sobre;margin-top:40px}
+  .pn-mais{grid-area:mais}
+  #pnVeja{grid-area:veja}
+  .pn-rel{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (min-width:900px){
+  .pn-sec{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .pn-sec .btn-ghost{width:100%!important;justify-content:center}
+}
