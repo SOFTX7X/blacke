@@ -523,7 +523,7 @@ function desenharMeus(){
 }
 
 async function trocarAba(aba){
-  S.aba = aba;
+  S.aba = aba; document.body.dataset.aba = aba;
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = $('meuPerfil').hidden = aba !== 'meus';

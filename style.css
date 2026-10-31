@@ -1031,3 +1031,6 @@ body.carregando{overflow:hidden}
   .bnav a{margin-top:2px}
 }
 @media (min-width:900px) and (prefers-reduced-motion:reduce){.bnav,.bnav span{transition:none}}
+/* título do mural só na aba Mural */
+body[data-aba="meus"] .hero,body[data-aba="destaques"] .hero{display:none}
+body[data-aba="meus"] #meuPerfil{margin-top:22px}
