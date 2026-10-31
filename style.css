@@ -891,3 +891,6 @@ body.carregando{overflow:hidden}
   .pn-box .pn-go span{display:inline}
 }
 @media (max-width:340px){.pn-sec .btn-ghost{width:34px;height:34px}.pn-go{font-size:13px;padding:12px 6px}.pn-box{gap:5px}}
+
+/* grades de sites: cantos quadrados (cards, capas, botões dos cards, "Veja também") */
+.card,.card *,.card *::before,.card *::after,.skeleton,.rel,.rel *{border-radius:0!important}
