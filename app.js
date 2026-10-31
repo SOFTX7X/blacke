@@ -1173,3 +1173,4 @@ function marcarInsights(){
   r.addEventListener('pointerleave', () => { r.classList.remove('aberto'); mexeu = false; });
   r.addEventListener('click', () => { r.classList.remove('aberto'); mexeu = false; });
 })();
+addEventListener('load', () => setTimeout(() => document.documentElement.classList.add('pronto'), 500));

@@ -1235,3 +1235,8 @@ body[data-aba="publicar"] .hero{display:none}
 .logo-ring{width:46px;height:30px}
 .sp-logo{width:150px;height:96px}
 @media (max-width:640px){.logo-ring{width:40px;height:26px}}
+/* enquanto a página carrega (F5), o menu lateral fica sempre fechado e sem animação */
+@media (min-width:900px){
+  html:not(.pronto) .bnav{width:62px!important;transition:none!important}
+  html:not(.pronto) .bnav span{opacity:0!important;transition:none!important}
+}
