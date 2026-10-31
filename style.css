@@ -1376,3 +1376,23 @@ body.carregando .card{animation-play-state:running}
   .pn-sec2{margin:0!important}
   .pn-sec2 p{white-space:pre-line}
 }
+
+/* ===== Topo da página do site: bolha flutuante (estilo Telegram) ===== */
+.pn-top{position:absolute!important;top:14px;left:50%;transform:translateX(-50%);z-index:6;width:min(calc(100% - 28px),720px);height:54px!important;
+  padding:0 8px 0 6px!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:999px;background:rgba(20,21,36,.94);
+  box-shadow:0 12px 34px -12px rgba(0,0,0,.85)}
+.pn-top::after{display:none!important}
+.pn-back{height:42px;padding:0 16px!important;border:0!important;background:rgba(255,255,255,.06)!important;border-radius:999px!important}
+.pn-back:hover{background:rgba(123,108,255,.22)!important}
+.pn-brand{display:flex!important;align-items:center;gap:10px;padding-right:12px;font:600 12.5px var(--mono);letter-spacing:.2em}
+.pn-logo{width:34px;height:22px;object-fit:contain}
+.pn-scroll{padding-top:84px}
+@media (max-width:640px){
+  .pn-top{top:10px;height:50px!important}
+  .pn-back{height:38px;padding:0 13px!important}
+  .pn-brand{font-size:10.5px;letter-spacing:.14em;gap:7px;padding-right:8px}
+  .pn-logo{width:28px;height:18px}
+  .pn-scroll{padding-top:72px}
+}
+.pn-back{white-space:nowrap}
+@media (max-width:640px){.pn-brand{font-size:0;letter-spacing:0;gap:0}.pn-brand b{font-size:0}.pn-logo{width:34px;height:22px}}
