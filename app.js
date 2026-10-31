@@ -5,7 +5,7 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const LOC = () => ({ pt:'pt-BR', en:'en-US', es:'es-ES' })[window.blLang ? window.blLang() : 'pt'];
 
-const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos,created_at';
+const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos,created_at,verificado';
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
 const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
@@ -285,6 +285,8 @@ function acoesDe(item){
   } else l.push({ act:'denunciar', ic:'fa-regular fa-flag', txt:'Denunciar' });
   return l;
 }
+const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
+const selo = it => it && it.verificado ? SELO : '';
 function criarCard(item, i){
   const n = item.cliques || 0;
   const card = document.createElement('article');
@@ -298,7 +300,7 @@ function criarCard(item, i){
       <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
-      <h3 data-act="detalhes" translate="no"><span>${esc(item.brand_name)}</span></h3>
+      <h3 data-act="detalhes" translate="no"><span>${esc(item.brand_name)}</span>${selo(item)}</h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
       </div>
@@ -387,7 +389,7 @@ function abrirFicha(id){
   const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
   img.src = it.image_url; img.style.objectPosition = posSegura(it.img_pos);
   $('fcCat').textContent = it.categoria || 'Outros';
-  $('fcNome').textContent = it.brand_name;
+  $('fcNome').innerHTML = esc(it.brand_name) + selo(it);
   $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
   $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString(LOC()) : 'Data não informada';
   $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : '<span class="anon">anônimo</span>';
@@ -407,7 +409,7 @@ function abrirFicha(id){
   $('pnRel').innerHTML = rel.map(s => `
     <button class="rel" type="button" data-act="detalhes" data-id="${esc(s.id)}">
       <span class="rel-img"><img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}"></span>
-      <b>${esc(s.brand_name)}</b><small>${esc(s.categoria || 'Outros')}</small>
+      <b>${esc(s.brand_name)}${selo(s)}</b><small>${esc(s.categoria || 'Outros')}</small>
     </button>`).join('');
 
   const aberta = !w.hidden && w.classList.contains('on');

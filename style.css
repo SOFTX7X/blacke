@@ -912,3 +912,9 @@ body.carregando{overflow:hidden}
   .hero h1{display:none}
   .hero-legal{margin:0;padding:8px 0 2px;font-size:11.5px}
 }
+
+/* selo de verificado */
+.selo{display:inline-block;flex:none;width:1em;height:1em;margin-left:.3em;vertical-align:-.12em;color:var(--ice);filter:drop-shadow(0 0 6px rgba(111,214,255,.55))}
+.card .body h3{display:flex;align-items:center;justify-content:center;min-width:0}.card .body h3>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.card h3 .selo{width:15px;height:15px}
+#fcNome .selo{width:.75em;height:.75em;vertical-align:-.05em}
