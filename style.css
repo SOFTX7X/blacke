@@ -894,3 +894,7 @@ body.carregando{overflow:hidden}
 
 /* grades de sites: cantos quadrados (cards, capas, botões dos cards, "Veja também") */
 .card,.card *,.card *::before,.card *::after,.skeleton,.rel,.rel *{border-radius:0!important}
+
+.pub-legal{margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--muted);text-align:center}
+.pub-legal a,footer a{color:var(--ice);text-decoration:none}
+.pub-legal a:hover,footer a:hover{text-decoration:underline}

@@ -1,6 +1,20 @@
 {
   "rewrites": [
-    { "source": "/s/:id", "destination": "/api/p?s=:id" },
-    { "source": "/:h(@[^/]+)", "destination": "/api/p?p=:h" }
+    {
+      "source": "/s/:id",
+      "destination": "/api/p?s=:id"
+    },
+    {
+      "source": "/:h(@[^/]+)",
+      "destination": "/api/p?p=:h"
+    },
+    {
+      "source": "/termos",
+      "destination": "/legal.html"
+    },
+    {
+      "source": "/privacidade",
+      "destination": "/legal.html"
+    }
   ]
 }

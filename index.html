@@ -147,7 +147,7 @@
     <button id="maisBtn" class="btn-ghost mais" hidden>Carregar mais</button>
   </main>
 
-  <footer>BLACKE LAVEX · rede privada</footer>
+  <footer>BLACKE LAVEX · rede privada · <a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></footer>
 
   <!-- Publicar / editar -->
   <div id="modalCadastro" class="modal" hidden>
@@ -191,6 +191,7 @@
         <textarea class="field" id="inputLegenda" rows="3" placeholder="Em uma ou duas frases, o que as pessoas encontram aí?" maxlength="200"></textarea>
         <div class="hint"><span id="legCount">0</span>/200</div>
         <div id="formErro" class="erro" hidden></div>
+        <p class="pub-legal">Ao publicar, você concorda com os <a href="/termos" target="_blank" rel="noopener">Termos</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
         <div class="pub-bar"><button class="btn-primary wide" id="btnSalvar" onclick="salvarSite()">Publicar</button></div>
       </section>
     </div>
