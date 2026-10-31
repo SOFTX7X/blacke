@@ -46,7 +46,7 @@ jobs:
       - name: Copiar o banco principal
         run: |
           if ! pg_dump "$MAIN_DB_URL" --schema=public --no-owner --exclude-table-data=public.admins -f dump.sql 2> erro.txt; then
-            echo "::error title=pg_dump::$(head -c 600 erro.txt | tr '\n' ' ')"; exit 1
+            echo "::error title=pg_dump::$(sed -E 's/[^ "]*@[^ "]*/[oculto]/g; s/postgres(ql)?:[^ ]*/[oculto]/g' erro.txt | head -c 600 | tr '\n' ' ')"; exit 1
           fi
           # linhas que o projeto reserva não aceita (dono do schema / permissões padrão de outros papéis)
           grep -v -E '^(CREATE SCHEMA public;|ALTER SCHEMA public OWNER|ALTER DEFAULT PRIVILEGES)' dump.sql > restaurar.sql
@@ -62,7 +62,7 @@ jobs:
             cat restaurar.sql
           } > completo.sql
           if ! psql "$RESERVA_DB_URL" -v ON_ERROR_STOP=1 --single-transaction -q -f completo.sql > /dev/null 2> erro.txt; then
-            echo "::error title=restaurar::$(grep -v NOTICE erro.txt | head -c 600 | tr '\n' ' ')"; exit 1
+            echo "::error title=restaurar::$(grep -v NOTICE erro.txt | sed -E 's/[^ "]*@[^ "]*/[oculto]/g; s/postgres(ql)?:[^ ]*/[oculto]/g' | head -c 600 | tr '\n' ' ')"; exit 1
           fi
           psql "$RESERVA_DB_URL" -At -c "select 'sites no reserva: ' || count(*) from public.sites_publicos"
 
