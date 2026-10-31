@@ -1404,3 +1404,6 @@ body.carregando .card{animation-play-state:running}
 .pn-brand{padding-right:0!important}
 @media (max-width:640px){.pn-top{width:min(calc(100% - 20px),360px)!important}.pn-back{width:38px;height:38px}.pn-esp{width:38px}
   .pn-brand{font-size:10.5px!important;letter-spacing:.14em!important;gap:7px!important}.pn-brand b{font-size:inherit!important}}
+/* bolha quase de ponta a ponta */
+.pn-top{width:calc(100% - 40px)!important;max-width:none!important}
+@media (max-width:640px){.pn-top{width:calc(100% - 20px)!important}}
