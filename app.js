@@ -414,15 +414,17 @@ async function carregarReacoes(ids){
   }catch(_){}
 }
 async function reagir(id, k){
-  id = String(id); const m = RXM.get(id) || [], on = !m.includes(k), t = { ...(RXT.get(id) || {}) };
-  t[k] = Math.max(0, (t[k] || 0) + (on ? 1 : -1));
-  RXT.set(id, t); RXM.set(id, on ? [...m, k] : m.filter(x => x !== k)); rxRedesenhar(id);   // resposta imediata
+  // uma reação por pessoa: escolher outro emoji troca o anterior; tocar no mesmo tira
+  id = String(id); const m = RXM.get(id) || [], antes = { ...(RXT.get(id) || {}) }, on = !m.includes(k), t = { ...antes };
+  m.forEach(x => { t[x] = Math.max(0, (t[x] || 0) - 1); });
+  if (on) t[k] = (t[k] || 0) + 1;
+  RXT.set(id, t); RXM.set(id, on ? [k] : []); rxRedesenhar(id);   // resposta imediata
   try{
     const { data, error } = await _supabase.rpc('reagir', { p_id:id, p_emoji:k, p_token:S.token, p_on:on });
     if (error) throw error;
     RXT.set(id, data || {}); rxRedesenhar(id);
   }catch(err){
-    RXM.set(id, m); const v = { ...(RXT.get(id) || {}) }; v[k] = Math.max(0, (v[k] || 0) + (on ? -1 : 1)); RXT.set(id, v); rxRedesenhar(id);
+    RXT.set(id, antes); RXM.set(id, m); rxRedesenhar(id);
     aviso(err.message || 'Não foi possível reagir.');
   }
 }
