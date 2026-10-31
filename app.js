@@ -8,7 +8,7 @@ const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_h
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
 const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
-            itens:[], meus:[], token:'', hash:'', total:0, perfil:null };
+            itens:[], meus:[], token:'', hash:'', total:0, perfil:null, dest:{ top:[], novos:[] }, destAba:'top' };
 let imagemBase64 = '', editId = null;
 let pos = { x:50, y:50 };   // posição da foto de capa (object-position, em %)
 
@@ -253,7 +253,7 @@ function efeitoCard(card){
 
 const posSegura = s => /^(100|\d{1,2})% (100|\d{1,2})%$/.test(s || '') ? s : '50% 50%';
 const ehDono = item => !!S.hash && item.owner_hash === S.hash;
-function acharItem(id){ return S.itens.concat(S.meus).find(s => String(s.id) === String(id)); }
+function acharItem(id){ return S.itens.concat(S.meus, S.dest.top, S.dest.novos).find(s => String(s.id) === String(id)); }
 function acoesDe(item){
   const l = [
     { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
@@ -466,7 +466,7 @@ async function buscarMural(reset){
       const filtrando = S.busca || S.cat !== 'Todas';
       setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
     } else setEstado('');
-    fecharSplash();
+    desenharDestaques(); fecharSplash();
   }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
 }
 
@@ -493,6 +493,7 @@ async function trocarAba(aba){
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = aba !== 'meus';
+  desenharDestaques();
   if (aba === 'mural'){ buscarMural(true); return; }
   skeleton();
   try{ await buscarMeus(); desenharMeus(); }catch(err){ erroCarga(err); }
@@ -716,3 +717,37 @@ async function abrirLinkDireto(){
     }catch(_){ aviso('Não foi possível abrir esse site'); }
   }
 }
+
+/* ---------- Em destaque: mais acessados e novos ---------- */
+function desenharDestaques(){
+  const box = $('destaques'), lista = S.dest[S.destAba] || [];
+  const visivel = S.aba === 'mural' && !S.busca && S.cat === 'Todas' && (S.dest.top.length || S.dest.novos.length);
+  box.hidden = !visivel; if (!visivel) return;
+  document.querySelectorAll('#destaques [data-d]').forEach(b => b.classList.toggle('on', b.dataset.d === S.destAba));
+  $('destLista').innerHTML = lista.map((it, i) => {
+    const n = it.cliques || 0;
+    return `<button type="button" class="dest-card" data-act="detalhes" data-id="${esc(it.id)}" aria-label="${esc(it.brand_name)}">
+      <span class="dest-img"><img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">
+        ${S.destAba === 'top' ? `<i class="dest-rank">${i + 1}</i>` : '<i class="dest-rank novo">novo</i>'}</span>
+      <b>${esc(it.brand_name)}</b><small>${S.destAba === 'top' ? `${n} ${n === 1 ? 'acesso' : 'acessos'}` : esc(it.categoria || 'Outros')}</small>
+    </button>`;
+  }).join('') || '<p class="dest-vazio">Ainda não há sites aqui.</p>';
+  $('destLista').scrollLeft = 0;
+}
+async function carregarDestaques(){
+  try{
+    const base = () => _supabase.from('sites_publicos').select(COLS).lt('denuncias', 5).eq('oculto', false);
+    const [t, n] = await Promise.all([
+      base().gt('cliques', 0).order('cliques', { ascending:false }).order('id', { ascending:false }).limit(8),
+      base().order('created_at', { ascending:false }).order('id', { ascending:false }).limit(8)
+    ]);
+    S.dest.top = t.data || []; S.dest.novos = n.data || [];
+    if (!S.dest.top.length) S.destAba = 'novos';
+  }catch(_){ S.dest = { top:[], novos:[] }; }
+  desenharDestaques();
+}
+$('destaques').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  S.destAba = b.dataset.d; desenharDestaques();
+});
+carregarDestaques();

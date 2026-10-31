@@ -792,3 +792,28 @@ body.carregando{overflow:hidden}
 /* compartilhar perfil */
 #pfShare{flex:none}
 @media (max-width:640px){#pfShare span,#pfLimpar{font-size:0}#pfShare,#pfLimpar{padding:0;width:40px;height:40px;border-radius:50%}#pfShare i,#pfLimpar i{font-size:15px}}
+
+/* ---- Em destaque ---- */
+.dest{margin-top:18px}
+.dest-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.dest-head h2{font:700 16px var(--display);letter-spacing:-.01em}
+.dest-tabs{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:99px;background:rgba(12,14,27,.9)}
+.dest-tabs button{border:0;background:none;color:var(--muted);font:600 12.5px var(--display);padding:6px 12px;border-radius:99px;cursor:pointer;transition:.2s}
+.dest-tabs button.on{background:var(--grad);color:#fff}
+.dest-lista{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.dest-card{flex:none;width:176px;scroll-snap-align:start;display:flex;flex-direction:column;gap:3px;text-align:left;padding:0 0 10px;border:1px solid var(--line);border-radius:18px;background:rgba(12,14,27,.94);color:var(--text);cursor:pointer;overflow:hidden;transition:transform .2s,border-color .2s}
+.dest-card:hover{transform:translateY(-3px);border-color:var(--violet)}
+.dest-img{position:relative;display:block;aspect-ratio:4/3;background:#0b0b14}
+.dest-img img{width:100%;height:100%;object-fit:cover;display:block}
+.dest-rank{position:absolute;left:8px;top:8px;min-width:24px;height:24px;padding:0 7px;display:grid;place-items:center;border-radius:99px;background:var(--grad);color:#fff;font:700 12px var(--mono);font-style:normal;box-shadow:0 4px 14px -4px rgba(123,108,255,.8)}
+.dest-rank.novo{background:rgba(6,7,13,.85);color:var(--ice);border:1px solid var(--line);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+.dest-card b{padding:8px 11px 0;font:600 13.5px var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dest-card small{padding:0 11px;font:400 11.5px var(--mono);color:var(--muted)}
+.dest-vazio{color:var(--muted);font-size:13px}
+@media (max-width:640px){
+  .dest{margin-top:12px}
+  .dest-card{width:138px;border-radius:16px}
+  .dest-card b{font-size:12.5px}
+  .dest-tabs button{padding:5px 10px;font-size:12px}
+}
+@media (max-width:640px){.dest-img{aspect-ratio:16/11}.dest-card{width:128px}.dest-card b{padding-top:6px}}
