@@ -61,7 +61,7 @@ async function iniciarChave(){
   let last = 0;
   function draw(t){
     requestAnimationFrame(draw);
-    if (document.hidden || document.body.classList.contains('modal-open') || document.body.classList.contains('ficha-open') || t - last < 90) return;
+    if (document.hidden || document.body.classList.contains('modal-open') || document.body.classList.contains('ficha-open') || t - last < (innerWidth < 700 ? 140 : 90)) return;
     last = t;
     ctx.fillStyle = 'rgba(6,7,13,.16)'; ctx.fillRect(0,0,cv.width,cv.height);
     for (let i=0;i<cols;i++){
@@ -263,7 +263,7 @@ function criarCard(item, i){
       <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
-      <h3>${esc(item.brand_name)}</h3>
+      <h3><span>${esc(item.brand_name)}</span></h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
       </div>

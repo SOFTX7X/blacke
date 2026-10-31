@@ -528,3 +528,110 @@ body.carregando{overflow:hidden}
 
 /* o miolo do painel não herda o espaçamento do <main> da página */
 .pn-main{padding:0;margin:0;max-width:none;width:auto;min-width:0;flex:none}
+
+/* ===== v22: ajuste para Android (só telas pequenas; o PC não muda) ===== */
+@media (pointer:coarse){
+  button,a,select,[data-act],.chip,.tab{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+}
+@media (max-width:640px){
+  html{-webkit-text-size-adjust:100%}
+
+  /* topo e abertura mais compactos */
+  .topbar{padding:8px 12px}
+  .logo-ring{width:38px;height:38px}
+  .brand-name{font-size:12px;letter-spacing:.1em}
+  .top-actions .btn-ghost,.top-actions .btn-primary{padding:0;width:42px;height:42px}
+  .hero{padding:16px 0 0;gap:10px}
+  .hero h1{font-size:22px}
+  .hero-sub{font-size:13px;margin-top:4px}
+  .searchbar input{padding:13px 0}
+
+  /* abas + ordenação na mesma linha; categorias embaixo, com rolagem */
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:12px}
+  .tabs{order:1;flex:1 1 190px;width:auto}
+  .tab{padding:10px 10px;font-size:13px}
+  .filtros{display:contents}
+  #ordem{order:2;flex:0 0 auto;width:132px;padding:9px 28px 9px 10px;font-size:12.5px}
+  .chips{order:3;flex:1 1 100%;min-width:0}
+
+  /* cards: nome inteiro (até 2 linhas) e botões que cabem */
+  .grid{gap:10px}
+  .card .body{padding:10px 8px 0}
+  .card .body h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow:hidden;text-overflow:clip;height:2.5em;font-size:12.5px;line-height:1.25;letter-spacing:.02em;margin-bottom:4px}
+  .line2{height:18px}
+  .card .foot{margin:8px 8px 10px;gap:6px;height:40px}
+  .card .foot .visit{height:40px;padding:0 4px;justify-content:center;font-size:12px;white-space:nowrap}
+  .card .sq{width:38px;height:40px}
+  .skeleton{height:300px}
+
+  /* janelas viram folha embaixo: título e botão sempre visíveis, formulário rola */
+  .modal{padding:0;align-items:flex-end}
+  .sheet{max-width:none;width:100%;max-height:94vh;max-height:94dvh;padding:0 16px;border-bottom:0;overflow-y:auto;overscroll-behavior:contain;animation:slideup .28s cubic-bezier(.2,.9,.3,1)}
+  .sheet-head{position:sticky;top:0;z-index:3;margin:0 -16px;padding:14px 16px 10px;background:var(--panel)}
+  .sheet h3{font-size:18px}
+  .field-label{margin:12px 0 6px}
+  .field{padding:11px 13px;font-size:16px}
+  textarea.field{min-height:84px}
+  .upload{padding:16px}
+  .preview{width:min(100%,264px);margin:0 auto}
+  #btnSalvar{position:sticky;bottom:0;z-index:3;margin:14px 0 0;box-shadow:0 0 0 14px var(--panel)}
+  .sheet.small{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .sheet.small h3{padding-top:18px}
+  .sheet-btns{gap:8px}.sheet-btns>*{flex:1}
+  .key-row{flex-wrap:wrap}.key-row .field{flex:1 1 100%}.key-row .btn-ghost{flex:1}
+  .erro{font-size:13px}
+
+  /* Meus sites */
+  .panel{padding:12px;gap:12px}
+  .stats{flex:1 1 100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat b{font-size:20px}.stat span{font-size:11px}
+  .arroba-row{gap:8px}
+  .panel-btns{width:100%}.panel-btns .btn-ghost{flex:1;padding:11px 8px;font-size:13px}
+  .panel-note{font-size:12px}
+}
+
+/* painel do site no celular */
+@media (max-width:900px){
+  .pn-top{height:56px;padding:0 14px}
+  .pn-back{padding:8px 12px;font-size:13px}
+  .pn-wrap{padding:20px 16px 110px}
+  .pn-head{gap:18px}
+  .pn-foto img{max-width:200px;max-height:200px}
+  .pn-info h1{font-size:22px;margin-top:8px}
+  .pn-handle{margin-top:10px}
+  .pn-stats{margin-top:12px;font-size:12px}
+  .pn-sec2,.pn-veja{margin-top:26px;padding-top:20px}
+  .pn-sub{margin-bottom:12px}
+  .pn-sec2 p{font-size:15.5px;line-height:1.7}
+  .pn-rel{gap:10px}
+  .pn-box{padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  .pn-go{padding:13px}
+  .pn-sec .btn-ghost{width:44px;height:44px}
+}
+
+/* ajustes finos Android */
+@media (max-width:640px){
+  .chip{padding:9px 14px;font-size:13px}
+  .chips{gap:8px}
+}
+@media (max-width:340px){
+  .card .foot{margin:8px 6px 10px;gap:4px}
+  .card .foot .visit{font-size:11px;padding:0 2px}
+  .card .sq{width:36px;flex:none}
+  .card .body{padding:10px 6px 0}
+}
+
+@media (max-width:640px){
+  /* nome centralizado também na vertical (1 ou 2 linhas) */
+  .card .body h3{display:flex;align-items:center;justify-content:center;-webkit-line-clamp:unset;height:2.5em;overflow:hidden;white-space:normal}
+  .card .body h3 span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;max-width:100%;text-align:center}
+  /* abas sem quebrar o texto */
+  .tabs{flex:1 1 200px}
+  .tab{padding:10px 8px;gap:6px;white-space:nowrap;font-size:12.5px;flex:1;justify-content:center}
+  #ordem{width:128px;font-size:12px;padding:9px 24px 9px 9px;background-position:right 8px center}
+}
+
+@media (max-width:640px){
+  #btnSalvar{bottom:12px}
+  .sheet{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+}
