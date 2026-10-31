@@ -650,6 +650,7 @@ setTimeout(fecharSplash, 7000);
 
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
+  if (typeof desenharSemana === 'function') setTimeout(desenharSemana, 0);
   const meu = ++S.seq;
   if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
   try{
@@ -715,7 +716,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0);
+  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharSemana, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
@@ -1120,7 +1121,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
   escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSemana();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }
@@ -1304,3 +1305,33 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
   // ao abrir um perfil pela busca (@nome), mostra o texto na barra
   new MutationObserver(() => { if ($('busca').value && S.busca && !document.body.classList.contains('modo-perfil')) tb.classList.add('buscando'); }).observe(document.body, { attributes:true, attributeFilter:['class'] });
 })();
+
+
+/* ---------- Site da semana (escolhido no admin) ---------- */
+let SEMANA = null;
+async function carregarSemana(){
+  try{
+    const { data } = await _supabase.rpc('site_da_semana');
+    SEMANA = data && data.id ? data : null;
+  }catch(_){ SEMANA = null; }
+  desenharSemana();
+}
+function desenharSemana(){
+  const el = $('semana'); if (!el) return;
+  const mostrar = SEMANA && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
+  el.hidden = !mostrar; if (!mostrar) return;
+  const it = SEMANA;
+  if (!acharItem(it.id)) S.itens.push(it);
+  el.innerHTML = `
+    <button type="button" class="sm-capa" data-act="detalhes" data-id="${esc(it.id)}" aria-label="Ver ${esc(it.brand_name)}"><img src="${esc(it.image_url)}" alt="" style="object-position:${posSegura(it.img_pos)}"></button>
+    <div class="sm-info">
+      <span class="sm-selo"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> Site da semana</span>
+      <h2 translate="no">${esc(it.brand_name)}${selo(it)}</h2>
+      ${it.handle ? `<div class="sm-ar">${arrobaBtn(it.handle)}</div>` : ''}
+      <p translate="no">${esc(it.nota || it.caption || '')}</p>
+      <div class="sm-acts">
+        <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
+        <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Ver detalhes</button>
+      </div>
+    </div>`;
+}
