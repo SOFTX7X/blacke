@@ -17,6 +17,7 @@ async function pedir(caminho, opcoes = {}){
   }
   return null;
 }
+exports.pedir = pedir;
 exports.site = async id => {
   const a = await pedir(`/rest/v1/sites_publicos?select=id,brand_name,caption,categoria,image_url,handle&id=eq.${id}&oculto=eq.false&denuncias=lt.5&limit=1`);
   return (a && a[0]) || null;

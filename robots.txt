@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /api/img
+Disallow: /api/
+Disallow: /meus-sites
+Disallow: /publicar
+
+Sitemap: https://blackelavex.online/sitemap.xml

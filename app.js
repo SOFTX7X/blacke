@@ -497,6 +497,14 @@ function relacionados(it){
 function recomecarAnimacao(){
   document.querySelectorAll('#ficha .rise').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
 }
+function atualizarTitulo(){
+  const B = 'BLACKE LAVEX';
+  const f = $('ficha'), aberta = f && !f.hidden && f.classList.contains('on') && S.fichaId;
+  const it = aberta && (acharItem(S.fichaId) || S.meus.find(s => String(s.id) === S.fichaId));
+  if (it){ document.title = it.brand_name + ' — ' + B; return; }
+  if (document.body.classList.contains('modo-perfil') && S.busca.startsWith('@')){ document.title = S.busca + ' — ' + B; return; }
+  document.title = ({ destaques:'Destaques — ' + B, meus:'Meus sites — ' + B, publicar:'Publicar — ' + B })[S.aba] || B + ' — Mural anônimo';
+}
 const ROTA = { mural:'/', destaques:'/destaques', meus:'/meus-sites', publicar:'/publicar' };
 function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : (ROTA[S.aba] || '/'); }
 function irUrl(url, state, trocar){
@@ -506,7 +514,7 @@ function irUrl(url, state, trocar){
   }catch(_){}
 }
 function abrirFicha(id){
-  S.fichaId = String(id);
+  S.fichaId = String(id); setTimeout(atualizarTitulo, 0);
   const it = acharItem(id); if (!it) return;
   const w = $('ficha'), n = it.cliques || 0;
   const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
@@ -557,7 +565,7 @@ function fecharFicha(voltar = true){
     if (history.state && history.state.ficha && !S.fichaEntrada){ try{ history.back(); }catch(_){} }
     else irUrl(urlBase(), null, true);
   }
-  S.fichaEntrada = false;
+  S.fichaEntrada = false; setTimeout(atualizarTitulo, 0);
 }
 addEventListener('keydown', e => {                                // Tab não escapa do painel
   if (e.key !== 'Tab' || $('ficha').hidden || document.querySelector('.modal:not([hidden])')) return;
@@ -645,7 +653,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  S.aba = aba; document.body.dataset.aba = aba;
+  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0);
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   document.querySelector('#bnav .bn-pub').classList.toggle('on', aba === 'publicar');
@@ -901,11 +909,12 @@ function irParaPerfil(h, semHistorico){
   if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
   S.busca = '@' + h; $('busca').value = S.busca; resetChips(); modoPerfil(true);
   if (!semHistorico) irUrl('/@' + h, { perfil:h });
+  setTimeout(atualizarTitulo, 0);
   scrollTo({ top:0 });
   if (S.aba !== 'mural') trocarAba('mural', true, true); else buscarMural(true);
 }
 function sairPerfil(){
-  modoPerfil(false); S.busca = ''; $('busca').value = ''; buscarMural(true);
+  modoPerfil(false); setTimeout(atualizarTitulo, 0); S.busca = ''; $('busca').value = ''; buscarMural(true);
   const y = S.voltar && S.voltar.scroll; S.voltar = null;
   if (y) setTimeout(() => scrollTo({ top:y }), 350);
 }

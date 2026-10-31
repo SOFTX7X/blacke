@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
       "source": "/s/:id",
       "destination": "/api/p?s=:id"
     },
@@ -28,5 +32,10 @@
       "source": "/publicar",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/p.js": {
+      "includeFiles": "index.html"
+    }
+  }
 }
