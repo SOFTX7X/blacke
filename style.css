@@ -1354,3 +1354,15 @@ body.carregando .card{animation-play-state:running}
   .pn-sec{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .pn-sec .btn-ghost{width:100%!important;justify-content:center}
 }
+/* PC: capa menor e legenda junto do nome, antes dos botões */
+@media (min-width:900px){
+  .pn-wrap{max-width:1000px!important;grid-template-columns:minmax(0,320px) minmax(0,1fr)!important;column-gap:40px!important;
+    grid-template-areas:"foto info" "foto sobre" "foto side" "mais mais" "veja veja"!important}
+  .pn-info{align-self:start;padding-bottom:14px}
+  .pn-sec2{grid-area:sobre;margin:0 0 18px!important;padding:0!important;border:0!important}
+  .pn-sec2::before{display:none}
+  .pn-sec2 .pn-sub{margin-bottom:6px}
+  .pn-sec2 p{font-size:15px;line-height:1.6}
+  .pn-mais{margin-top:40px}
+}
+@media (min-width:900px){.pn-info{padding-bottom:20px}.pn-sec2{margin-bottom:22px!important}}
