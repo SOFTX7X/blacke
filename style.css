@@ -927,3 +927,77 @@ body.carregando{overflow:hidden}
 #meuArroba .ma{display:inline-flex;align-items:center;max-width:100%;white-space:nowrap}#meuArroba .ma>span{overflow:hidden;text-overflow:ellipsis;min-width:0}#meuArroba .selo{flex:none}
 .arroba{overflow:visible}.arroba .selo,#pfHandle .selo{filter:none}
 #pfHandle{display:flex;align-items:center;min-width:0;overflow:visible}#pfHandle>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}#pfHandle .selo{flex:none}
+
+/* ===== Perfil (estilo app) ===== */
+.perfil{display:block;position:relative;padding:0;border:0;background:none;margin-top:14px}
+#meuPerfil{margin-bottom:14px}
+.pc{position:relative;overflow:hidden;padding:20px 20px 18px;border:1px solid var(--line);border-radius:22px;
+  background:linear-gradient(180deg,rgba(26,22,72,.55) 0,rgba(12,14,27,.96) 92px),rgba(12,14,27,.96);animation:pcIn .45s cubic-bezier(.2,.8,.2,1) both}
+.pc::before{content:"";position:absolute;inset:-60px -40px auto auto;width:260px;height:180px;background:radial-gradient(closest-side,rgba(123,108,255,.35),transparent);pointer-events:none}
+.pc::after{content:"";position:absolute;left:-60px;top:-70px;width:220px;height:160px;background:radial-gradient(closest-side,rgba(111,214,255,.16),transparent);pointer-events:none}
+.pc>*{position:relative;z-index:1}
+.pc-top{display:flex;align-items:center;gap:20px}
+.pc-av{flex:none;width:88px;height:88px;border-radius:50%;padding:3px;background:linear-gradient(140deg,#4a3fd6,#7b6cff 50%,#6fd6ff);box-shadow:0 10px 30px -10px rgba(123,108,255,.7)}
+.pc.pc-ver .pc-av{animation:pcGlow 3s ease-in-out infinite}
+.pc-av img,.pc-av .pc-ini{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #0c0e1b;background:#14173a}
+.pc-ini{font:700 32px var(--display);color:#fff}
+.pc-nums{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:center;min-width:0}
+.pc-nums div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pc-nums b{font:700 21px/1.1 var(--display);color:#fff;letter-spacing:-.02em}
+.pc-nums span{font:500 11.5px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-nome{display:flex;align-items:center;gap:6px;margin-top:14px;font:700 17px var(--mono);color:#fff;min-width:0}
+.pc-nome>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pc-nome .selo{width:18px;height:18px;margin:0;flex:none}
+.pc-bio{margin:7px 0 0;font-size:14px;line-height:1.5;color:#d7daf0;white-space:pre-line;overflow-wrap:anywhere}
+.pc-bio.dim{color:var(--muted);font-size:13px}
+.pc-meta,.pc-pend{display:flex;align-items:center;gap:7px;margin-top:9px;font:500 11.5px var(--mono);color:#6d74a0}
+.pc-pend{color:var(--ice)}
+.pc-ct{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pc-acts{display:flex;gap:8px;margin-top:14px}
+.pc-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid #262b58;border-radius:12px;background:#12152f;color:#e8eaf8;font:600 13.5px var(--display);text-decoration:none;cursor:pointer;transition:transform .15s,border-color .2s,background .2s}
+.pc-btn:hover{border-color:var(--violet);background:#171a3d}.pc-btn:active{transform:scale(.97)}
+.pc-btn.pri{background:linear-gradient(135deg,#4a3fd6,#7b6cff);border-color:transparent;color:#fff}
+.pc-btn.ico{flex:none;width:42px;padding:0}
+.pc-btn.ct{flex:1 1 140px;border-color:rgba(111,214,255,.32);background:rgba(111,214,255,.07);color:#dff6ff}
+.pc-btn.ct i{font-size:16px;color:var(--ice)}
+.pc.pc-vz .pc-av{background:#262b58;box-shadow:none}.pc.pc-vz .pc-ini{font-size:26px;color:var(--violet)}
+.pc-fechar{position:absolute;top:12px;right:12px;z-index:3;width:34px;height:34px;display:grid;place-items:center;border:1px solid #262b58;border-radius:50%;background:rgba(12,14,27,.85);color:var(--muted);cursor:pointer}
+.pc-fechar:hover{color:#fff;border-color:var(--violet)}
+#perfilBox .pc-top{padding-right:30px}
+@keyframes pcIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pcGlow{0%,100%{box-shadow:0 10px 30px -10px rgba(123,108,255,.7)}50%{box-shadow:0 0 26px 0 rgba(111,214,255,.45)}}
+
+/* editar perfil */
+.pe-foto{display:flex;align-items:center;gap:16px;margin:4px 0 14px}
+.pe-av{position:relative;flex:none;width:84px;height:84px;padding:3px;border:0;border-radius:50%;background:linear-gradient(140deg,#4a3fd6,#7b6cff 50%,#6fd6ff);cursor:pointer}
+.pe-av img,.pe-av span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #0c0e1b;background:#14173a;font:700 30px var(--display);color:#fff}
+.pe-av>i{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--ice);color:#06070d;font-size:12px;border:3px solid #0c0e1b}
+.pe-foto-btns{display:flex;flex-direction:column;gap:8px}
+.pe textarea.field{resize:none;min-height:84px;line-height:1.45}
+.pe-n{text-align:right;font:500 11px var(--mono);color:var(--muted);margin:4px 2px 6px}
+.pe-ct{display:grid;grid-template-columns:132px 1fr;gap:8px;margin-bottom:8px}
+.pe-ct input:disabled{opacity:.45}
+
+@media (max-width:640px){
+  .pc{padding:16px 15px 15px;border-radius:20px}
+  .pc-top{gap:14px}
+  .pc-av{width:74px;height:74px}
+  .pc-ini{font-size:27px}
+  .pc-nums b{font-size:18px}.pc-nums span{font-size:10.5px}
+  .pc-nome{font-size:15.5px;margin-top:12px}
+  .pc-bio{font-size:13.5px}
+  .pc-btn{min-height:38px;font-size:13px}
+  .pe-ct{grid-template-columns:112px 1fr}
+}
+@media (prefers-reduced-motion:reduce){.pc,.pc.pc-ver .pc-av{animation:none}}
+#meuPerfil{flex:none;width:100%;min-height:0}
+#perfilBox.perfil{display:block;height:auto;max-height:none}#pfCard{width:100%}
+#perfilBox[hidden]{display:none}
+.pe .hint.left{color:var(--muted)}
+.pe-ct select.field{padding-right:30px;text-overflow:ellipsis}
+.pc{max-width:760px}
+.pc-nums{max-width:430px}
+.pc-btn{white-space:nowrap;min-width:0}.pc-btn>span{overflow:hidden;text-overflow:ellipsis}
+.pc-btn.ct{flex:1 1 0}
+@media (max-width:640px){.pc-btn{padding:0 10px;font-size:12.5px;gap:6px}.pc-acts,.pc-ct{gap:7px}}
+#perfilBox{max-width:760px}

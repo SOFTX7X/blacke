@@ -99,10 +99,8 @@
 
     <!-- Cabeçalho de perfil (busca por @) -->
     <section class="perfil" id="perfilBox" hidden>
-      <div class="pf-avatar"><i class="fa-solid fa-at"></i></div>
-      <div class="pf-txt"><b id="pfHandle"></b><span id="pfInfo"></span></div>
-      <button class="btn-ghost" id="pfShare" type="button" data-act="linkperfil" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>
-      <button class="btn-ghost" id="pfLimpar"><i class="fa-solid fa-xmark"></i> Limpar</button>
+      <div id="pfCard"></div>
+      <button class="pc-fechar" id="pfLimpar" type="button" aria-label="Fechar perfil"><i class="fa-solid fa-xmark"></i></button>
     </section>
 
     <!-- Em destaque -->
@@ -119,12 +117,13 @@
 
     <!-- Painel "Meus sites" -->
     <section class="panel" id="painelMeus" hidden>
-      <div class="stats">
+      <div id="meuPerfil"></div>
+      <div class="stats" style="display:none">
         <div class="stat"><b id="stSites">0</b><span>sites</span></div>
         <div class="stat"><b id="stAcessos">0</b><span>acessos</span></div>
         <div class="stat"><b id="stLimite">10</b><span>vagas livres</span></div>
       </div>
-      <div class="arroba-row">
+      <div class="arroba-row" style="display:none">
         <i class="fa-solid fa-at"></i>
         <span id="meuArroba" class="meu-arroba">Você ainda não tem um @</span>
         <button class="btn-ghost" id="btnArroba">Reservar @</button>
@@ -254,6 +253,33 @@
       <div id="arrobaErro" class="erro" hidden></div>
       <button class="btn-primary wide" id="btnSalvarArroba">Reservar @</button>
       <button class="btn-ghost wide-ghost" id="btnLiberarArroba" hidden>Liberar meu @</button>
+    </div>
+  </div>
+
+  <!-- Editar perfil -->
+  <div id="modalPerfil" class="modal" hidden>
+    <div class="sheet pe" role="dialog" aria-modal="true" aria-labelledby="peTitulo">
+      <div class="sheet-head">
+        <h3 id="peTitulo">Editar perfil</h3>
+        <button class="icon-btn" onclick="fechar('modalPerfil')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="pe-foto">
+        <button type="button" class="pe-av" id="peAv" aria-label="Trocar foto"><img id="peImg" alt="" hidden><span id="peIni"></span><i class="fa-solid fa-camera"></i></button>
+        <div class="pe-foto-btns">
+          <button type="button" class="btn-ghost" id="peTrocar"><i class="fa-solid fa-image"></i> Trocar foto</button>
+          <button type="button" class="btn-ghost" id="peRemover">Remover</button>
+        </div>
+        <input type="file" id="peArquivo" accept="image/*" hidden>
+      </div>
+      <label class="field-label" for="peBio">Bio</label>
+      <textarea class="field" id="peBio" maxlength="150" rows="3" placeholder="Conte em poucas palavras o que você faz"></textarea>
+      <div class="pe-n"><span id="peBioN">0</span>/150</div>
+      <label class="field-label">Botões de contato</label>
+      <div class="pe-ct"><select class="field" id="peT1"><option value="">Nenhum</option><option value="telegram">Telegram</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option></select><input class="field" id="peU1" autocomplete="off" spellcheck="false" placeholder="@usuario, número ou link"></div>
+      <div class="pe-ct"><select class="field" id="peT2"><option value="">Nenhum</option><option value="telegram">Telegram</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option></select><input class="field" id="peU2" autocomplete="off" spellcheck="false" placeholder="@usuario, número ou link"></div>
+      <p class="hint left">Telegram: @usuario ou link de grupo (t.me/...). WhatsApp: número com DDD ou link de grupo. Instagram: @usuario.</p>
+      <div id="peErro" class="erro" hidden></div>
+      <button class="btn-primary wide" id="peSalvar">Salvar perfil</button>
     </div>
   </div>
 

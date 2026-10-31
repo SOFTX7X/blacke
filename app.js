@@ -262,6 +262,7 @@ function favAlternar(id){
   id = String(id); const on = !ehFav(id);
   FAVS = on ? [id, ...FAVS] : FAVS.filter(x => x !== id);
   try{ localStorage.setItem('bl_fav', JSON.stringify(FAVS)); }catch(_){}
+  if (S.token) _supabase.rpc('salvar_site', { p_id:id, p_token:S.token, p_on:on }).then(() => {}, () => {});
   document.querySelectorAll(`.fav-btn[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
   aviso(on ? 'Salvo no seu aparelho' : 'Removido dos salvos');
   if (!on && S.aba === 'mural' && S.cat === 'Salvos'){
@@ -514,6 +515,7 @@ function atualizarMeusUI(){
   const n = S.meus.length, acessos = S.meus.reduce((a, s) => a + (s.cliques || 0), 0);
   $('nMeus').textContent = n; $('stSites').textContent = n; $('stAcessos').textContent = acessos;
   $('stLimite').textContent = Math.max(0, LIMITE - n); $('btnExcluirTodos').disabled = n === 0;
+  if (!S.perfil || !S.perfil.handle) desenharMeuPerfil();
 }
 function desenharMeus(){
   $('maisBtn').hidden = true; anexar(S.meus, true); atualizarMeusUI();
@@ -585,7 +587,7 @@ async function carregarPerfil(){
   atualizarPerfilUI();
 }
 function atualizarPerfilUI(){
-  const p = S.perfil;
+  const p = S.perfil; desenharMeuPerfil();
   const m = $('meuArroba');
   if (!p?.handle) m.textContent = 'Você ainda não tem um @';
   else m.innerHTML = `<span class="ma"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}</span>${p.suspenso ? ' <span>(suspenso)</span>' : ''}${p.pendente ? ` <small class="pendente">Troca para @${esc(p.pendente)} em análise</small>` : ''}`;
@@ -598,11 +600,157 @@ async function mostrarPerfil(h){
   try{ ({ data } = await _supabase.rpc('perfil_publico', { p_handle:h })); }catch(_){}
   if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
   if (!data){ box.hidden = true; return; }
-  const s = data.sites, a = data.acessos;
-  $('pfHandle').innerHTML = `<span translate="no">@${esc(data.handle)}</span>${data.verificado ? SELO : ''}`; $('pfShare').dataset.h = data.handle;
-  $('pfInfo').textContent = `${s} ${s === 1 ? 'site' : 'sites'} · ${a} ${a === 1 ? 'acesso' : 'acessos'} · no mural desde ${new Date(data.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' })}`;
+  if (data.verificado) VERIF.add(data.handle);
+  $('pfCard').innerHTML = cartaoPerfil(data, false);
   box.hidden = false;
 }
+
+/* ---------- cartão de perfil ---------- */
+const fmtN = n => { try{ return new Intl.NumberFormat(LOC(), { notation:'compact', maximumFractionDigits:1 }).format(n || 0); }catch(_){ return String(n || 0); } };
+const CT_ICO = { telegram:'fa-brands fa-telegram', whatsapp:'fa-brands fa-whatsapp', instagram:'fa-brands fa-instagram' };
+function nomeContato(c){
+  if (c.tipo === 'telegram') return /t\.me\/(\+|joinchat)/i.test(c.url) ? 'Grupo' : 'Telegram';
+  if (c.tipo === 'whatsapp') return /chat\.whatsapp\.com/i.test(c.url) ? 'Grupo' : 'WhatsApp';
+  return 'Instagram';
+}
+function avatarHTML(p){
+  const ini = esc(((p && p.handle) || '@').charAt(0).toUpperCase());
+  return p && p.foto ? `<img src="${esc(p.foto)}" alt="" loading="lazy" decoding="async">` : `<span class="pc-ini">${ini}</span>`;
+}
+function cartaoPerfil(p, dono){
+  if (!p || !p.handle){
+    const n = S.meus.length, ac = S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
+    return `<div class="pc pc-vz">
+      <div class="pc-top"><div class="pc-av"><span class="pc-ini"><i class="fa-solid fa-at"></i></span></div>
+        <div class="pc-nums"><div><b>${fmtN(n)}</b><span>${n === 1 ? 'site' : 'sites'}</span></div><div><b>${fmtN(ac)}</b><span>${ac === 1 ? 'acesso' : 'acessos'}</span></div><div><b>${fmtN(Math.max(0, LIMITE - n))}</b><span>vagas livres</span></div></div></div>
+      <div class="pc-nome">Seu perfil</div>
+      <p class="pc-bio dim">Reserve um @ para ter um perfil público com foto, bio e botões de contato.</p>
+      <div class="pc-acts"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button></div>
+    </div>`;
+  }
+  const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
+  const desde = p.desde ? new Date(p.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '';
+  return `<div class="pc${p.verificado ? ' pc-ver' : ''}">
+    <div class="pc-top">
+      <div class="pc-av">${avatarHTML(p)}</div>
+      <div class="pc-nums">
+        <div><b>${fmtN(p.sites)}</b><span>${p.sites === 1 ? 'site' : 'sites'}</span></div>
+        <div><b>${fmtN(p.acessos)}</b><span>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
+        <div><b>${fmtN(p.salvos)}</b><span>${+p.salvos === 1 ? 'salvo' : 'salvos'}</span></div>
+      </div>
+    </div>
+    <div class="pc-nome"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}</div>
+    ${p.bio ? `<p class="pc-bio" translate="no">${esc(p.bio)}</p>` : (dono ? '<p class="pc-bio dim">Adicione uma bio em "Editar perfil".</p>' : '')}
+    ${desde ? `<div class="pc-meta"><i class="fa-regular fa-calendar"></i> <span>No mural desde ${esc(desde)}</span></div>` : ''}
+    ${dono && p.pendente ? `<div class="pc-pend"><i class="fa-regular fa-clock"></i> <span>Troca para @${esc(p.pendente)} em análise</span></div>` : ''}
+    ${dono && p.suspenso ? '<div class="pc-pend"><span>Perfil suspenso</span></div>' : ''}
+    ${ct.length ? `<div class="pc-ct">${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}</div>` : ''}
+    <div class="pc-acts">
+      ${dono ? `<button class="pc-btn pri" type="button" data-pc="editar"><i class="fa-solid fa-pen"></i> Editar perfil</button>
+      <button class="pc-btn" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Trocar @</button>` : ''}
+      <button class="pc-btn${dono ? ' ico' : ''}" type="button" data-act="linkperfil" data-h="${esc(p.handle)}" aria-label="Compartilhar perfil"><i class="fa-solid fa-share-nodes"></i>${dono ? '' : ' <span>Compartilhar</span>'}</button>
+    </div>
+  </div>`;
+}
+function desenharMeuPerfil(){
+  const el = $('meuPerfil'); if (!el) return;
+  const p = S.perfil;
+  el.innerHTML = cartaoPerfil(p && p.handle ? p : null, true);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pc]'); if (!b) return;
+  if (b.dataset.pc === 'arroba') $('btnArroba').click();
+  else if (b.dataset.pc === 'editar') abrirEditarPerfil();
+});
+
+/* ---------- editar perfil ---------- */
+const PE = { foto:null };
+function normContato(tipo, v){
+  v = String(v || '').trim(); if (!tipo || !v) return null;
+  if (tipo === 'telegram'){
+    let m = v.match(/^(?:https?:\/\/)?(?:www\.)?(?:t\.me|telegram\.me)\/([A-Za-z0-9_+\/-]{3,80})\/?$/i);
+    if (m) return 'https://t.me/' + m[1];
+    m = v.match(/^@?([A-Za-z0-9_]{4,32})$/); if (m) return 'https://t.me/' + m[1];
+    throw new Error('Telegram inválido. Use @usuario ou um link t.me/...');
+  }
+  if (tipo === 'whatsapp'){
+    let m = v.match(/^(?:https?:\/\/)?chat\.whatsapp\.com\/([A-Za-z0-9]{10,40})\/?$/i);
+    if (m) return 'https://chat.whatsapp.com/' + m[1];
+    m = v.match(/^(?:https?:\/\/)?wa\.me\/(\d{8,15})\/?$/i); if (m) return 'https://wa.me/' + m[1];
+    let d = v.replace(/\D/g, '');
+    if (d.length === 10 || d.length === 11) d = '55' + d;
+    if (/^\d{12,15}$/.test(d)) return 'https://wa.me/' + d;
+    throw new Error('WhatsApp inválido. Use o número com DDD ou um link de grupo.');
+  }
+  if (tipo === 'instagram'){
+    const m = v.match(/^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([A-Za-z0-9_.]{1,30})\/?(?:\?.*)?$/i) || v.match(/^@?([A-Za-z0-9_.]{1,30})$/);
+    if (m) return 'https://www.instagram.com/' + m[1];
+    throw new Error('Instagram inválido. Use @usuario.');
+  }
+  return null;
+}
+function contatoParaCampo(c){
+  if (!c) return '';
+  if (c.tipo === 'telegram'){ const m = c.url.match(/t\.me\/(.+)$/); return m ? (/^[A-Za-z0-9_]+$/.test(m[1]) ? '@' + m[1] : 't.me/' + m[1]) : c.url; }
+  if (c.tipo === 'whatsapp'){ const m = c.url.match(/wa\.me\/(\d+)/); return m ? '+' + m[1] : c.url.replace(/^https:\/\//, ''); }
+  if (c.tipo === 'instagram'){ const m = c.url.match(/instagram\.com\/([^/?]+)/); return m ? '@' + m[1] : c.url; }
+  return c.url;
+}
+function peFotoUI(){
+  const img = $('peImg'), p = S.perfil || {};
+  $('peIni').textContent = (p.handle || '@').charAt(0).toUpperCase();
+  if (PE.foto){ img.src = PE.foto; img.hidden = false; $('peIni').hidden = true; } else { img.hidden = true; img.removeAttribute('src'); $('peIni').hidden = false; }
+  $('peRemover').hidden = !PE.foto;
+}
+function abrirEditarPerfil(){
+  const p = S.perfil; if (!p || !p.handle) return $('btnArroba').click();
+  PE.foto = p.foto || null; peFotoUI();
+  $('peBio').value = p.bio || ''; $('peBioN').textContent = $('peBio').value.length;
+  const ct = Array.isArray(p.contatos) ? p.contatos : [];
+  [1, 2].forEach(i => { const c = ct[i - 1]; $('peT' + i).value = c ? c.tipo : ''; $('peU' + i).value = contatoParaCampo(c); $('peU' + i).disabled = !c; });
+  $('peErro').hidden = true; abrir('modalPerfil');
+}
+[1, 2].forEach(i => $('peT' + i).addEventListener('change', e => { const u = $('peU' + i); u.disabled = !e.target.value; if (!e.target.value) u.value = ''; else if (!matchMedia('(max-width:640px)').matches) u.focus(); }));
+$('peBio').addEventListener('input', e => { $('peBioN').textContent = e.target.value.length; });
+$('peAv').addEventListener('click', () => $('peArquivo').click());
+$('peTrocar').addEventListener('click', () => $('peArquivo').click());
+$('peRemover').addEventListener('click', () => { PE.foto = null; peFotoUI(); });
+$('peArquivo').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  if (!/^image\//.test(f.type)) return peErro('Escolha uma imagem.');
+  try{ PE.foto = await fotoQuadrada(f, 360); peFotoUI(); $('peErro').hidden = true; }
+  catch(_){ peErro('Não foi possível ler essa imagem.'); }
+});
+function fotoQuadrada(file, lado){
+  return new Promise((ok, falha) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(img.width, img.height), c = document.createElement('canvas');
+      c.width = c.height = lado;
+      c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, lado, lado);
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', .85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(); };
+    img.src = url;
+  });
+}
+function peErro(m){ const e = $('peErro'); e.textContent = m; e.hidden = false; }
+$('peSalvar').addEventListener('click', async () => {
+  const btn = $('peSalvar'); $('peErro').hidden = true;
+  let contatos = [];
+  try{
+    [1, 2].forEach(i => { const t = $('peT' + i).value, u = normContato(t, $('peU' + i).value); if (t && u) contatos.push({ tipo:t, url:u }); });
+  }catch(err){ return peErro(err.message); }
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try{
+    const foto = PE.foto ? await enviarImagem(PE.foto) : null;
+    const { error } = await _supabase.rpc('editar_perfil', { p_token:S.token, p_bio:$('peBio').value, p_foto:foto, p_contatos:contatos });
+    if (error) throw error;
+    await carregarPerfil(); fechar('modalPerfil'); aviso('Perfil atualizado');
+  }catch(err){ peErro(err.message || 'Não foi possível salvar.'); }
+  finally{ btn.disabled = false; btn.textContent = 'Salvar perfil'; }
+});
+
 function resetChips(){ S.cat = 'Todas'; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x.dataset.cat === 'Todas')); }
 function irParaPerfil(h){
   S.busca = '@' + h; $('busca').value = S.busca; resetChips();
@@ -722,6 +870,9 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados();
+  if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
+    Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
+  }
   abrirLinkDireto();
 })();
 
