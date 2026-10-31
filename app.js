@@ -109,27 +109,28 @@ function confirmar({titulo, texto, botao}){
   });
 }
 
-/* ---------- Publicar / editar: tela própria em 3 etapas (Capa · Ajustar · Detalhes) ---------- */
+/* ---------- Publicar / editar: uma tela só (prévia do card com a capa + campos) ---------- */
 $('inputCat').innerHTML = CATEGORIAS.map(c => `<option>${c}</option>`).join('');
-function mostrarErro(m){ const d = $('formErro'); d.textContent = m; d.hidden = false; }
-const PT = { e:1, src:'', w:0, h:0, zoom:1, tx:0, ty:0, capa:'', item:null, voltarPara:'mural' };
-const ETAPAS = ['Capa', 'Ajustar', 'Detalhes'];
+function mostrarErro(m){ const d = $('formErro'); d.textContent = m; d.hidden = false; d.scrollIntoView({ block:'center', behavior:'smooth' }); }
+const PT = { src:'', w:0, h:0, zoom:1, tx:0, ty:0, capa:'', item:null, voltarPara:'mural' };
 
 function limparForm(){
   ['inputNome','inputLink','inputLegenda'].forEach(id => $(id).value = '');
   $('inputCat').value = 'Outros'; $('legCount').textContent = '0'; $('formErro').hidden = true;
   imagemBase64 = ''; pos = { x:50, y:50 }; $('fileInput').value = '';
   Object.assign(PT, { src:'', w:0, h:0, zoom:1, tx:0, ty:0, capa:'', item:null });
+  $('ptZoom').value = 1; capaUI();
 }
 function entrarPublicar(){
   if (S.aba !== 'publicar') PT.voltarPara = document.body.classList.contains('modo-perfil') ? 'mural' : (S.aba || 'mural');
-  trocarAba('publicar', location.pathname === '/publicar' && S.aba !== 'publicar' ? true : S.aba === 'publicar');
+  trocarAba('publicar', location.pathname === '/publicar' || S.aba === 'publicar');
+  requestAnimationFrame(() => { capaUI(); previa(); });
 }
 function abrirPublicar(){
   if (S.meus.length >= LIMITE){ aviso(`Você já tem ${LIMITE} sites. Exclua um para publicar outro.`); if (location.pathname === '/publicar') irUrl('/', null, true); return; }
   editId = null; limparForm();
-  $('ptTitulo').textContent = 'Nova publicação';
-  entrarPublicar(); etapa(1);
+  $('ptTitulo').textContent = 'Nova publicação'; $('btnSalvar').textContent = 'Publicar';
+  entrarPublicar();
 }
 function abrirEditar(id){
   const it = S.meus.find(s => String(s.id) === String(id)); if (!it) return;
@@ -138,47 +139,32 @@ function abrirEditar(id){
   $('inputLegenda').value = it.caption || ''; $('legCount').textContent = $('inputLegenda').value.length;
   $('inputCat').value = CATEGORIAS.includes(it.categoria) ? it.categoria : 'Outros';
   PT.capa = it.image_url; pos = lerPos(it.img_pos);
-  $('ptTitulo').textContent = 'Editar site';
-  entrarPublicar(); etapa(3);
+  $('ptTitulo').textContent = 'Editar site'; $('btnSalvar').textContent = 'Salvar';
+  entrarPublicar();
 }
 function sairPublicar(){ const d = PT.voltarPara || 'mural'; trocarAba(d === 'publicar' ? 'mural' : d); }
 function fecharModal(){ editId = null; $('formErro').hidden = true; limparForm(); if (S.aba === 'publicar') sairPublicar(); }
+$('btnSalvar').addEventListener('click', () => salvarSite());
+$('ptVoltar').addEventListener('click', sairPublicar);
 
-function etapa(n){
-  PT.e = n;
-  document.querySelectorAll('#pubTela .pt-etapa').forEach(el => el.hidden = +el.dataset.e !== n);
-  document.querySelectorAll('#pubTela .pt-steps i').forEach((el, k) => { el.classList.toggle('on', k < n); });
-  $('ptPasso').textContent = ETAPAS[n - 1];
-  const b = $('btnSalvar');
-  b.textContent = n < 3 ? 'Avançar' : (editId ? 'Salvar' : 'Publicar');
-  b.classList.toggle('pub', n === 3);
-  b.disabled = n === 1 && !PT.src;
-  b.hidden = n === 1 && !PT.src;
-  $('pubTela').dataset.e = n;
-  if (n === 2) requestAnimationFrame(() => { ajustarCrop(true); });
-  if (n === 3) desenharPrevia();
-  scrollTo({ top:0 });
+/* capa: escolher (toque ou arrastar e soltar), enquadrar arrastando e zoom */
+function capaUI(){
+  const img = $('ptImg'), nova = !!PT.src, temCapa = nova || !!PT.capa;
+  $('ptDrop').hidden = temCapa; $('ptTrocar').hidden = !temCapa;
+  $('ptZoomBox').hidden = !nova; $('ptArraste').hidden = !nova;
+  $('ptCrop').classList.toggle('editavel', nova);
+  img.hidden = !temCapa;
+  if (nova){ if (img.getAttribute('src') !== PT.src) img.src = PT.src; img.classList.remove('fixa'); ajustarCrop(true); }
+  else if (PT.capa){ img.src = PT.capa; img.classList.add('fixa'); img.removeAttribute('style'); img.style.objectPosition = posStr(); }
+  else { img.removeAttribute('src'); img.removeAttribute('style'); }
 }
-$('btnSalvar').addEventListener('click', () => {
-  if (PT.e === 1){ if (PT.src) etapa(2); return; }
-  if (PT.e === 2){ recortar(); etapa(3); return; }
-  salvarSite();
-});
-$('ptVoltar').addEventListener('click', () => {
-  if (PT.e === 3 && PT.src) return etapa(2);
-  if (PT.e === 2) return etapa(1);
-  sairPublicar();
-});
-$('ptTrocar').addEventListener('click', () => $('fileInput').click());
-$('ptTrocarCapa').addEventListener('click', () => etapa(1));
-
-/* etapa 1: escolher (toque ou arrastar e soltar) */
-const drop = $('ptDrop');
-drop.addEventListener('click', () => $('fileInput').click());
-drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('fileInput').click(); } });
-['dragenter','dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave','drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) carregarArquivo(f); });
+const abrirArquivo = () => $('fileInput').click();
+$('ptDrop').addEventListener('click', abrirArquivo);
+$('ptTrocar').addEventListener('click', abrirArquivo);
+const crop = $('ptCrop');
+['dragenter','dragover'].forEach(t => crop.addEventListener(t, e => { e.preventDefault(); crop.classList.add('over'); }));
+['dragleave','drop'].forEach(t => crop.addEventListener(t, e => { e.preventDefault(); crop.classList.remove('over'); }));
+crop.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) carregarArquivo(f); });
 $('fileInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) carregarArquivo(f); });
 
 function lerImagem(file, max){
@@ -199,13 +185,10 @@ async function carregarArquivo(file){
   if (file.size > 15 * 1024 * 1024){ aviso('A imagem passa de 15 MB. Escolha uma menor.'); return; }
   try{
     const r = await lerImagem(file, 2000);
-    Object.assign(PT, { src:r.src, w:r.w, h:r.h, zoom:1 });
-    $('ptImg').src = r.src; $('ptZoom').value = 1;
-    etapa(2);
+    Object.assign(PT, { src:r.src, w:r.w, h:r.h, zoom:1 }); $('ptZoom').value = 1; $('formErro').hidden = true;
+    const img = $('ptImg'); img.onload = () => { img.onload = null; capaUI(); }; img.src = r.src;
   }catch(_){ aviso('Não foi possível ler essa imagem. Tente outra.'); }
 }
-
-/* etapa 2: enquadrar (arrastar + zoom). O recorte final segue o formato do card (6:5). */
 function medidas(){ const f = $('ptCrop'); return { W:f.clientWidth, H:f.clientHeight }; }
 function limitar(){
   const { W, H } = medidas(), s = Math.max(W / PT.w, H / PT.h) * PT.zoom, dw = PT.w * s, dh = PT.h * s;
@@ -216,11 +199,13 @@ function limitar(){
 }
 function ajustarCrop(centralizar){
   if (!PT.w) return;
-  const { W, H } = medidas(), s = Math.max(W / PT.w, H / PT.h) * PT.zoom;
+  const { W, H } = medidas(); if (!W) return;
+  const s = Math.max(W / PT.w, H / PT.h) * PT.zoom;
   if (centralizar){ PT.tx = (W - PT.w * s) / 2; PT.ty = (H - PT.h * s) / 2; }
   limitar();
 }
 function zoomPara(z, cx, cy){
+  if (!PT.src) return;
   const { W, H } = medidas(); z = Math.max(1, Math.min(3, z));
   const s0 = Math.max(W / PT.w, H / PT.h), antes = s0 * PT.zoom, depois = s0 * z;
   cx = cx ?? W / 2; cy = cy ?? H / 2;
@@ -231,10 +216,11 @@ $('ptZoom').addEventListener('input', e => zoomPara(+e.target.value));
 (function arrastar(){
   const f = $('ptCrop'), toques = new Map(); let ini = null, pinca = null;
   f.addEventListener('pointerdown', e => {
+    if (!PT.src || e.target.closest('button')) return;
     f.setPointerCapture(e.pointerId); toques.set(e.pointerId, { x:e.clientX, y:e.clientY });
     if (toques.size === 1) ini = { x:e.clientX, y:e.clientY, tx:PT.tx, ty:PT.ty };
     if (toques.size === 2){ const [a, b] = [...toques.values()]; pinca = { d:Math.hypot(a.x - b.x, a.y - b.y), z:PT.zoom }; }
-    f.classList.add('drag');
+    f.classList.add('drag'); $('ptArraste').hidden = true;
   });
   f.addEventListener('pointermove', e => {
     if (!toques.has(e.pointerId)) return;
@@ -246,34 +232,30 @@ $('ptZoom').addEventListener('input', e => zoomPara(+e.target.value));
   });
   const fim = e => { toques.delete(e.pointerId); pinca = null; if (toques.size === 1){ const [p] = [...toques.values()]; ini = { x:p.x, y:p.y, tx:PT.tx, ty:PT.ty }; } else { ini = null; f.classList.remove('drag'); } };
   f.addEventListener('pointerup', fim); f.addEventListener('pointercancel', fim);
-  f.addEventListener('wheel', e => { e.preventDefault(); const r = f.getBoundingClientRect(); zoomPara(PT.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
-  addEventListener('resize', () => { if (PT.e === 2) limitar(); });
+  f.addEventListener('wheel', e => { if (!PT.src) return; e.preventDefault(); const r = f.getBoundingClientRect(); zoomPara(PT.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
+  addEventListener('resize', () => { if (S.aba === 'publicar' && PT.src) limitar(); });
 })();
 function recortar(){
   if (!PT.src) return;
   const { W, H } = medidas(), s = limitar(), img = $('ptImg');
-  const c = document.createElement('canvas'); c.width = 960; c.height = 800;
+  const c = document.createElement('canvas'); c.width = 960; c.height = Math.round(960 * H / W);
   c.getContext('2d').drawImage(img, -PT.tx / s, -PT.ty / s, W / s, H / s, 0, 0, c.width, c.height);
   imagemBase64 = c.toDataURL('image/jpeg', .85); pos = { x:50, y:50 };
 }
-// compatibilidade com o código antigo de posição da foto
 const posStr = () => `${Math.round(pos.x)}% ${Math.round(pos.y)}%`;
 function lerPos(s){ const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m ? { x:Math.min(100, +m[1]), y:Math.min(100, +m[2]) } : { x:50, y:50 }; }
 
-/* etapa 3: detalhes com prévia ao vivo do card */
-function desenharPrevia(){
+/* prévia ao vivo: nome, categoria, @ */
+function previa(){
   const p = S.perfil, it = PT.item || {};
-  const prev = {
-    id:'previa', brand_name:$('inputNome').value.trim() || 'Nome do seu site', link_url:'#',
-    image_url:imagemBase64 || PT.capa || '', categoria:$('inputCat').value, cliques:it.cliques || 0,
-    handle:it.handle || (p && p.handle) || null, verificado:!!it.verificado, img_pos:imagemBase64 ? '50% 50%' : posStr()
-  };
-  const card = criarCard(prev, 0); card.classList.add('previa');
-  $('ptCard').replaceChildren(card);
+  $('ptNome').textContent = $('inputNome').value.trim() || 'Nome do seu site';
+  $('ptSelo').innerHTML = it.verificado ? SELO : '';
+  $('ptTag').textContent = $('inputCat').value;
+  const h = it.handle || (p && p.handle);
+  $('ptArroba').innerHTML = h ? `<span class="arroba"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</span>` : '<span class="anon">anônimo</span>';
 }
-let _prevT; const previaDepois = () => { clearTimeout(_prevT); _prevT = setTimeout(desenharPrevia, 120); };
-['inputNome','inputCat'].forEach(id => $(id).addEventListener('input', previaDepois));
-$('inputCat').addEventListener('change', previaDepois);
+['inputNome','inputCat'].forEach(id => $(id).addEventListener('input', previa));
+$('inputCat').addEventListener('change', previa);
 $('inputLegenda').addEventListener('input', () => { $('legCount').textContent = $('inputLegenda').value.length; });
 
 /* Envia a capa ao Supabase Storage; se falhar, segue com a imagem embutida (como antes) */
@@ -293,7 +275,8 @@ async function salvarSite(){
   const legenda = $('inputLegenda').value.trim(), cat = $('inputCat').value;
   const editando = !!editId, btn = $('btnSalvar'); $('formErro').hidden = true;
 
-  if (!editando && !imagemBase64){ etapa(1); return aviso('Escolha uma imagem de capa.'); }
+  if (PT.src) recortar();
+  if (!editando && !imagemBase64) return mostrarErro('Escolha uma imagem de capa.');
   if (!nome || !link) return mostrarErro('Preencha o nome e o link.');
   if (!/^https?:\/\/\S+$/i.test(link)) return mostrarErro('O link precisa começar com http:// ou https://');
 

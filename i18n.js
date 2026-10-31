@@ -99,6 +99,8 @@
     ['Link do site','Site link','Enlace del sitio'],['Legenda','Caption','Descripción'],
     ['Nome do seu site','Your site name','Nombre de tu sitio'],
     ['Escolha um arquivo de imagem.','Choose an image file.','Elige un archivo de imagen.'],
+    ['Escolher capa','Choose cover','Elegir portada'],['Toque ou arraste uma imagem','Tap or drag an image','Toca o arrastra una imagen'],
+    ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],['no mural','on the wall','en el muro'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],
     ['Centralizar','Center','Centrar'],

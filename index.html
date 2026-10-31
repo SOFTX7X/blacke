@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="style.css?v=1793470365">
+  <link rel="stylesheet" href="style.css?v=1793470590">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -143,41 +143,40 @@
     </section>
 
 
-    <!-- Publicar / editar: tela própria em etapas -->
+    <!-- Publicar / editar: tela própria (prévia do card + campos) -->
     <section id="pubTela" class="pt" hidden aria-labelledby="ptTitulo">
       <header class="pt-head">
         <button type="button" class="pt-nav" id="ptVoltar" aria-label="Voltar"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-        <div class="pt-tit"><b id="ptTitulo">Nova publicação</b><span id="ptPasso">Capa</span></div>
-        <button type="button" class="pt-acao" id="btnSalvar">Avançar</button>
+        <div class="pt-tit"><b id="ptTitulo">Nova publicação</b><span>no mural</span></div>
+        <button type="button" class="pt-acao pub" id="btnSalvar">Publicar</button>
       </header>
-      <div class="pt-steps" aria-hidden="true"><i></i><i></i><i></i></div>
-
-      <div class="pt-etapa" data-e="1">
-        <div id="ptDrop" class="pt-drop" tabindex="0" role="button" aria-label="Escolher imagem de capa">
-          <svg class="pt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
-          <h3>Escolha a capa do seu site</h3>
-          <p>Arraste uma imagem para cá ou</p>
-          <span class="pt-escolher">Selecionar do aparelho</span>
-          <small>JPG, PNG ou WEBP · até 15 MB</small>
-        </div>
-        <input type="file" id="fileInput" accept="image/*" hidden>
-      </div>
-
-      <div class="pt-etapa" data-e="2" hidden>
-        <div class="pt-crop" id="ptCrop"><img id="ptImg" alt="" draggable="false"><div class="pt-grade" aria-hidden="true"></div></div>
-        <div class="pt-zoom">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>
-          <input type="range" id="ptZoom" min="1" max="3" step="0.01" value="1" aria-label="Zoom">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6M11 8v6"/></svg>
-        </div>
-        <div class="pt-dicas"><span>Arraste para enquadrar · use o zoom para aproximar</span><button type="button" class="pt-link" id="ptTrocar">Trocar imagem</button></div>
-      </div>
-
-      <div class="pt-etapa pt-det" data-e="3" hidden>
+      <div class="pt-det">
         <div class="pt-prev">
           <div class="pt-lbl">Prévia no mural</div>
-          <div id="ptCard"></div>
-          <button type="button" class="pt-link" id="ptTrocarCapa">Trocar capa</button>
+          <article class="card previa" id="ptCard">
+            <div class="cover" id="ptCrop">
+              <img id="ptImg" class="pt-img" alt="" draggable="false" hidden>
+              <div class="pt-grade" aria-hidden="true"></div>
+              <button type="button" class="pt-vazio" id="ptDrop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+                <b>Escolher capa</b><small>Toque ou arraste uma imagem</small>
+              </button>
+              <span class="tag" id="ptTag">Outros</span>
+              <span class="pt-arraste" id="ptArraste" hidden>Arraste para ajustar</span>
+            </div>
+            <div class="body">
+              <h3 translate="no"><span id="ptNome">Nome do seu site</span><span id="ptSelo"></span></h3>
+              <div class="line2" id="ptArroba"></div>
+            </div>
+            <div class="foot"><span class="visit"><span>Acessar site</span></span><span class="sq"></span></div>
+          </article>
+          <div class="pt-zoom" id="ptZoomBox" hidden>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>
+            <input type="range" id="ptZoom" min="1" max="3" step="0.01" value="1" aria-label="Zoom">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6M11 8v6"/></svg>
+          </div>
+          <button type="button" class="pt-link" id="ptTrocar" hidden>Trocar capa</button>
+          <input type="file" id="fileInput" accept="image/*" hidden>
         </div>
         <div class="pt-form">
           <label class="field-label" for="inputLink">Link do site</label>
@@ -194,6 +193,7 @@
         </div>
       </div>
     </section>
+
     <section id="muralGrid" class="grid" aria-live="polite"></section>
     <div id="estado" class="estado"></div>
     <button id="maisBtn" class="btn-ghost mais" hidden>Carregar mais</button>
@@ -358,7 +358,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="i18n.js?v=1793470365"></script>
-  <script src="app.js?v=1793470365"></script>
+  <script src="i18n.js?v=1793470590"></script>
+  <script src="app.js?v=1793470590"></script>
 </body>
 </html>
