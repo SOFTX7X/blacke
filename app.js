@@ -697,6 +697,9 @@ async function carregarPerfil(){
   try{ const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token }); S.perfil = data || null; }
   catch(_){ S.perfil = null; }
   atualizarPerfilUI();
+  // abriu o link do próprio @ antes de o perfil carregar: mostra a Conta
+  const h = S.perfil && S.perfil.handle;
+  if (h && document.body.classList.contains('modo-perfil') && S.busca === '@' + h) irParaPerfil(h, true);
 }
 function atualizarPerfilUI(){
   const p = S.perfil; desenharMeuPerfil();
@@ -881,6 +884,11 @@ function resetChips(){ S.cat = 'Todas'; document.querySelectorAll('.chip').forEa
 /* Página de perfil: abre limpa (sem título, busca e filtros), com Voltar */
 function modoPerfil(on){ document.body.classList.toggle('modo-perfil', !!on); }
 function irParaPerfil(h, semHistorico){
+  // o meu próprio @ abre a minha Conta (com Editar perfil, Trocar @ etc.)
+  if (S.perfil && S.perfil.handle && S.perfil.handle === String(h).toLowerCase()){
+    if (semHistorico) irUrl('/conta', { aba:'meus' }, true);
+    trocarAba('meus', !!semHistorico); return;
+  }
   if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
   S.busca = '@' + h; $('busca').value = S.busca; resetChips(); modoPerfil(true);
   if (!semHistorico) irUrl('/@' + h, { perfil:h });
