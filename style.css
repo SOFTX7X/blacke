@@ -1282,3 +1282,12 @@ button:not(:disabled):active,.btn-primary:active,.btn-ghost:active,.pc-btn:activ
 .sp-bar i{width:35%;border-radius:2px;background:var(--violet);box-shadow:none}
 .sp-status,.sp-code{display:none}
 @keyframes spFade{from{opacity:0}to{opacity:1}}
+
+/* ===== Desempenho: cards entram rápido e menos camadas pesadas ===== */
+.card{animation:rise .32s ease-out forwards;animation-delay:calc(min(var(--i,0),8) * 25ms)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+body.carregando .card{animation-play-state:running}
+.bnav,.fav-btn{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@media (min-width:900px){.bnav{background:rgba(16,17,30,.97)}}
+@media (max-width:899px){.bnav{background:rgba(20,21,34,.97)}}
+.fav-btn{background:rgba(6,7,13,.82)}
