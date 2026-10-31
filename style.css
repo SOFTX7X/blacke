@@ -1366,3 +1366,13 @@ body.carregando .card{animation-play-state:running}
   .pn-mais{margin-top:40px}
 }
 @media (min-width:900px){.pn-info{padding-bottom:20px}.pn-sec2{margin-bottom:22px!important}}
+/* PC: botões fixos embaixo da capa (coluna esquerda); nome e legenda na direita, sem empurrar os botões */
+@media (min-width:900px){
+  .pn-wrap{grid-template-columns:320px minmax(0,1fr)!important;column-gap:48px!important;
+    grid-template-areas:"foto info" "foto sobre" "side sobre" "side ." "mais mais" "veja veja"!important;grid-template-rows:auto auto auto 1fr auto auto}
+  .pn-side{margin-top:18px}
+  .pn-sec .btn-ghost{font-size:13px;padding-left:8px;padding-right:8px;white-space:nowrap}
+  .pn-note{font-size:11.5px}
+  .pn-sec2{margin:0!important}
+  .pn-sec2 p{white-space:pre-line}
+}
