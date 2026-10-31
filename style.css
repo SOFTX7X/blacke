@@ -1188,3 +1188,9 @@ body[data-aba="publicar"] .hero{display:none}
   .pt-det{grid-template-columns:1fr;gap:18px;padding:14px 0 10px}
   .pt-prev{width:min(78%,300px);margin:0 auto}
 }
+/* etapa Capa mais compacta */
+.pt-drop{min-height:0;max-width:560px;margin:28px auto;padding:34px 24px;gap:8px}
+.pt-ic{width:58px;height:58px;margin-bottom:2px}
+.pt-drop h3{font-size:18px}
+.pt-escolher{padding:10px 20px;font-size:13.5px}
+@media (max-width:640px){.pt-drop{min-height:0;margin:18px 0;padding:30px 18px}.pt-ic{width:52px;height:52px}.pt-drop h3{font-size:17px}}
