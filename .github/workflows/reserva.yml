@@ -1,0 +1,77 @@
+name: Backup e banco reserva
+
+# Todo dia às 03:17 (Manaus) copia o banco principal e as capas para o projeto reserva
+# e guarda um backup criptografado (14 dias). Também dá para rodar na hora em Actions > Run workflow.
+on:
+  schedule:
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reserva
+  cancel-in-progress: false
+
+jobs:
+  copiar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MAIN_DB_URL: ${{ secrets.MAIN_DB_URL }}
+      RESERVA_DB_URL: ${{ secrets.RESERVA_DB_URL }}
+      MAIN_SERVICE_KEY: ${{ secrets.MAIN_SERVICE_KEY }}
+      RESERVA_SERVICE_KEY: ${{ secrets.RESERVA_SERVICE_KEY }}
+      BACKUP_PASSWORD: ${{ secrets.BACKUP_PASSWORD }}
+      MAIN_URL: https://wyjrjioipqfltdyupfna.supabase.co
+      RESERVA_URL: https://ldghexvlbkiqduzlpdss.supabase.co
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir segredos
+        run: |
+          for v in MAIN_DB_URL RESERVA_DB_URL MAIN_SERVICE_KEY RESERVA_SERVICE_KEY BACKUP_PASSWORD; do
+            if [ -z "${!v}" ]; then echo "::error::Falta o segredo $v (Settings > Secrets and variables > Actions)"; exit 1; fi
+          done
+
+      - name: Instalar cliente PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Copiar o banco principal
+        run: |
+          pg_dump "$MAIN_DB_URL" --schema=public --no-owner --exclude-table-data=public.admins -f dump.sql
+          # linhas que o projeto reserva não aceita (dono do schema / permissões padrão de outros papéis)
+          grep -v -E '^(CREATE SCHEMA public;|ALTER SCHEMA public OWNER|ALTER DEFAULT PRIVILEGES)' dump.sql > restaurar.sql
+          echo "Tamanho do dump: $(du -h dump.sql | cut -f1)"
+
+      - name: Restaurar no reserva (tudo ou nada)
+        run: |
+          {
+            echo "drop schema if exists public cascade;"
+            echo "create schema public;"
+            echo "grant usage on schema public to postgres, anon, authenticated, service_role;"
+            echo "grant all on schema public to postgres, service_role;"
+            cat restaurar.sql
+          } > completo.sql
+          psql "$RESERVA_DB_URL" -v ON_ERROR_STOP=1 --single-transaction -q -f completo.sql
+          psql "$RESERVA_DB_URL" -At -c "select 'sites no reserva: ' || count(*) from public.sites_publicos"
+
+      - name: Copiar as capas e fotos
+        run: python3 scripts/copiar_capas.py
+
+      - name: Backup criptografado
+        run: |
+          gzip -9 -c dump.sql | openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:BACKUP_PASSWORD -out "backup-$(date +%F).sql.gz.enc"
+          rm -f dump.sql restaurar.sql completo.sql
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup-banco
+          path: backup-*.sql.gz.enc
+          retention-days: 14
