@@ -675,3 +675,13 @@ body.carregando{overflow:hidden}
   body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
   .toast{bottom:calc(98px + env(safe-area-inset-bottom))}
 }
+
+/* Publicar no celular: tela própria, em página cheia */
+@media (max-width:640px){
+  #modalCadastro{background:var(--panel);align-items:stretch}
+  #modalCadastro .sheet{height:100vh;height:100dvh;max-height:none;border:0;box-shadow:none;animation:pagein .3s cubic-bezier(.2,.9,.3,1)}
+  #modalCadastro .sheet-head{padding:16px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  #modalCadastro .sheet-head h3{font-size:19px}
+  #btnSalvar{margin-bottom:calc(14px + env(safe-area-inset-bottom))}
+}
+@keyframes pagein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}

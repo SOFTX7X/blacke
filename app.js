@@ -122,7 +122,7 @@ function abrirPublicar(){
   if (S.meus.length >= LIMITE){ aviso(`Você já tem ${LIMITE} sites. Exclua um para publicar outro.`); return; }
   editId = null; limparForm();
   $('modalTitulo').textContent = 'Publicar no mural'; $('btnSalvar').textContent = 'Publicar';
-  abrir('modalCadastro'); setTimeout(() => $('inputNome').focus(), 60);
+  abrir('modalCadastro'); if (!matchMedia('(max-width:640px)').matches) setTimeout(() => $('inputNome').focus(), 60); // no celular o teclado só abre ao tocar num campo
 }
 function abrirEditar(id){
   const it = S.meus.find(s => String(s.id) === String(id)); if (!it) return;
@@ -570,7 +570,7 @@ $('btnArroba').addEventListener('click', () => {
   const info = $('arrobaInfo');
   if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString('pt-BR');
   else info.textContent = '';
-  abrir('modalArroba'); setTimeout(() => $('arrobaInput').focus(), 60);
+  abrir('modalArroba'); if (!matchMedia('(max-width:640px)').matches) setTimeout(() => $('arrobaInput').focus(), 60);
 });
 function erroArroba(m){ const e = $('arrobaErro'); e.textContent = m; e.hidden = false; }
 $('btnSalvarArroba').addEventListener('click', async () => {
