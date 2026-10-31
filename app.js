@@ -12,7 +12,7 @@ async function responde(url, key, ms){
   catch(_){ return false; } finally{ clearTimeout(t); }
 }
 async function escolherBanco(){
-  if (await responde(SUPABASE_URL, SUPABASE_KEY, 4500)) return;
+  if (await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
@@ -995,7 +995,9 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 
 /* ---------- início ---------- */
 (async function iniciar(){
-  await Promise.all([iniciarChave(), escolherBanco()]);
+  await iniciarChave();
+  // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
+  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
