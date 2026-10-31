@@ -375,6 +375,7 @@ function criarCard(item, i){
       <div class="line2">
         ${item.handle ? arrobaBtn(item.handle) : '<span class="anon">anônimo</span>'}
       </div>
+      <div class="rx" data-rx="${esc(item.id)}">${rxHTML(item.id)}</div>
     </div>
     <div class="foot">
       <a class="visit" data-act="visitar" href="${urlSegura(item.link_url)}" target="_blank" rel="noopener noreferrer">
@@ -389,7 +390,69 @@ function criarCard(item, i){
 function anexar(lista, reset){
   const grid = $('muralGrid'); if (reset) grid.innerHTML = '';
   lista.forEach((it, i) => grid.appendChild(criarCard(it, i)));
+  carregarReacoes(lista.map(s => s.id));
 }
+
+/* ---------- Reações (estilo Telegram, só positivas) ---------- */
+const RX = [['fogo','🔥'],['like','👍'],['coracao','❤️'],['amei','😍'],['palmas','👏'],['foguete','🚀']];
+const RXE = Object.fromEntries(RX);
+const RXT = new Map(), RXM = new Map();   // totais por site e minhas reações
+function rxHTML(id){
+  id = String(id); const t = RXT.get(id) || {}, m = RXM.get(id) || [];
+  const bolhas = RX.filter(([k]) => t[k] > 0).map(([k, e]) => `<button type="button" class="rx-b${m.includes(k) ? ' on' : ''}" data-rxe="${k}" aria-pressed="${m.includes(k)}" aria-label="${e} ${t[k]}"><span>${e}</span><b>${fmtN(t[k])}</b></button>`).join('');
+  return bolhas + `<button type="button" class="rx-add" data-rxadd aria-label="Reagir"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.3 1.8 3.5 1.8 3.5-1.8 3.5-1.8M9 9.5h.01M15 9.5h.01"/></svg><i>+</i></button>`;
+}
+function rxRedesenhar(id){ document.querySelectorAll(`[data-rx="${CSS.escape(String(id))}"]`).forEach(el => { el.innerHTML = rxHTML(id); }); }
+async function carregarReacoes(ids){
+  ids = [...new Set(ids.map(String))].filter(id => !RXT.has(id)).slice(0, 200); if (!ids.length) return;
+  try{
+    const [t, m] = await Promise.all([
+      _supabase.rpc('reacoes_de', { p_ids:ids }),
+      S.token ? _supabase.rpc('minhas_reacoes', { p_ids:ids, p_token:S.token }) : Promise.resolve({ data:{} })
+    ]);
+    ids.forEach(id => { RXT.set(id, (t.data || {})[id] || {}); RXM.set(id, (m.data || {})[id] || []); rxRedesenhar(id); });
+  }catch(_){}
+}
+async function reagir(id, k){
+  id = String(id); const m = RXM.get(id) || [], on = !m.includes(k), t = { ...(RXT.get(id) || {}) };
+  t[k] = Math.max(0, (t[k] || 0) + (on ? 1 : -1));
+  RXT.set(id, t); RXM.set(id, on ? [...m, k] : m.filter(x => x !== k)); rxRedesenhar(id);   // resposta imediata
+  try{
+    const { data, error } = await _supabase.rpc('reagir', { p_id:id, p_emoji:k, p_token:S.token, p_on:on });
+    if (error) throw error;
+    RXT.set(id, data || {}); rxRedesenhar(id);
+  }catch(err){
+    RXM.set(id, m); const v = { ...(RXT.get(id) || {}) }; v[k] = Math.max(0, (v[k] || 0) + (on ? -1 : 1)); RXT.set(id, v); rxRedesenhar(id);
+    aviso(err.message || 'Não foi possível reagir.');
+  }
+}
+let rxPop = null;
+function fecharRxPop(){ if (rxPop){ rxPop.remove(); rxPop = null; } }
+function abrirRxPop(btn, id){
+  fecharRxPop();
+  const p = document.createElement('div'); p.className = 'rx-pop'; p.setAttribute('role', 'menu');
+  const m = RXM.get(String(id)) || [];
+  p.innerHTML = RX.map(([k, e]) => `<button type="button" role="menuitem" data-rxpick="${k}" class="${m.includes(k) ? 'on' : ''}" aria-label="${e}">${e}</button>`).join('');
+  document.body.appendChild(p); rxPop = p; p.dataset.id = id;
+  const r = btn.getBoundingClientRect(), w = p.offsetWidth, h = p.offsetHeight;
+  let x = Math.min(innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2)), y = r.top - h - 8;
+  if (y < 8) y = r.bottom + 8;
+  p.style.left = x + 'px'; p.style.top = y + 'px';
+}
+document.addEventListener('click', e => {
+  const pick = e.target.closest('[data-rxpick]');
+  if (pick){ e.stopPropagation(); reagir(rxPop.dataset.id, pick.dataset.rxpick); fecharRxPop(); return; }
+  const add = e.target.closest('[data-rxadd]'), b = e.target.closest('[data-rxe]');
+  if (add || b){
+    e.preventDefault(); e.stopPropagation();
+    const id = e.target.closest('[data-rx]').dataset.rx;
+    if (add) abrirRxPop(add, id); else reagir(id, b.dataset.rxe);
+    return;
+  }
+  if (rxPop && !e.target.closest('.rx-pop')) fecharRxPop();
+}, true);
+addEventListener('scroll', fecharRxPop, { passive:true });
+addEventListener('keydown', e => { if (e.key === 'Escape') fecharRxPop(); });
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
 const BTN_NOVO = '<br><button class="btn-primary" data-act="novo" style="margin-top:14px"><i class="fa-solid fa-plus"></i> Publicar link</button>';
 /* Estados vazios e de erro: ícone, título, texto e botão */
@@ -507,6 +570,7 @@ function abrirFicha(id){
   $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
   $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString(LOC()) : 'Data não informada';
   $('mPerfil').innerHTML = it.handle ? arrobaBtn(it.handle) : '<span class="anon">anônimo</span>';
+  const fr = $('fcRx'); fr.dataset.rx = it.id; fr.innerHTML = rxHTML(it.id); carregarReacoes([it.id]);
   const leg = $('fcLegenda'); leg.translate = !it.caption; leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
 
   const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
@@ -1129,6 +1193,7 @@ function desenharDestaques(){
     if (S.destAba === 'top') c.querySelector('.cover').insertAdjacentHTML('beforeend', `<i class="dest-rank${i < 3 ? ' top' : ''}">#${i + 1}</i>`);
     g.appendChild(c);
   });
+  carregarReacoes(lista.map(s => s.id));
 }
 async function abrirDestaques(){
   $('destLista').innerHTML = '<div class="skeleton"></div>'.repeat(4);

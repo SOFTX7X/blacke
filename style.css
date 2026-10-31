@@ -1315,3 +1315,24 @@ body.ficha-open::before{display:none}
 }
 /* lupa só onde faz sentido (fora de Publicar e Conta) */
 body[data-aba="publicar"] .tb-busca,body[data-aba="meus"] .tb-busca,body[data-aba="publicar"] .topbar .searchbar,body[data-aba="meus"] .topbar .searchbar{display:none!important}
+
+/* ===== Reações (estilo Telegram) ===== */
+.rx{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.rx-b,.rx-add{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border:1px solid #262b58;border-radius:99px!important;background:rgba(18,21,47,.85);color:#c7cbe6;font:600 12.5px var(--display);cursor:pointer;transition:background .15s,border-color .15s,transform .12s}
+.rx-b span{font-size:14px;line-height:1}
+.rx-b b{font-weight:700}
+.rx-b:hover,.rx-add:hover{border-color:#3a4090;background:#171a3d}
+.rx-b:active,.rx-add:active{transform:scale(.94)}
+.rx-b.on{background:rgba(123,108,255,.28);border-color:#7b6cff;color:#fff}
+.rx-add{width:28px;padding:0;justify-content:center;position:relative;color:#8c92b3}
+.rx-add i{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;display:grid;place-items:center;border-radius:50%!important;background:#7b6cff;color:#fff;font:700 10px/1 var(--display);font-style:normal}
+.rx-pop{position:fixed;z-index:90;display:flex;gap:2px;padding:6px;border:1px solid #2c3270;border-radius:99px!important;background:rgba(20,21,36,.98);box-shadow:0 14px 34px -10px rgba(0,0,0,.85);animation:rxIn .16s cubic-bezier(.2,.9,.3,1.2) both}
+.rx-pop button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%!important;background:none;font-size:22px;cursor:pointer;transition:transform .12s,background .12s}
+.rx-pop button:hover{transform:scale(1.22);background:rgba(255,255,255,.06)}
+.rx-pop button.on{background:rgba(123,108,255,.28)}
+@keyframes rxIn{from{opacity:0;transform:translateY(6px) scale(.9)}to{opacity:1;transform:none}}
+.rx-ficha{justify-content:flex-start;margin:12px 0 0}
+.rx-ficha .rx-b,.rx-ficha .rx-add{height:32px}
+.rx-ficha .rx-add{width:32px}
+.previa .rx,body[data-aba="meus"] .card .rx-add{display:none}
+@media (max-width:640px){.rx{gap:5px;margin-top:8px}.rx-b,.rx-add{height:30px}.rx-add{width:30px}.rx-pop button{width:42px;height:42px}}
