@@ -1253,3 +1253,32 @@ body[data-aba="publicar"] .hero{display:none}
 /* cliques: resposta tátil leve em botões */
 button:not(:disabled):active,.btn-primary:active,.btn-ghost:active,.pc-btn:active,.chip:active{transform:scale(.97)}
 .brand:hover .brand-name{animation:none}
+
+/* ===== Visual limpo, sem neon ===== */
+.aurora{background:radial-gradient(60vw 45vw at -5% -10%,rgba(74,63,214,.16),transparent 70%),radial-gradient(50vw 40vw at 105% 110%,rgba(123,108,255,.10),transparent 70%)}
+.btn-primary,.btn-primary:hover{box-shadow:none}
+.brand-name b,.hero h1,.pn-brand{filter:none}
+.chip.on,.tab.on{box-shadow:none}
+.card:hover{border-color:#2c3270;box-shadow:0 14px 30px -18px rgba(0,0,0,.9)}
+.visit:hover{border-color:#3a4090;box-shadow:none}
+.sq:hover,.btn-ghost:hover:not(:disabled){box-shadow:none}
+.pn-foto{border-color:#262b58;box-shadow:none}
+.pn-foto::after{display:none}
+.pn-cat,.pn-info h1{text-shadow:none}
+.pn-go{box-shadow:none}
+.rel:hover{border-color:#2c3270;box-shadow:none}
+.pn-aurora::before,.pn-aurora::after{animation:none;opacity:.6}
+.selo{filter:none}
+.pt-acao.pub,.pc-btn.pri{box-shadow:none}
+.ig-av{box-shadow:none}
+
+/* ===== Tela de carregamento leve e limpa ===== */
+#splash{background:var(--bg)}
+#splash::before{display:none}
+.sp-center{gap:20px;animation:spFade .3s ease both}
+.sp-name{font-size:16px;letter-spacing:.32em;text-shadow:none;color:#e8eaf8}
+.sp-name b{text-shadow:none;color:var(--violet)}
+.sp-bar{width:120px;height:2px;border-radius:2px;background:#1a1d3a}
+.sp-bar i{width:35%;border-radius:2px;background:var(--violet);box-shadow:none}
+.sp-status,.sp-code{display:none}
+@keyframes spFade{from{opacity:0}to{opacity:1}}
