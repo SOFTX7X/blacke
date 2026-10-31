@@ -1164,3 +1164,12 @@ function marcarInsights(){
     el.innerHTML = `<span class="ins-n"><i class="fa-regular fa-eye"></i><b>${fmtN(total)}</b><em>${total === 1 ? 'visualização' : 'visualizações'}</em></span>${s ? chipTendencia(s.hj, s.ontem) : ''}`;
   });
 }
+
+/* Menu lateral do PC: abre só quando o mouse entra de verdade (não ao recarregar com o mouse parado em cima) e fecha ao clicar */
+(() => {
+  const r = $('bnav'); if (!r) return;
+  let mexeu = false;
+  r.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; if (!mexeu){ mexeu = true; return; } r.classList.add('aberto'); });
+  r.addEventListener('pointerleave', () => { r.classList.remove('aberto'); mexeu = false; });
+  r.addEventListener('click', () => { r.classList.remove('aberto'); mexeu = false; });
+})();
