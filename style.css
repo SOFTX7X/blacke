@@ -634,3 +634,7 @@ body.carregando{overflow:hidden}
   #btnSalvar{bottom:12px}
   .sheet{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
 }
+
+/* foto e nome do card abrem os detalhes; o resto do card não */
+.card .cover,.card .body h3{cursor:pointer}
+.card .cover:focus-visible{outline:2px solid var(--ice);outline-offset:-2px}

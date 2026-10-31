@@ -256,14 +256,14 @@ function criarCard(item, i){
   const card = document.createElement('article');
   card.className = 'card'; card.dataset.id = item.id; card.style.setProperty('--i', Math.min(i, 12));
   card.innerHTML = `
-    <div class="cover">
+    <div class="cover" data-act="detalhes" role="button" tabindex="0" aria-label="Ver detalhes de ${esc(item.brand_name)}">
       <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
       <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
-      <h3><span>${esc(item.brand_name)}</span></h3>
+      <h3 data-act="detalhes"><span>${esc(item.brand_name)}</span></h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
       </div>
@@ -274,6 +274,7 @@ function criarCard(item, i){
       </a>
       <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
+  card.querySelector('.cover').addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); abrirFicha(item.id); } });
   efeitoCard(card);
   return card;
 }
