@@ -1066,3 +1066,5 @@ body.modo-perfil .hero,body.modo-perfil .toolbar{display:none}
 body.modo-perfil #perfilBox{margin-top:18px;margin-bottom:22px}
 .pc-voltar{display:inline-flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 14px;border:1px solid #262b58;border-radius:99px;background:rgba(18,21,47,.85);color:#c7cbe6;font:600 13px var(--display);cursor:pointer;transition:border-color .2s,color .2s}
 .pc-voltar:hover{border-color:var(--violet);color:#fff}
+/* ficha aberta no PC: esconde o menu lateral para não cobrir o conteúdo */
+@media (min-width:900px){body:has(#ficha:not([hidden])) .bnav{opacity:0;visibility:hidden;pointer-events:none}}
