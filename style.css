@@ -685,3 +685,34 @@ body.carregando{overflow:hidden}
   #btnSalvar{margin-bottom:calc(14px + env(safe-area-inset-bottom))}
 }
 @keyframes pagein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---- Publicar: visual profissional ---- */
+.sheet.pub .sh-sub{margin:4px 0 0;font:400 13px var(--display);color:var(--muted)}
+.sheet.pub .sheet-head{align-items:flex-start;margin-bottom:4px}
+.pub-sec{margin-top:16px;padding:16px;border:1px solid var(--line);background:rgba(12,14,27,.6)}
+.pub-sec .field-label:first-of-type{margin-top:0}
+.pub-t{display:flex;align-items:center;gap:10px;font:600 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--text);margin-bottom:12px}
+.pub-t b{display:inline-grid;place-items:center;width:22px;height:22px;background:var(--grad);color:#fff;font:700 12px var(--mono);letter-spacing:0}
+.pub-sec .hint{margin-top:6px}
+.upload .up-ic{color:var(--violet);margin-bottom:2px}
+.upload{padding:30px 16px}
+.pub-bar{margin-top:18px}
+.pub-bar .btn-primary{margin-top:0}
+
+@media (max-width:640px){
+  /* a barra em bolha continua visível por cima da tela de publicar */
+  body:has(#modalCadastro:not([hidden])) .bnav{z-index:55}
+  body:has(#modalCadastro:not([hidden])) .bnav [data-nav].on{background:none;color:#c7cbe6}
+  body:has(#modalCadastro:not([hidden])) .bnav [data-nav].on svg{fill:none}
+  body:has(#modalCadastro:not([hidden])) .bnav .bn-pub{background:rgba(123,108,255,.22);color:#a99bff}
+  body:has(#modalCadastro:not([hidden])) .bnav .bn-pub svg{fill:currentColor;fill-opacity:.35}
+  #modalCadastro .sheet.pub{padding:0 16px calc(190px + env(safe-area-inset-bottom))}
+  #modalCadastro .sheet-head{padding:18px 16px 14px;margin:0 -16px}
+  .pub-sec{margin-top:12px;padding:14px}
+  .pub-bar{position:fixed;left:0;right:0;bottom:calc(86px + env(safe-area-inset-bottom));z-index:54;margin:0;padding:10px 16px;background:linear-gradient(to top,var(--panel) 60%,transparent)}
+  #btnSalvar{position:static;box-shadow:0 8px 30px -8px rgba(123,108,255,.7);margin-bottom:0}
+}
+
+@media (min-width:641px){
+  .pub-bar{position:sticky;bottom:-26px;margin:18px -26px -26px;padding:14px 26px;background:linear-gradient(to top,var(--panel) 70%,transparent)}
+}
