@@ -759,3 +759,15 @@ body.carregando{overflow:hidden}
   body:has(#modalCadastro:not([hidden])) .bnav{bottom:auto;height:68px;top:calc(var(--h0, 100dvh) - 78px - env(safe-area-inset-bottom))}
   body:has(#modalCadastro:not([hidden])) .pub-bar{bottom:auto;height:76px;top:calc(var(--h0, 100dvh) - 164px - env(safe-area-inset-bottom))}
 }
+
+/* barra inferior mais compacta (celular) */
+@media (max-width:640px){
+  .bnav{left:16px;right:16px;bottom:calc(8px + env(safe-area-inset-bottom));padding:4px;gap:2px}
+  .bnav button,.bnav a{height:44px;gap:1px;font-size:9.5px}
+  .bnav svg{width:19px;height:19px}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom))}
+  #modalCadastro .sheet.pub{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+  body:has(#modalCadastro:not([hidden])) .bnav{height:54px;top:calc(var(--h0, 100dvh) - 62px - env(safe-area-inset-bottom))}
+  body:has(#modalCadastro:not([hidden])) .pub-bar{top:calc(var(--h0, 100dvh) - 146px - env(safe-area-inset-bottom))}
+}
