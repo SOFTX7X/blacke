@@ -49,6 +49,16 @@
       <span class="brand-name">BLACKE <b>LAVEX</b></span>
     </a>
     <div class="top-actions">
+        <div class="lang">
+          <button type="button" class="btn-ghost lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma / Language">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><b>PT</b>
+          </button>
+          <div class="lang-menu" id="langMenu" hidden role="menu" translate="no">
+            <button type="button" role="menuitem" data-l="pt">Português</button>
+            <button type="button" role="menuitem" data-l="en">English</button>
+            <button type="button" role="menuitem" data-l="es">Español</button>
+          </div>
+        </div>
       <a class="btn-ghost" href="https://t.me/BlackeLavex" target="_blank" rel="noopener noreferrer" aria-label="Comunidade no Telegram" title="Comunidade no Telegram">
         <i class="fa-brands fa-telegram"></i><span>Comunidade</span>
       </a>
@@ -313,6 +323,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

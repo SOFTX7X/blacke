@@ -3,6 +3,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
+const LOC = () => ({ pt:'pt-BR', en:'en-US', es:'es-ES' })[window.blLang ? window.blLang() : 'pt'];
 
 const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos,created_at';
 const PAGE = 24, LIMITE = 10;
@@ -297,7 +298,7 @@ function criarCard(item, i){
       <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
-      <h3 data-act="detalhes"><span>${esc(item.brand_name)}</span></h3>
+      <h3 data-act="detalhes" translate="no"><span>${esc(item.brand_name)}</span></h3>
       <div class="line2">
         ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
       </div>
@@ -388,9 +389,9 @@ function abrirFicha(id){
   $('fcCat').textContent = it.categoria || 'Outros';
   $('fcNome').textContent = it.brand_name;
   $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
-  $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString('pt-BR') : 'Data não informada';
+  $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString(LOC()) : 'Data não informada';
   $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : '<span class="anon">anônimo</span>';
-  const leg = $('fcLegenda'); leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
+  const leg = $('fcLegenda'); leg.translate = !it.caption; leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
 
   const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
   $('pnBox').innerHTML = `
@@ -604,7 +605,7 @@ $('btnArroba').addEventListener('click', () => {
   $('btnSalvarArroba').textContent = p?.handle ? 'Trocar @' : 'Reservar @';
   $('btnLiberarArroba').hidden = !p?.handle;
   const info = $('arrobaInfo');
-  if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString('pt-BR');
+  if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString(LOC());
   else info.textContent = '';
   abrir('modalArroba'); if (!matchMedia('(max-width:640px)').matches) setTimeout(() => $('arrobaInput').focus(), 60);
 });
