@@ -45,7 +45,9 @@ jobs:
 
       - name: Copiar o banco principal
         run: |
-          pg_dump "$MAIN_DB_URL" --schema=public --no-owner --exclude-table-data=public.admins -f dump.sql
+          if ! pg_dump "$MAIN_DB_URL" --schema=public --no-owner --exclude-table-data=public.admins -f dump.sql 2> erro.txt; then
+            echo "::error title=pg_dump::$(head -c 600 erro.txt | tr '\n' ' ')"; exit 1
+          fi
           # linhas que o projeto reserva não aceita (dono do schema / permissões padrão de outros papéis)
           grep -v -E '^(CREATE SCHEMA public;|ALTER SCHEMA public OWNER|ALTER DEFAULT PRIVILEGES)' dump.sql > restaurar.sql
           echo "Tamanho do dump: $(du -h dump.sql | cut -f1)"
@@ -59,11 +61,14 @@ jobs:
             echo "grant all on schema public to postgres, service_role;"
             cat restaurar.sql
           } > completo.sql
-          psql "$RESERVA_DB_URL" -v ON_ERROR_STOP=1 --single-transaction -q -f completo.sql
+          if ! psql "$RESERVA_DB_URL" -v ON_ERROR_STOP=1 --single-transaction -q -f completo.sql > /dev/null 2> erro.txt; then
+            echo "::error title=restaurar::$(grep -v NOTICE erro.txt | head -c 600 | tr '\n' ' ')"; exit 1
+          fi
           psql "$RESERVA_DB_URL" -At -c "select 'sites no reserva: ' || count(*) from public.sites_publicos"
 
       - name: Copiar as capas e fotos
-        run: python3 scripts/copiar_capas.py
+        run: |
+          if ! python3 scripts/copiar_capas.py 2> erro.txt; then echo "::error title=capas::$(tail -c 600 erro.txt | tr '\n' ' ')"; exit 1; fi
 
       - name: Backup criptografado
         run: |
