@@ -1,7 +1,42 @@
 const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* Banco reserva: cópia semanal do principal. Se o principal não responder, o site lê daqui (só leitura). */
+const RESERVA_URL = 'https://ldghexvlbkiqduzlpdss.supabase.co';
+const RESERVA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZ2hleHZsYmtpcWR1emxwZHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjgzNzAsImV4cCI6MjEwMjkwNDM3MH0.MJOsPqcyc5J5TRH_JxvpH0Eul_v9bwfSeab-bFLe6vM';
+let _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const MODO = { reserva:false };
+async function responde(url, key, ms){
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  try{ const r = await fetch(`${url}/rest/v1/sites_publicos?select=id&limit=1`, { headers:{ apikey:key, Authorization:'Bearer ' + key }, signal:c.signal }); return r.ok; }
+  catch(_){ return false; } finally{ clearTimeout(t); }
+}
+async function escolherBanco(){
+  if (await responde(SUPABASE_URL, SUPABASE_KEY, 4500)) return;
+  if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
+  MODO.reserva = true;
+  const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats'];
+  const rpcOrig = cli.rpc.bind(cli);
+  cli.rpc = (nome, args) => {
+    if (LEITURA.includes(nome)) return rpcOrig(nome, args);
+    if (!['registrar_clique','salvar_site'].includes(nome)) aviso('Publicar e editar estão pausados por alguns instantes.');
+    return Promise.resolve({ data:null, error:{ message:'Publicar e editar estão pausados por alguns instantes.' } });
+  };
+  _supabase = cli;
+  document.body.classList.add('modo-reserva');
+  const b = document.createElement('div'); b.className = 'aviso-reserva'; b.setAttribute('role', 'status');
+  b.textContent = 'Modo de segurança: o mural está no ar, mas publicar e editar estão pausados por alguns instantes.';
+  document.body.prepend(b);
+  // capas guardadas no armazenamento do principal passam a vir do reserva
+  const DE = SUPABASE_URL + '/storage/', PARA = RESERVA_URL + '/storage/';
+  const troca = img => { const s = img.getAttribute('src'); if (s && s.startsWith(DE)) img.setAttribute('src', PARA + s.slice(DE.length)); };
+  document.querySelectorAll('img').forEach(troca);
+  new MutationObserver(ms => ms.forEach(m => {
+    if (m.type === 'attributes') troca(m.target);
+    else m.addedNodes.forEach(n => { if (n.nodeType === 1){ if (n.tagName === 'IMG') troca(n); n.querySelectorAll && n.querySelectorAll('img').forEach(troca); } });
+  })).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['src'] });
+}
 const $ = id => document.getElementById(id);
 const LOC = () => ({ pt:'pt-BR', en:'en-US', es:'es-ES' })[window.blLang ? window.blLang() : 'pt'];
 
@@ -127,12 +162,14 @@ function entrarPublicar(){
   requestAnimationFrame(() => { capaUI(); previa(); });
 }
 function abrirPublicar(){
+  if (MODO.reserva){ aviso('Publicar está pausado por alguns instantes. Tente de novo mais tarde.'); if (location.pathname === '/publicar') irUrl('/', null, true); return; }
   if (S.meus.length >= LIMITE){ aviso(`Você já tem ${LIMITE} sites. Exclua um para publicar outro.`); if (location.pathname === '/publicar') irUrl('/', null, true); return; }
   editId = null; limparForm();
   $('ptTitulo').textContent = 'Nova publicação'; $('btnSalvar').textContent = 'Publicar';
   entrarPublicar();
 }
 function abrirEditar(id){
+  if (MODO.reserva){ aviso('Editar está pausado por alguns instantes. Tente de novo mais tarde.'); return; }
   const it = S.meus.find(s => String(s.id) === String(id)); if (!it) return;
   limparForm(); editId = String(it.id); PT.item = it;
   $('inputNome').value = it.brand_name || ''; $('inputLink').value = it.link_url || '';
@@ -993,7 +1030,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 
 /* ---------- início ---------- */
 (async function iniciar(){
-  await iniciarChave();
+  await Promise.all([iniciarChave(), escolherBanco()]);
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
