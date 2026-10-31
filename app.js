@@ -253,11 +253,29 @@ function efeitoCard(card){
 
 const posSegura = s => /^(100|\d{1,2})% (100|\d{1,2})%$/.test(s || '') ? s : '50% 50%';
 const ehDono = item => !!S.hash && item.owner_hash === S.hash;
+/* ---------- Salvos (favoritos, só neste aparelho) ---------- */
+const HEART = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+let FAVS = []; try{ FAVS = JSON.parse(localStorage.getItem('bl_fav') || '[]').map(String).slice(0, 500); }catch(_){}
+const ehFav = id => FAVS.includes(String(id));
+function favAlternar(id){
+  id = String(id); const on = !ehFav(id);
+  FAVS = on ? [id, ...FAVS] : FAVS.filter(x => x !== id);
+  try{ localStorage.setItem('bl_fav', JSON.stringify(FAVS)); }catch(_){}
+  document.querySelectorAll(`.fav-btn[data-id="${id}"]`).forEach(b => { b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  aviso(on ? 'Salvo no seu aparelho' : 'Removido dos salvos');
+  if (!on && S.aba === 'mural' && S.cat === 'Salvos'){
+    document.querySelectorAll(`#muralGrid .card[data-id="${id}"]`).forEach(c => c.remove());
+    S.itens = S.itens.filter(s => String(s.id) !== id);
+    if (!$('muralGrid').children.length) buscarMural(true);
+  }
+}
+
 function acharItem(id){ return S.itens.concat(S.meus, S.dest.top, S.dest.novos).find(s => String(s.id) === String(id)); }
 function acoesDe(item){
   const l = [
     { act:'detalhes', ic:'fa-regular fa-rectangle-list', txt:'Ver detalhes' },
-    { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' }
+    { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' },
+    { act:'fav',      ic: ehFav(item.id) ? 'fa-solid fa-heart' : 'fa-regular fa-heart', txt: ehFav(item.id) ? 'Remover dos salvos' : 'Salvar' }
   ];
   l.push({ act:'linkmural', ic:'fa-solid fa-link', txt:'Link no BLACKE' });
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
@@ -275,6 +293,7 @@ function criarCard(item, i){
       <img src="${esc(item.image_url)}" alt="Capa de ${esc(item.brand_name)}" loading="lazy" decoding="async" style="object-position:${posSegura(item.img_pos)}"
            onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop'">
       <span class="tag">${esc(item.categoria || 'Outros')}</span>
+      <button class="fav-btn${ehFav(item.id) ? ' on' : ''}" type="button" data-act="fav" data-id="${esc(item.id)}" aria-pressed="${ehFav(item.id)}" aria-label="Salvar">${HEART}</button>
       <span class="vistas" title="${n} ${n === 1 ? 'acesso' : 'acessos'}"><i class="fa-regular fa-eye"></i> ${n}</span>
     </div>
     <div class="body">
@@ -437,7 +456,8 @@ async function buscarMural(reset){
   if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
   try{
     let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
-    if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
+    if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
+    else if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
     const porArroba = S.busca.startsWith('@');
     if (porArroba){
       const h = normArroba(S.busca);
@@ -464,7 +484,7 @@ async function buscarMural(reset){
     vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
-      setEstado(filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
+      setEstado(S.cat === 'Salvos' && !S.busca ? 'Você ainda não salvou nenhum site. Toque no ♥ de um card para guardar aqui.' : filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
     } else setEstado('');
     fecharSplash();
   }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
@@ -647,6 +667,7 @@ document.addEventListener('click', e => {
     case 'detalhes': abrirFicha(id); break;
     case 'fecharficha': fecharFicha(); break;
     case 'copiar': copiarLink(id); break;
+    case 'fav': e.stopPropagation(); favAlternar(id); break;
     case 'compartilhar': compartilhar(id); break;
     case 'linkmural': linkMural(id); break;
     case 'linkperfil': linkPerfil(el.dataset.h); break;
@@ -663,7 +684,7 @@ document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('c
   if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
-$('chips').innerHTML = ['Todas', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c}</button>`).join('');
+$('chips').innerHTML = ['Todas', 'Salvos', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c}</button>`).join('');
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
