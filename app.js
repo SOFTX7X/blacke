@@ -1189,11 +1189,11 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
   const btn = document.createElement('button');
   btn.type = 'button'; btn.className = 'tb-busca'; btn.setAttribute('aria-label', 'Buscar'); btn.title = 'Buscar';
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
-  tb.prepend(btn);
+  const acoes = tb.querySelector('.top-actions'); tb.insertBefore(btn, acoes);
   const fechar = document.createElement('button');
   fechar.type = 'button'; fechar.className = 'sb-fechar'; fechar.setAttribute('aria-label', 'Fechar busca');
   fechar.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
-  sb.appendChild(fechar); tb.appendChild(sb);
+  sb.appendChild(fechar); tb.insertBefore(sb, acoes);
   const abrirBusca = () => {
     if (S.aba !== 'mural' || document.body.classList.contains('modo-perfil')) trocarAba('mural');
     sb.hidden = false; tb.classList.add('buscando'); setTimeout(() => $('busca').focus(), 30);

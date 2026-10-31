@@ -1436,3 +1436,27 @@ body.carregando .card{animation-play-state:running}
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:74px;z-index:29;pointer-events:none;background:linear-gradient(var(--bg) 62%,rgba(6,7,13,0))}
 @media (max-width:640px){body::before{height:66px}}
 body.ficha-open::before{display:none}
+/* cabeçalho: marca à esquerda; busca (compacta) e idioma à direita */
+.topbar{grid-template-columns:1fr auto auto!important;padding:0 7px 0 18px!important}
+.topbar .brand{grid-column:1!important;justify-self:start!important}
+.tb-busca{grid-column:2!important}
+.topbar .top-actions{grid-column:3!important}
+.topbar .searchbar{grid-column:2}
+.topbar.buscando .tb-busca{display:none}
+.topbar.buscando .searchbar:not([hidden]){position:static!important;inset:auto!important;width:300px;height:42px;padding:0 4px 0 14px!important;border-radius:999px;background:rgba(255,255,255,.06)!important;border:1px solid #2c3270!important}
+.topbar .searchbar input{font-size:14px}
+.topbar .searchbar .count{font-size:11px}
+.sb-fechar{width:32px;height:32px}
+@media (max-width:640px){
+  .topbar{padding:0 6px 0 12px!important}
+  .topbar.buscando .searchbar:not([hidden]){width:min(56vw,230px);height:38px}
+  .topbar.buscando .brand-name{display:none}
+  .topbar .searchbar .count{display:none}
+}
+@media (max-width:640px){
+  .topbar{grid-template-columns:auto 1fr auto!important;column-gap:6px!important}
+  .topbar.buscando .searchbar:not([hidden]){width:auto;min-width:0;justify-self:stretch}
+  .topbar .top-actions{min-width:0}
+  .topbar .lang-btn{padding:0 10px!important}
+}
+@media (max-width:640px){.tb-busca{justify-self:end}}
