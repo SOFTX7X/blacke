@@ -154,7 +154,15 @@
     ['Os sites desta chave atual só serão gerenciáveis de novo se você tiver guardado ela. Copie antes se precisar.','The sites under the current key can only be managed again if you saved it. Copy it first if needed.','Los sitios de la clave actual solo se podrán gestionar de nuevo si la guardaste. Cópiala antes si la necesitas.'],
     ['Esse site não está mais no mural','That site is no longer on the wall','Ese sitio ya no está en el muro'],
     ['Não foi possível abrir esse site','Could not open that site','No se pudo abrir ese sitio'],
-    ['Ainda sem acessos registrados.','No visits recorded yet.','Aún sin visitas registradas.']
+    ['Ainda sem acessos registrados.','No visits recorded yet.','Aún sin visitas registradas.'],
+    // mensagens do servidor
+    ['esse link já está no mural','that link is already on the wall','ese enlace ya está en el muro'],
+    ['muitas publicações em pouco tempo. Tente de novo mais tarde','too many posts in a short time. Try again later','demasiadas publicaciones en poco tiempo. Inténtalo más tarde'],
+    ['o mural recebeu muitas publicações agora. Tente em alguns minutos','the wall is receiving many posts right now. Try again in a few minutes','el muro está recibiendo muchas publicaciones. Inténtalo en unos minutos'],
+    ['limite de 10 sites atingido','limit of 10 sites reached','límite de 10 sitios alcanzado'],
+    ['link inválido','invalid link','enlace inválido'],
+    ['imagem inválida ou muito grande','invalid or too large image','imagen inválida o demasiado grande'],
+    ['perfil suspenso','profile suspended','perfil suspendido']
   ];
   const MES = { en:['January','February','March','April','May','June','July','August','September','October','November','December'],
                 es:['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'] };
@@ -175,7 +183,7 @@
     [/^Você poderá trocar de @ em (.+)$/, (L, d) => (L === 'en' ? 'You can change your @ on ' : 'Podrás cambiar tu @ el ') + d],
     [/^(@\S+) agora é seu$/, (L, h) => L === 'en' ? `${h} is now yours` : `${h} ahora es tuyo`],
     [/^Você já tem (\d+) sites\. Exclua um para publicar outro\.$/, (L, n) => L === 'en' ? `You already have ${n} sites. Delete one to publish another.` : `Ya tienes ${n} sitios. Elimina uno para publicar otro.`],
-    [/^Não foi possível salvar: (.*)$/, (L, m) => (L === 'en' ? 'Could not save: ' : 'No se pudo guardar: ') + m],
+    [/^Não foi possível salvar: (.*)$/, (L, m) => (L === 'en' ? 'Could not save: ' : 'No se pudo guardar: ') + tr(m, L)],
     [/^"(.*)" sai do mural para todo mundo\. Não dá para desfazer\.$/, (L, n) => L === 'en' ? `"${n}" leaves the wall for everyone. This can't be undone.` : `"${n}" sale del muro para todos. No se puede deshacer.`],
     [/^Excluir seu site\?$/, L => L === 'en' ? 'Delete your site?' : '¿Eliminar tu sitio?'],
     [/^Excluir todos os (\d+) sites\?$/, (L, n) => L === 'en' ? `Delete all ${n} of your sites?` : `¿Eliminar tus ${n} sitios?`],
