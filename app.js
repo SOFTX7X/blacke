@@ -392,12 +392,38 @@ function anexar(lista, reset){
 }
 function setEstado(html, aviso_){ const e = $('estado'); e.className = 'estado' + (aviso_ ? ' warn' : ''); e.innerHTML = html || ''; }
 const BTN_NOVO = '<br><button class="btn-primary" data-act="novo" style="margin-top:14px"><i class="fa-solid fa-plus"></i> Publicar link</button>';
+/* Estados vazios e de erro: ícone, título, texto e botão */
+const ICV = {
+  grade:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  busca:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  coracao:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  pasta:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  estrela:'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+  erro:'<path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>',
+  chave:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>'
+};
+const BTNV = {
+  publicar:'<button class="btn-primary" type="button" data-act="novo">Publicar link</button>',
+  limpar:'<button class="btn-ghost" type="button" data-vz="limpar">Limpar busca e filtros</button>',
+  mural:'<button class="btn-ghost" type="button" data-vz="mural">Ver o mural</button>',
+  tentar:'<button class="btn-primary" type="button" data-vz="tentar">Tentar de novo</button>'
+};
+function vazio(ic, titulo, texto, botoes){
+  return `<div class="vz"><span class="vz-ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICV[ic] || ''}</svg></span>
+    <h3>${titulo}</h3><p>${texto}</p>${botoes && botoes.length ? `<div class="vz-btns">${botoes.map(b => BTNV[b]).join('')}</div>` : ''}</div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-vz]'); if (!b) return;
+  const v = b.dataset.vz;
+  if (v === 'limpar' || v === 'mural'){ S.busca = ''; $('busca').value = ''; resetChips(); document.querySelector('.topbar')?.classList.remove('buscando'); if (S.aba !== 'mural') trocarAba('mural'); else buscarMural(true); }
+  else if (v === 'tentar'){ if (S.aba === 'destaques') abrirDestaques(); else trocarAba(S.aba, true, true); }
+});
 function skeleton(){ $('muralGrid').innerHTML = '<div class="skeleton"></div>'.repeat(4); setEstado(''); $('maisBtn').hidden = true; }
 function erroCarga(err){
   console.error(err);
   $('muralGrid').innerHTML = ''; $('maisBtn').hidden = true;
   const desatualizado = err && (err.code === '42703' || /column|function/i.test(err.message || ''));
-  setEstado(desatualizado ? 'O banco ainda não foi atualizado. Rode o arquivo supabase.sql no Supabase.' : 'Não foi possível carregar. Atualize a página em instantes.', true);
+  setEstado(desatualizado ? 'O banco ainda não foi atualizado. Rode o arquivo supabase.sql no Supabase.' : vazio('erro', 'Não foi possível carregar', 'Verifique sua conexão e tente de novo em instantes.', ['tentar']), desatualizado);
 }
 
 /* ---------- menu ⋯, detalhes e copiar ---------- */
@@ -590,7 +616,9 @@ async function buscarMural(reset){
     vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
-      setEstado(S.cat === 'Salvos' && !S.busca ? 'Você ainda não salvou nenhum site. Toque no ♥ de um card para guardar aqui.' : filtrando ? 'Nada encontrado. Tente outra busca ou categoria.' : 'O mural está vazio. Seja o primeiro a publicar.' + BTN_NOVO);
+      setEstado(S.cat === 'Salvos' && !S.busca ? vazio('coracao', 'Nenhum site salvo', 'Toque no ♥ de um card para guardar aqui.', ['mural'])
+        : filtrando ? vazio('busca', 'Nada encontrado', 'Tente outra busca ou categoria.', ['limpar'])
+        : vazio('grade', 'O mural está vazio', 'Seja o primeiro a publicar um site.', ['publicar']));
     } else setEstado('');
     fecharSplash();
   }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
@@ -612,7 +640,7 @@ function atualizarMeusUI(){
 }
 function desenharMeus(){
   $('maisBtn').hidden = true; anexar(S.meus, true); atualizarMeusUI(); marcarInsights();
-  setEstado(S.meus.length ? '' : (S.hash ? 'Você ainda não publicou nenhum site neste navegador.' + BTN_NOVO : 'Seu navegador bloqueou o recurso de chave. Abra o site em https.'), !S.hash);
+  setEstado(S.meus.length ? '' : (S.hash ? vazio('pasta', 'Nenhum site publicado', 'Os sites que você publicar neste navegador aparecem aqui.', ['publicar']) : vazio('chave', 'Chave bloqueada', 'Seu navegador bloqueou o recurso de chave. Abra o site em https.')));
 }
 
 async function trocarAba(aba, semHistorico, manterPerfil){
@@ -1095,10 +1123,10 @@ function desenharDestaques(){
   const lista = S.dest[S.destAba] || [], g = $('destLista');
   document.querySelectorAll('#destaques [data-d]').forEach(b => b.classList.toggle('on', b.dataset.d === S.destAba));
   g.innerHTML = '';
-  if (!lista.length){ g.innerHTML = '<p class="dest-vazio">Ainda não há sites aqui.</p>'; return; }
+  if (!lista.length){ g.innerHTML = vazio('estrela', 'Ainda não há destaques', S.destAba === 'top' ? 'Os sites mais acessados aparecem aqui.' : 'Os sites mais novos aparecem aqui.', ['mural']); return; }
   lista.forEach((it, i) => {
     const c = criarCard(it, i);
-    if (S.destAba === 'top') c.querySelector('.cover').insertAdjacentHTML('beforeend', `<i class="dest-rank">${i + 1}</i>`);
+    if (S.destAba === 'top') c.querySelector('.cover').insertAdjacentHTML('beforeend', `<i class="dest-rank${i < 3 ? ' top' : ''}">#${i + 1}</i>`);
     g.appendChild(c);
   });
 }
