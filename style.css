@@ -754,8 +754,8 @@ body.carregando{overflow:hidden}
 .sheet{border-radius:24px}
 @media (max-width:640px){.sheet{border-radius:24px 24px 0 0}.pn-sec .btn-ghost{border-radius:50%}}
 
+/* Publicar no celular: barra e botão ancorados pelo topo (usam a altura sem teclado), então não sobem com o teclado */
 @media (max-width:640px){
-  body.kb .bnav{display:none}
-  body.kb .pub-bar{position:static;background:none;padding:14px 0 0}
-  body.kb #modalCadastro .sheet.pub{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  body:has(#modalCadastro:not([hidden])) .bnav{bottom:auto;height:68px;top:calc(var(--h0, 100dvh) - 78px - env(safe-area-inset-bottom))}
+  body:has(#modalCadastro:not([hidden])) .pub-bar{bottom:auto;height:76px;top:calc(var(--h0, 100dvh) - 164px - env(safe-area-inset-bottom))}
 }
