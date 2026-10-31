@@ -48,6 +48,9 @@
     ['Política de Privacidade','Privacy Policy','Política de Privacidad'],
     ['Privacidade','Privacy','Privacidad'],
     ['BLACKE LAVEX · rede privada ·','BLACKE LAVEX · private network ·','BLACKE LAVEX · red privada ·'],
+    ['você já tem uma troca de @ em análise','you already have an @ change under review','ya tienes un cambio de @ en revisión'],
+    ['(suspenso)','(suspended)','(suspendido)'],
+    ['Verificado','Verified','Verificado'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],
     ['Centralizar','Center','Centrar'],
@@ -188,6 +191,8 @@
       return `${s} ${w(L, 'site', s)} · ${a} ${w(L, 'acesso', a)} · ${L === 'en' ? `on the wall since ${mm} ${y}` : `en el muro desde ${mm} de ${y}`}`;
     }],
     [/^Você poderá trocar de @ em (.+)$/, (L, d) => (L === 'en' ? 'You can change your @ on ' : 'Podrás cambiar tu @ el ') + d],
+    [/^Troca para (@\S+) em análise$/, (L, h) => L === 'en' ? `Change to ${h} under review` : `Cambio a ${h} en revisión`],
+    [/^Pedido enviado: (@\S+) em análise$/, (L, h) => L === 'en' ? `Request sent: ${h} under review` : `Solicitud enviada: ${h} en revisión`],
     [/^(@\S+) agora é seu$/, (L, h) => L === 'en' ? `${h} is now yours` : `${h} ahora es tuyo`],
     [/^Você já tem (\d+) sites\. Exclua um para publicar outro\.$/, (L, n) => L === 'en' ? `You already have ${n} sites. Delete one to publish another.` : `Ya tienes ${n} sitios. Elimina uno para publicar otro.`],
     [/^Não foi possível salvar: (.*)$/, (L, m) => (L === 'en' ? 'Could not save: ' : 'No se pudo guardar: ') + tr(m, L)],

@@ -287,6 +287,15 @@ function acoesDe(item){
 }
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const selo = it => it && it.verificado ? SELO : '';
+const VERIF = new Set();
+const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</button>`;
+async function carregarVerificados(){
+  try{
+    const { data } = await _supabase.rpc('perfis_verificados');
+    (data || []).forEach(h => VERIF.add(h));
+    document.querySelectorAll('.arroba[data-h]').forEach(b => { if (VERIF.has(b.dataset.h) && !b.querySelector('.selo')) b.insertAdjacentHTML('beforeend', SELO); });
+  }catch(_){}
+}
 function criarCard(item, i){
   const n = item.cliques || 0;
   const card = document.createElement('article');
@@ -302,7 +311,7 @@ function criarCard(item, i){
     <div class="body">
       <h3 data-act="detalhes" translate="no"><span>${esc(item.brand_name)}</span>${selo(item)}</h3>
       <div class="line2">
-        ${item.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(item.handle)}">@${esc(item.handle)}</button>` : '<span class="anon">anônimo</span>'}
+        ${item.handle ? arrobaBtn(item.handle) : '<span class="anon">anônimo</span>'}
       </div>
     </div>
     <div class="foot">
@@ -392,7 +401,7 @@ function abrirFicha(id){
   $('fcNome').innerHTML = esc(it.brand_name) + selo(it);
   $('mAcessos').textContent = `${n} ${n === 1 ? 'acesso' : 'acessos'}`;
   $('mData').textContent = it.created_at ? 'Publicado em ' + new Date(it.created_at).toLocaleDateString(LOC()) : 'Data não informada';
-  $('mPerfil').innerHTML = it.handle ? `<button class="arroba" type="button" data-act="perfil" data-h="${esc(it.handle)}">@${esc(it.handle)}</button>` : '<span class="anon">anônimo</span>';
+  $('mPerfil').innerHTML = it.handle ? arrobaBtn(it.handle) : '<span class="anon">anônimo</span>';
   const leg = $('fcLegenda'); leg.translate = !it.caption; leg.textContent = it.caption || 'Este site ainda não tem legenda.'; leg.classList.toggle('vazia', !it.caption);
 
   const extras = acoesDe(it).filter(a => a.act !== 'detalhes' && a.act !== 'copiar');
@@ -577,7 +586,9 @@ async function carregarPerfil(){
 }
 function atualizarPerfilUI(){
   const p = S.perfil;
-  $('meuArroba').textContent = p?.handle ? '@' + p.handle + (p.suspenso ? ' (suspenso)' : '') : 'Você ainda não tem um @';
+  const m = $('meuArroba');
+  if (!p?.handle) m.textContent = 'Você ainda não tem um @';
+  else m.innerHTML = `<span class="ma"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}</span>${p.suspenso ? ' <span>(suspenso)</span>' : ''}${p.pendente ? ` <small class="pendente">Troca para @${esc(p.pendente)} em análise</small>` : ''}`;
   $('btnArroba').innerHTML = '<i class="fa-solid fa-at"></i> ' + (p?.handle ? 'Trocar @' : 'Reservar @');
 }
 async function mostrarPerfil(h){
@@ -588,7 +599,7 @@ async function mostrarPerfil(h){
   if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
   if (!data){ box.hidden = true; return; }
   const s = data.sites, a = data.acessos;
-  $('pfHandle').textContent = '@' + data.handle; $('pfShare').dataset.h = data.handle;
+  $('pfHandle').innerHTML = `<span translate="no">@${esc(data.handle)}</span>${data.verificado ? SELO : ''}`; $('pfShare').dataset.h = data.handle;
   $('pfInfo').textContent = `${s} ${s === 1 ? 'site' : 'sites'} · ${a} ${a === 1 ? 'acesso' : 'acessos'} · no mural desde ${new Date(data.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' })}`;
   box.hidden = false;
 }
@@ -607,7 +618,8 @@ $('btnArroba').addEventListener('click', () => {
   $('btnSalvarArroba').textContent = p?.handle ? 'Trocar @' : 'Reservar @';
   $('btnLiberarArroba').hidden = !p?.handle;
   const info = $('arrobaInfo');
-  if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString(LOC());
+  if (p?.pendente) info.textContent = 'Troca para @' + p.pendente + ' em análise';
+  else if (p?.handle && !p.pode_trocar) info.textContent = 'Você poderá trocar de @ em ' + new Date(p.troca_em).toLocaleDateString(LOC());
   else info.textContent = '';
   abrir('modalArroba'); if (!matchMedia('(max-width:640px)').matches) setTimeout(() => $('arrobaInput').focus(), 60);
 });
@@ -618,10 +630,12 @@ $('btnSalvarArroba').addEventListener('click', async () => {
   if (!S.meus.length) return erroArroba('Publique pelo menos 1 site antes de reservar um @.');
   btn.disabled = true;
   try{
-    const { error } = await _supabase.rpc('reservar_arroba', { p_handle:h, p_token:S.token });
+    const { data:res, error } = await _supabase.rpc('reservar_arroba', { p_handle:h, p_token:S.token });
     if (error) throw error;
     await carregarPerfil(); await buscarMeus(); atualizarMeusUI();
-    fechar('modalArroba'); aviso('@' + h + ' agora é seu');
+    fechar('modalArroba');
+    if (String(res || '').startsWith('analise:')){ aviso('Pedido enviado: @' + h + ' em análise'); return; }
+    aviso('@' + h + ' agora é seu');
     if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
   }catch(err){ erroArroba(err.message || 'Não foi possível reservar.'); }
   finally{ btn.disabled = false; }
@@ -707,7 +721,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados();
   abrirLinkDireto();
 })();
 

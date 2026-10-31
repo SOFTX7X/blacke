@@ -918,3 +918,12 @@ body.carregando{overflow:hidden}
 .card .body h3{display:flex;align-items:center;justify-content:center;min-width:0}.card .body h3>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .card h3 .selo{width:15px;height:15px}
 #fcNome .selo{width:.75em;height:.75em;vertical-align:-.05em}
+
+.arroba .selo{width:.95em;height:.95em;margin-left:.25em}
+#pfHandle .selo{width:.8em;height:.8em}
+#meuArroba .selo{width:15px;height:15px}
+#meuArroba .pendente{display:block;margin-top:3px;font:500 11.5px var(--mono);color:var(--ice);opacity:.85}
+.arroba{display:inline-flex;align-items:center;min-width:0}.arroba>span{min-width:0;overflow:hidden;text-overflow:ellipsis}.arroba .selo{flex:none}
+#meuArroba .ma{display:inline-flex;align-items:center;max-width:100%;white-space:nowrap}#meuArroba .ma>span{overflow:hidden;text-overflow:ellipsis;min-width:0}#meuArroba .selo{flex:none}
+.arroba{overflow:visible}.arroba .selo,#pfHandle .selo{filter:none}
+#pfHandle{display:flex;align-items:center;min-width:0;overflow:visible}#pfHandle>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}#pfHandle .selo{flex:none}
