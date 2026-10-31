@@ -753,3 +753,9 @@ body.carregando{overflow:hidden}
 .field,.sheet{border-radius:16px}
 .sheet{border-radius:24px}
 @media (max-width:640px){.sheet{border-radius:24px 24px 0 0}.pn-sec .btn-ghost{border-radius:50%}}
+
+@media (max-width:640px){
+  body.kb .bnav{display:none}
+  body.kb .pub-bar{position:static;background:none;padding:14px 0 0}
+  body.kb #modalCadastro .sheet.pub{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+}

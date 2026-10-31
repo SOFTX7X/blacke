@@ -669,3 +669,11 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 })();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+
+/* Publicar: com o teclado aberto, o botão deixa de ser fixo (não sobe junto) e a barra inferior some */
+(() => {
+  const m = $('modalCadastro'), campo = el => el && el.matches && el.matches('input:not([type=file]),textarea,select');
+  m.addEventListener('focusin', e => { if (campo(e.target)) document.body.classList.add('kb'); });
+  m.addEventListener('focusout', () => setTimeout(() => { if (!campo(document.activeElement)) document.body.classList.remove('kb'); }, 120));
+  new MutationObserver(() => { if (m.hidden) document.body.classList.remove('kb'); }).observe(m, { attributes:true, attributeFilter:['hidden'] });
+})();
