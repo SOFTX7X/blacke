@@ -781,3 +781,10 @@ body.carregando{overflow:hidden}
   body.kb:has(#modalCadastro:not([hidden])) .pub-bar{position:static;height:auto;padding:14px 0 0;background:none}
   body.kb #modalCadastro .sheet.pub{padding-bottom:24px}
 }
+
+/* Publicar: botão embutido no fim do formulário (não flutua) */
+.pub-bar,body.kb .pub-bar,body:has(#modalCadastro:not([hidden])) .pub-bar{position:static!important;height:auto!important;top:auto!important;bottom:auto!important;margin:16px 0 0!important;padding:0!important;background:none!important}
+@media (max-width:640px){
+  #modalCadastro .sheet.pub,body.kb #modalCadastro .sheet.pub{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  body.kb #modalCadastro .sheet.pub{padding-bottom:24px}
+}
