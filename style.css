@@ -1305,3 +1305,27 @@ body.carregando .card{animation-play-state:running}
 .bn-av.foto i{font-size:13px}
 @media (min-width:900px){.bnav .bn-conta{padding-left:8px}.bn-av{width:32px;height:32px}}
 @media (max-width:640px){.bn-av{width:28px;height:28px}}
+
+/* ===== Legenda ao passar o mouse (PC) ===== */
+.cv-leg{display:none}
+@media (hover:hover) and (min-width:900px){
+  .cv-leg{display:flex;align-items:flex-end;position:absolute;inset:0;z-index:2;padding:46px 16px 56px;pointer-events:none;
+    background:linear-gradient(180deg,transparent 25%,rgba(6,7,13,.92) 85%);opacity:0;transition:opacity .22s ease}
+  .cv-leg p{margin:0;font-size:13.5px;line-height:1.5;color:#eef0fb;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;transform:translateY(6px);transition:transform .22s ease}
+  .card:hover .cv-leg{opacity:1}
+  .card:hover .cv-leg p{transform:none}
+  body[data-aba="meus"] .cv-leg,.previa .cv-leg{display:none}
+}
+
+/* ===== Busca + categorias fixas ao rolar (PC) ===== */
+@media (min-width:900px){
+  .toolbar.fixa{position:sticky;top:var(--topo,60px);z-index:25;margin:0 calc(-1 * clamp(10px,2vw,28px));padding:10px clamp(10px,2vw,28px);
+    flex-wrap:nowrap;gap:12px;background:rgba(8,9,18,.97);border-bottom:1px solid var(--line);animation:barIn .2s ease-out}
+  .toolbar.fixa .searchbar{flex:0 0 300px;height:40px;border-radius:12px}
+  .toolbar.fixa .searchbar input{font-size:13.5px}
+  .toolbar.fixa .filtros{flex:1;min-width:0;flex-wrap:nowrap}
+  .toolbar.fixa .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .toolbar.fixa .chips::-webkit-scrollbar{display:none}
+  .toolbar.fixa .chip{flex:none}
+  @keyframes barIn{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+}
