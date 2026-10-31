@@ -1299,3 +1299,9 @@ body.carregando .card{animation-play-state:running}
 /* a foto do item Conta nunca some com o menu fechado */
 .bnav .bn-av,html:not(.pronto) .bnav .bn-av{opacity:1!important;transform:none!important}
 .bnav .bn-av span{opacity:1!important}
+/* foto do item Conta maior */
+.bn-av{width:30px;height:30px}
+.bn-av.foto{padding:2px}
+.bn-av.foto i{font-size:13px}
+@media (min-width:900px){.bnav .bn-conta{padding-left:8px}.bn-av{width:32px;height:32px}}
+@media (max-width:640px){.bn-av{width:28px;height:28px}}
