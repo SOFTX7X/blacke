@@ -716,3 +716,27 @@ body.carregando{overflow:hidden}
 @media (min-width:641px){
   .pub-bar{position:sticky;bottom:-26px;margin:18px -26px -26px;padding:14px 26px;background:linear-gradient(to top,var(--panel) 70%,transparent)}
 }
+
+/* ---- Publicar: visual mais leve, arredondado e com mais espaço ---- */
+#modalCadastro .sheet.pub{border-radius:26px!important;border-color:rgba(255,255,255,.06)}
+#modalCadastro .sh-sub{display:none}
+#modalCadastro .sheet-head{border-bottom:0;margin-bottom:0}
+#modalCadastro .sheet-head h3{font-size:20px}
+#modalCadastro .icon-btn{width:38px;height:38px;border-radius:50%!important;background:rgba(255,255,255,.06);border-color:transparent}
+#modalCadastro .pub-sec{margin-top:6px;padding:0;border:0;background:none}
+#modalCadastro .pub-t{margin:14px 0 8px;font:600 12px var(--display);letter-spacing:.04em;text-transform:none;color:var(--muted)}
+#modalCadastro .pub-t b{width:20px;height:20px;border-radius:50%!important;font-size:11px}
+#modalCadastro .field-label{margin:10px 0 6px;font-size:12.5px}
+#modalCadastro .field{border-radius:14px!important;background:rgba(255,255,255,.045);border-color:transparent;padding:13px 16px}
+#modalCadastro .field:focus{border-color:var(--violet);background:rgba(123,108,255,.08)}
+#modalCadastro .upload{border-radius:20px!important;padding:22px 16px;border:1.5px dashed rgba(123,108,255,.45);background:rgba(123,108,255,.06)}
+#modalCadastro .preview{border-radius:20px!important}
+#modalCadastro .dica,#modalCadastro .centra,#modalCadastro .trash{border-radius:999px!important}
+#modalCadastro .btn-primary.wide{border-radius:999px!important;padding:15px}
+#modalCadastro .erro{border-radius:14px!important}
+@media (max-width:640px){
+  #modalCadastro .sheet.pub{border-radius:0!important;padding:0 16px calc(176px + env(safe-area-inset-bottom))}
+  #modalCadastro .sheet-head{padding:14px 16px 6px}
+  #modalCadastro .upload{padding:18px 14px}
+  #modalCadastro .upload small{display:none}
+}
