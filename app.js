@@ -162,6 +162,18 @@ function lerPos(s){ const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m 
   $('btnCentralizar').addEventListener('click', () => { pos = { x:50, y:50 }; aplicarPos(); });
 })();
 
+/* Envia a capa ao Supabase Storage; se falhar, segue com a imagem embutida (como antes) */
+async function enviarImagem(dataUrl){
+  if (!dataUrl || !dataUrl.startsWith('data:')) return dataUrl;
+  try{
+    const blob = await (await fetch(dataUrl)).blob();
+    const nome = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)).replace(/-/g, '') + '.jpg';
+    const { error } = await _supabase.storage.from('capas').upload(nome, blob, { contentType:'image/jpeg', cacheControl:'31536000' });
+    if (error) throw error;
+    return _supabase.storage.from('capas').getPublicUrl(nome).data.publicUrl;
+  }catch(_){ return dataUrl; }
+}
+
 /* Reduz a imagem antes de enviar (900px, JPEG) */
 function comprimir(file){
   return new Promise((ok, falha) => {
@@ -203,13 +215,14 @@ async function salvarSite(){
 
   btn.disabled = true; btn.textContent = editando ? 'Salvando...' : 'Publicando...';
   try{
+    const imagemFinal = await enviarImagem(imagemBase64);
     if (editando){
-      const { data, error } = await _supabase.rpc('editar_meu_site', { p_id:editId, p_token:S.token, p_nome:nome, p_link:link, p_legenda:legenda, p_categoria:cat, p_imagem:imagemBase64 || null });
+      const { data, error } = await _supabase.rpc('editar_meu_site', { p_id:editId, p_token:S.token, p_nome:nome, p_link:link, p_legenda:legenda, p_categoria:cat, p_imagem:imagemFinal || null });
       if (error) throw error;
       if (!data) throw new Error('Esse site não pertence a esta chave.');
       await _supabase.rpc('ajustar_posicao_foto', { p_id:editId, p_token:S.token, p_pos:posStr() });
     }else{
-      const { data: novoId, error } = await _supabase.rpc('publicar_site', { p_nome:nome, p_link:link, p_legenda:legenda, p_imagem:imagemBase64, p_categoria:cat, p_token:S.token });
+      const { data: novoId, error } = await _supabase.rpc('publicar_site', { p_nome:nome, p_link:link, p_legenda:legenda, p_imagem:imagemFinal, p_categoria:cat, p_token:S.token });
       if (error) throw error;
       if (novoId && posStr() !== '50% 50%') await _supabase.rpc('ajustar_posicao_foto', { p_id:String(novoId), p_token:S.token, p_pos:posStr() });
     }
