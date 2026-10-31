@@ -274,8 +274,6 @@ function criarCard(item, i){
       </a>
       <button class="sq" type="button" data-act="menu" aria-label="Mais opções" aria-haspopup="menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
-  card.tabIndex = 0; card.setAttribute('aria-label', 'Abrir detalhes de ' + item.brand_name);
-  card.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target === card){ ev.preventDefault(); abrirFicha(item.id); } });
   efeitoCard(card);
   return card;
 }
@@ -608,11 +606,7 @@ $('btnExcluirTodos').addEventListener('click', excluirTodos);
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!e.target.closest('#menu') && !(el && el.dataset.act === 'menu')) fecharMenu();
-  if (!el){
-    const card = e.target.closest('.card');
-    if (card && !String(getSelection()).trim()) abrirFicha(card.dataset.id);
-    return;
-  }
+  if (!el) return;
   const a = el.dataset.act, id = el.dataset.id || el.closest('[data-id]')?.dataset.id;
   if (el.closest('#menu')) fecharMenu();
   if (['perfil','editar','excluir','denunciar'].includes(a)) fecharFicha();

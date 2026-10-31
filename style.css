@@ -320,7 +320,6 @@ select.field{font-size:15px;padding:13px 38px 13px 15px;border-radius:12px;width
 html{scrollbar-gutter:stable}
 body.ficha-open{overflow:hidden}
 body.ficha-open #rain{visibility:hidden}
-.card{cursor:pointer}
 button.visit{font-family:inherit;cursor:pointer;text-align:left}
 .visit i{transition:transform .25s}.visit:hover i{transform:translateX(3px)}
 
