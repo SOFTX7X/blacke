@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="style.css?v=1793469528">
+  <link rel="stylesheet" href="style.css?v=1793470148">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -142,6 +142,58 @@
       <p class="panel-note">Seus sites são ligados a este navegador por uma chave secreta, não a uma conta. Guarde a chave para gerenciá-los em outro aparelho.</p>
     </section>
 
+
+    <!-- Publicar / editar: tela própria em etapas -->
+    <section id="pubTela" class="pt" hidden aria-labelledby="ptTitulo">
+      <header class="pt-head">
+        <button type="button" class="pt-nav" id="ptVoltar" aria-label="Voltar"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="pt-tit"><b id="ptTitulo">Nova publicação</b><span id="ptPasso">Capa</span></div>
+        <button type="button" class="pt-acao" id="btnSalvar">Avançar</button>
+      </header>
+      <div class="pt-steps" aria-hidden="true"><i></i><i></i><i></i></div>
+
+      <div class="pt-etapa" data-e="1">
+        <div id="ptDrop" class="pt-drop" tabindex="0" role="button" aria-label="Escolher imagem de capa">
+          <svg class="pt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+          <h3>Escolha a capa do seu site</h3>
+          <p>Arraste uma imagem para cá ou</p>
+          <span class="pt-escolher">Selecionar do aparelho</span>
+          <small>JPG, PNG ou WEBP · até 15 MB</small>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+      </div>
+
+      <div class="pt-etapa" data-e="2" hidden>
+        <div class="pt-crop" id="ptCrop"><img id="ptImg" alt="" draggable="false"><div class="pt-grade" aria-hidden="true"></div></div>
+        <div class="pt-zoom">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>
+          <input type="range" id="ptZoom" min="1" max="3" step="0.01" value="1" aria-label="Zoom">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6M11 8v6"/></svg>
+        </div>
+        <div class="pt-dicas"><span>Arraste para enquadrar · use o zoom para aproximar</span><button type="button" class="pt-link" id="ptTrocar">Trocar imagem</button></div>
+      </div>
+
+      <div class="pt-etapa pt-det" data-e="3" hidden>
+        <div class="pt-prev">
+          <div class="pt-lbl">Prévia no mural</div>
+          <div id="ptCard"></div>
+          <button type="button" class="pt-link" id="ptTrocarCapa">Trocar capa</button>
+        </div>
+        <div class="pt-form">
+          <label class="field-label" for="inputLink">Link do site</label>
+          <input class="field" type="url" id="inputLink" placeholder="https://" maxlength="500" inputmode="url" autocomplete="off" autocapitalize="off">
+          <label class="field-label" for="inputNome">Nome da marca ou site</label>
+          <input class="field" type="text" id="inputNome" placeholder="Ex: Anonymous BR" maxlength="60" autocomplete="off">
+          <label class="field-label" for="inputCat">Categoria</label>
+          <select class="field" id="inputCat"></select>
+          <label class="field-label" for="inputLegenda">Legenda</label>
+          <textarea class="field" id="inputLegenda" rows="4" placeholder="Em uma ou duas frases, o que as pessoas encontram aí?" maxlength="200"></textarea>
+          <div class="hint"><span id="legCount">0</span>/200</div>
+          <div id="formErro" class="erro" hidden></div>
+          <p class="pub-legal">Ao publicar, você concorda com os <a href="/termos" target="_blank" rel="noopener">Termos</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
+        </div>
+      </div>
+    </section>
     <section id="muralGrid" class="grid" aria-live="polite"></section>
     <div id="estado" class="estado"></div>
     <button id="maisBtn" class="btn-ghost mais" hidden>Carregar mais</button>
@@ -150,52 +202,7 @@
   <footer>BLACKE LAVEX · rede privada · <a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></footer>
 
   <!-- Publicar / editar -->
-  <div id="modalCadastro" class="modal" hidden>
-    <div class="sheet pub" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
-      <div class="sheet-head">
-        <div class="sh-text">
-          <h3 id="modalTitulo">Publicar no mural</h3>
-          <p class="sh-sub">Sua capa, seu link e uma legenda. Sem cadastro.</p>
-        </div>
-        <button class="icon-btn" onclick="fecharModal()" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-      </div>
-
-      <section class="pub-sec">
-        <div class="pub-t"><b>1</b> Capa</div>
-        <div id="uploadArea" class="upload" onclick="document.getElementById('fileInput').click()" tabindex="0" role="button">
-          <svg class="up-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="34" height="34"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
-          <span>Toque para escolher a imagem</span>
-          <small>Reduzida automaticamente · você ajusta o enquadramento</small>
-        </div>
-        <input type="file" id="fileInput" accept="image/*" hidden onchange="processarImagem(event)">
-        <div id="previewContainer" class="preview" hidden>
-          <img id="imagePreview" src="" alt="Prévia da capa">
-          <button class="icon-btn trash" onclick="removerImagem()" aria-label="Trocar imagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 14h10l1-14"/></svg></button>
-          <span class="dica" id="dicaPos">Arraste para ajustar</span>
-          <button class="centra" id="btnCentralizar" type="button">Centralizar</button>
-        </div>
-      </section>
-
-      <section class="pub-sec">
-        <div class="pub-t"><b>2</b> Seu site</div>
-        <label class="field-label" for="inputNome">Nome da marca ou site</label>
-        <input class="field" type="text" id="inputNome" placeholder="Ex: Anonymous BR" maxlength="60" autocomplete="off">
-        <label class="field-label" for="inputLink">Link</label>
-        <input class="field" type="url" id="inputLink" placeholder="https://" maxlength="500" inputmode="url" autocomplete="off" autocapitalize="off">
-        <label class="field-label" for="inputCat">Categoria</label>
-        <select class="field" id="inputCat"></select>
-      </section>
-
-      <section class="pub-sec">
-        <div class="pub-t"><b>3</b> Legenda</div>
-        <textarea class="field" id="inputLegenda" rows="3" placeholder="Em uma ou duas frases, o que as pessoas encontram aí?" maxlength="200"></textarea>
-        <div class="hint"><span id="legCount">0</span>/200</div>
-        <div id="formErro" class="erro" hidden></div>
-        <p class="pub-legal">Ao publicar, você concorda com os <a href="/termos" target="_blank" rel="noopener">Termos</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
-        <div class="pub-bar"><button class="btn-primary wide" id="btnSalvar" onclick="salvarSite()">Publicar</button></div>
-      </section>
-    </div>
-  </div>
+  <div id="modalCadastro" class="modal" hidden></div>
 
   <!-- Confirmação -->
   <div id="modalConfirma" class="modal" hidden>
@@ -351,7 +358,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="i18n.js?v=1793469528"></script>
-  <script src="app.js?v=1793469528"></script>
+  <script src="i18n.js?v=1793470148"></script>
+  <script src="app.js?v=1793470148"></script>
 </body>
 </html>
