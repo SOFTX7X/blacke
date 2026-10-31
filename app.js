@@ -393,7 +393,16 @@ function relacionados(it){
 function recomecarAnimacao(){
   document.querySelectorAll('#ficha .rise').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
 }
+const ROTA = { mural:'/', destaques:'/destaques', meus:'/meus-sites' };
+function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : (ROTA[S.aba] || '/'); }
+function irUrl(url, state, trocar){
+  try{
+    if (location.pathname === url && !location.search) trocar = true;
+    history[trocar ? 'replaceState' : 'pushState'](state ?? null, '', url);
+  }catch(_){}
+}
 function abrirFicha(id){
+  S.fichaId = String(id);
   const it = acharItem(id); if (!it) return;
   const w = $('ficha'), n = it.cliques || 0;
   const img = $('fcImg'); img.style.display = ''; img.onerror = () => { img.style.display = 'none'; };
@@ -426,12 +435,13 @@ function abrirFicha(id){
   clearTimeout(fichaTimer);
   if (aberta){                                           // trocou de site com o painel já aberto
     $('pnScroll').scrollTo({ top:0, behavior:'smooth' }); recomecarAnimacao();
+    if (!S.rotaSilenciosa) irUrl('/s/' + id, { ficha:String(id) }, true);
   }else{
     fichaFoco = document.activeElement;
     w.classList.remove('sai'); w.hidden = false; document.body.classList.add('ficha-open');
     $('pnScroll').scrollTop = 0; void w.offsetWidth;     // reinicia as animações
     requestAnimationFrame(() => { w.classList.add('on'); w.focus({ preventScroll:true }); });
-    try{ history.pushState({ ficha:true }, ''); }catch(_){}
+    if (!S.rotaSilenciosa) irUrl('/s/' + id, { ficha:String(id) });
   }
 }
 function fecharFicha(voltar = true){
@@ -439,9 +449,12 @@ function fecharFicha(voltar = true){
   w.classList.add('sai'); w.classList.remove('on'); document.body.classList.remove('ficha-open');
   clearTimeout(fichaTimer);
   fichaTimer = setTimeout(() => { w.hidden = true; try{ fichaFoco?.focus({ preventScroll:true }); }catch(_){} }, 460);
-  if (voltar && history.state && history.state.ficha){ try{ history.back(); }catch(_){} }
+  if (voltar){
+    if (history.state && history.state.ficha && !S.fichaEntrada){ try{ history.back(); }catch(_){} }
+    else irUrl(urlBase(), null, true);
+  }
+  S.fichaEntrada = false;
 }
-addEventListener('popstate', () => fecharFicha(false));          // botão "voltar" do celular fecha o painel
 addEventListener('keydown', e => {                                // Tab não escapa do painel
   if (e.key !== 'Tab' || $('ficha').hidden || document.querySelector('.modal:not([hidden])')) return;
   const f = [...$('ficha').querySelectorAll('a[href],button:not([disabled])')].filter(x => x.getClientRects().length);
@@ -522,10 +535,11 @@ function desenharMeus(){
   setEstado(S.meus.length ? '' : (S.hash ? 'Você ainda não publicou nenhum site neste navegador.' + BTN_NOVO : 'Seu navegador bloqueou o recurso de chave. Abra o site em https.'), !S.hash);
 }
 
-async function trocarAba(aba){
-  if (document.body.classList.contains('modo-perfil')){
-    if (aba === 'mural'){ sairPerfil(true); return; }
-    modoPerfil(false); S.busca = ''; $('busca').value = ''; try{ history.pushState(null, '', '/'); }catch(_){}
+async function trocarAba(aba, semHistorico, manterPerfil){
+  if (!semHistorico) irUrl(ROTA[aba] || '/', { aba });
+  if (!manterPerfil && document.body.classList.contains('modo-perfil')){
+    if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
+    modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
   S.aba = aba; document.body.dataset.aba = aba;
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
@@ -775,25 +789,16 @@ function modoPerfil(on){ document.body.classList.toggle('modo-perfil', !!on); }
 function irParaPerfil(h, semHistorico){
   if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
   S.busca = '@' + h; $('busca').value = S.busca; resetChips(); modoPerfil(true);
-  if (!semHistorico){ try{ if (!(history.state && history.state.perfil === h)) history.pushState({ perfil:h }, '', '/@' + h); }catch(_){} }
+  if (!semHistorico) irUrl('/@' + h, { perfil:h });
   scrollTo({ top:0 });
-  if (S.aba !== 'mural') trocarAba('mural'); else buscarMural(true);
+  if (S.aba !== 'mural') trocarAba('mural', true, true); else buscarMural(true);
 }
-function sairPerfil(trocarUrl){
+function sairPerfil(){
   modoPerfil(false); S.busca = ''; $('busca').value = ''; buscarMural(true);
-  if (trocarUrl){ try{ history.pushState(null, '', '/'); }catch(_){} }
   const y = S.voltar && S.voltar.scroll; S.voltar = null;
   if (y) setTimeout(() => scrollTo({ top:y }), 350);
 }
-$('pfLimpar').addEventListener('click', () => {
-  if (history.state && history.state.perfil){ history.back(); return; }
-  sairPerfil();
-});
-addEventListener('popstate', e => {
-  const h = e.state && e.state.perfil;
-  if (h) irParaPerfil(h, true);
-  else if (document.body.classList.contains('modo-perfil')) sairPerfil();
-});
+$('pfLimpar').addEventListener('click', () => trocarAba('mural'));
 // se a busca mudar ou o perfil sumir, sai do modo perfil
 $('busca').addEventListener('input', () => modoPerfil(false));
 new MutationObserver(() => { if ($('perfilBox').hidden && document.body.classList.contains('modo-perfil') && !S.busca.startsWith('@')) modoPerfil(false); }).observe($('perfilBox'), { attributes:true, attributeFilter:['hidden'] });
@@ -884,9 +889,8 @@ document.addEventListener('click', e => {
       const h = el.dataset.h;
       if (!$('ficha').hidden && $('ficha').classList.contains('on')){
         // veio da ficha: fecha sem voltar no histórico e troca a entrada da ficha pela do perfil
-        const daFicha = history.state && history.state.ficha;
-        fecharFicha(false);
-        if (daFicha){ try{ history.replaceState({ perfil:h }, '', '/@' + h); }catch(_){} irParaPerfil(h, true); break; }
+        fecharFicha(false); S.fichaEntrada = false;
+        irUrl('/@' + h, { perfil:h }, true); irParaPerfil(h, true); break;
       }
       irParaPerfil(h); break;
     }
@@ -940,22 +944,43 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEv
 })();
 
 /* Abre direto o site (?s=ID) ou o perfil (?p=nome) vindos de um link compartilhado */
+/* ---------- Rotas: cada tela tem seu link ----------
+   /            Mural          /destaques   Destaques
+   /meus-sites  Meus sites     /@nome       Perfil
+   /s/ID        Site           /publicar    abre o Publicar */
+async function abrirSitePorId(id){
+  try{
+    let it = acharItem(id);
+    if (!it){
+      const { data } = await _supabase.from('sites_publicos').select(COLS).eq('id', id).lt('denuncias', 5).eq('oculto', false).maybeSingle();
+      if (!data){ aviso('Esse site não está mais no mural'); irUrl(urlBase(), null, true); return; }
+      S.itens.push(data); it = data;
+    }
+    S.rotaSilenciosa = true; abrirFicha(it.id); S.rotaSilenciosa = false;
+  }catch(_){ S.rotaSilenciosa = false; aviso('Não foi possível abrir esse site'); }
+}
+function rotear(){
+  const p = location.pathname.replace(/\/+$/, '') || '/';
+  const ms = p.match(/^\/s\/(\d{1,12})$/), mp = p.match(/^\/@([a-z0-9_]{3,30})$/i);
+  if (!ms) fecharFicha(false);
+  if (mp){
+    const h = mp[1].toLowerCase();
+    if (!(document.body.classList.contains('modo-perfil') && S.busca === '@' + h)) irParaPerfil(h, true);
+  }else if (!ms){
+    const aba = p === '/destaques' ? 'destaques' : p === '/meus-sites' ? 'meus' : 'mural';
+    if (document.body.classList.contains('modo-perfil') || S.aba !== aba) trocarAba(aba, true);
+  }
+  if (ms && !(S.fichaId === ms[1] && !$('ficha').hidden)) abrirSitePorId(ms[1]);
+}
+addEventListener('popstate', rotear);
 async function abrirLinkDireto(){
   const q = new URLSearchParams(location.search), s = q.get('s'), p = q.get('p');
-  if (!s && !p) return;
-  try{ history.replaceState(null, '', location.pathname); }catch(_){}
-  if (p && /^[a-z0-9_]{3,30}$/i.test(p)){ const h = p.toLowerCase(); try{ history.replaceState({ perfil:h }, '', '/@' + h); }catch(_){} irParaPerfil(h, true); return; }
-  if (s && /^\d{1,12}$/.test(s)){
-    try{
-      let it = acharItem(s);
-      if (!it){
-        const { data } = await _supabase.from('sites_publicos').select(COLS).eq('id', s).lt('denuncias', 5).eq('oculto', false).maybeSingle();
-        if (!data){ aviso('Esse site não está mais no mural'); return; }
-        S.itens.push(data); it = data;
-      }
-      abrirFicha(it.id);
-    }catch(_){ aviso('Não foi possível abrir esse site'); }
-  }
+  if (p && /^[a-z0-9_]{3,30}$/i.test(p)) irUrl('/@' + p.toLowerCase(), null, true);
+  else if (s && /^\d{1,12}$/.test(s)){ irUrl('/s/' + s, null, true); S.fichaEntrada = true; }
+  else if (location.search) irUrl(location.pathname, null, true);
+  if (location.pathname.replace(/\/+$/, '') === '/publicar'){ irUrl('/', null, true); setTimeout(abrirPublicar, 300); return; }
+  if (location.pathname.startsWith('/s/')) S.fichaEntrada = true;
+  rotear();
 }
 
 /* ---------- Destaques: seção própria (mais acessados e novos) ---------- */

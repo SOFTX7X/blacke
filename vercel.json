@@ -15,6 +15,18 @@
     {
       "source": "/privacidade",
       "destination": "/legal.html"
+    },
+    {
+      "source": "/destaques",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/meus-sites",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/publicar",
+      "destination": "/index.html"
     }
   ]
 }
