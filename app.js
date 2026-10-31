@@ -1169,18 +1169,43 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
   const hero = document.querySelector('.hero'), bar = document.querySelector('.toolbar'), sb = $('searchbar');
   if (!hero || !bar || !sb || !('IntersectionObserver' in window)) return;
   const pc = matchMedia('(min-width:900px)'), lar = sb.parentNode, prox = sb.nextSibling;
-  const ajustarTopo = () => document.documentElement.style.setProperty('--topo', (document.querySelector('.topbar')?.offsetHeight || 60) + 'px');
+  const ajustarTopo = () => { const t = document.querySelector('.topbar'); document.documentElement.style.setProperty('--topo', (t ? Math.round(t.getBoundingClientRect().height + 14) : 60) + 'px'); };
   ajustarTopo(); addEventListener('resize', ajustarTopo);
   let fixo = false;
   const aplicar = on => {
     on = on && pc.matches && S.aba === 'mural' && !document.body.classList.contains('modo-perfil');
     if (on === fixo) return; fixo = on;
-    const foco = document.activeElement === $('busca');
-    if (on) bar.prepend(sb); else lar.insertBefore(sb, prox);
     bar.classList.toggle('fixa', on); document.body.classList.toggle('barra-fixa', on);
-    if (foco) $('busca').focus({ preventScroll:true });
   };
   new IntersectionObserver(([e]) => aplicar(!e.isIntersecting && e.boundingClientRect.top < 0), { rootMargin:'-70px 0px 0px 0px' }).observe(hero);
   pc.addEventListener('change', () => aplicar(false));
   document.addEventListener('click', e => { if (e.target.closest('#bnav')) setTimeout(() => aplicar(scrollY > hero.offsetTop + hero.offsetHeight), 50); });
+})();
+
+
+/* Cabeçalho em bolha: ícone de busca à esquerda, marca no centro, idioma à direita */
+(() => {
+  const tb = document.querySelector('.topbar'), sb = $('searchbar'); if (!tb || !sb) return;
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'tb-busca'; btn.setAttribute('aria-label', 'Buscar'); btn.title = 'Buscar';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
+  tb.prepend(btn);
+  const fechar = document.createElement('button');
+  fechar.type = 'button'; fechar.className = 'sb-fechar'; fechar.setAttribute('aria-label', 'Fechar busca');
+  fechar.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  sb.appendChild(fechar); tb.appendChild(sb);
+  const abrirBusca = () => {
+    if (S.aba !== 'mural' || document.body.classList.contains('modo-perfil')) trocarAba('mural');
+    sb.hidden = false; tb.classList.add('buscando'); setTimeout(() => $('busca').focus(), 30);
+  };
+  const fecharBusca = () => {
+    tb.classList.remove('buscando');
+    if ($('busca').value){ $('busca').value = ''; S.busca = ''; modoPerfil(false); buscarMural(true); }
+  };
+  btn.addEventListener('click', abrirBusca);
+  fechar.addEventListener('click', fecharBusca);
+  $('busca').addEventListener('keydown', e => { if (e.key === 'Escape'){ e.stopPropagation(); fecharBusca(); } });
+  $('busca').addEventListener('blur', () => setTimeout(() => { if (!$('busca').value && document.activeElement !== $('busca')) tb.classList.remove('buscando'); }, 150));
+  // ao abrir um perfil pela busca (@nome), mostra o texto na barra
+  new MutationObserver(() => { if ($('busca').value && S.busca && !document.body.classList.contains('modo-perfil')) tb.classList.add('buscando'); }).observe(document.body, { attributes:true, attributeFilter:['class'] });
 })();

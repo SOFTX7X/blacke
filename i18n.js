@@ -107,6 +107,7 @@
     ['Editar está pausado por alguns instantes. Tente de novo mais tarde.','Editing is paused for a moment. Try again later.','Editar está en pausa por unos instantes. Inténtalo más tarde.'],
     ['Conta','Account','Cuenta'],
     ['Mais deste perfil','More from this profile','Más de este perfil'],['Mais de','More from','Más de'],
+    ['Buscar','Search','Buscar'],['Fechar busca','Close search','Cerrar búsqueda'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],
     ['Centralizar','Center','Centrar'],

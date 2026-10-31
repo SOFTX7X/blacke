@@ -1407,3 +1407,32 @@ body.carregando .card{animation-play-state:running}
 /* bolha quase de ponta a ponta */
 .pn-top{width:calc(100% - 40px)!important;max-width:none!important}
 @media (max-width:640px){.pn-top{width:calc(100% - 20px)!important}}
+
+/* ===== Cabeçalho em bolha (igual ao da página do site) ===== */
+.topbar{position:sticky!important;top:10px!important;z-index:30;display:grid!important;grid-template-columns:42px 1fr auto;align-items:center;gap:8px;
+  margin:10px 20px 0;height:56px;padding:0 7px!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:999px;
+  background:rgba(20,21,36,.95)!important;box-shadow:0 12px 34px -12px rgba(0,0,0,.85);justify-content:initial!important}
+.topbar .brand{justify-self:center;grid-column:2}
+.topbar .top-actions{grid-column:3;position:static!important;transform:none!important}
+.tb-busca{grid-column:1;width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:#e8eaf8;cursor:pointer;transition:background .2s}
+.tb-busca:hover{background:rgba(123,108,255,.22)}
+.topbar .lang-btn{height:42px;border:0!important;background:rgba(255,255,255,.06)!important}
+.topbar .searchbar{display:none}
+.topbar.buscando .searchbar:not([hidden]){display:flex;position:absolute;inset:6px 6px;z-index:2;margin:0;flex:none;height:auto;border-radius:999px;padding:0 6px 0 16px;background:#14162b;border:1px solid #2c3270;animation:fade .15s ease}
+.topbar.buscando .searchbar input{flex:1;min-width:0}
+.sb-fechar{display:grid;place-items:center;width:34px;height:34px;flex:none;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:#c7cbe6;cursor:pointer}
+.sb-fechar:hover{background:rgba(255,255,255,.12);color:#fff}
+.hero .searchbar{display:none!important}
+@media (min-width:900px){.topbar{margin-left:20px;margin-right:20px}}
+@media (max-width:640px){
+  .topbar{margin:8px 10px 0;height:52px;top:8px!important;grid-template-columns:38px 1fr auto}
+  .tb-busca{width:38px;height:38px}
+  .topbar .lang-btn{height:38px!important}
+}
+/* busca: sem o X nativo (já existe o nosso) e sem ícone duplicado */
+#busca::-webkit-search-cancel-button{display:none;-webkit-appearance:none}
+.topbar .searchbar > i{display:none}
+/* faixa de fundo atrás da bolha, para o conteúdo rolando não aparecer em volta dela */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:74px;z-index:29;pointer-events:none;background:linear-gradient(var(--bg) 62%,rgba(6,7,13,0))}
+@media (max-width:640px){body::before{height:66px}}
+body.ficha-open::before{display:none}
