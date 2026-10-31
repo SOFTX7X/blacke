@@ -645,3 +645,5 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil();
 })();
+
+if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
