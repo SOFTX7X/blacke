@@ -1171,6 +1171,9 @@ function marcarInsights(){
   let mexeu = false;
   r.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; if (!mexeu){ mexeu = true; return; } r.classList.add('aberto'); });
   r.addEventListener('pointerleave', () => { r.classList.remove('aberto'); mexeu = false; });
-  r.addEventListener('click', () => { r.classList.remove('aberto'); mexeu = false; });
+  r.addEventListener('click', e => { r.classList.remove('aberto'); mexeu = false; const b = e.target.closest('button,a'); if (b && e.detail) b.blur(); });
+  // o menu só abre pelo teclado com Tab (F5 e outras teclas não abrem)
+  addEventListener('keydown', e => { if (e.key === 'Tab') document.documentElement.classList.add('tecla'); });
+  addEventListener('pointerdown', () => document.documentElement.classList.remove('tecla'));
 })();
 addEventListener('load', () => setTimeout(() => document.documentElement.classList.add('pronto'), 500));
