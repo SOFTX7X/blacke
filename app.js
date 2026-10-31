@@ -459,9 +459,9 @@ function atualizarTitulo(){
   const it = aberta && (acharItem(S.fichaId) || S.meus.find(s => String(s.id) === S.fichaId));
   if (it){ document.title = it.brand_name + ' — ' + B; return; }
   if (document.body.classList.contains('modo-perfil') && S.busca.startsWith('@')){ document.title = S.busca + ' — ' + B; return; }
-  document.title = ({ destaques:'Destaques — ' + B, meus:'Meus sites — ' + B, publicar:'Publicar — ' + B })[S.aba] || B + ' — Mural anônimo';
+  document.title = ({ destaques:'Destaques — ' + B, meus:'Conta — ' + B, publicar:'Publicar — ' + B })[S.aba] || B + ' — Mural anônimo';
 }
-const ROTA = { mural:'/', destaques:'/destaques', meus:'/meus-sites', publicar:'/publicar' };
+const ROTA = { mural:'/', destaques:'/destaques', meus:'/conta', publicar:'/publicar' };
 function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : (ROTA[S.aba] || '/'); }
 function irUrl(url, state, trocar){
   try{
@@ -754,7 +754,13 @@ function cartaoPerfil(p, dono){
   </div>
   <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
 }
+function iconeConta(){
+  const b = $('bnAv'); if (!b) return; const p = S.perfil;
+  if (p && p.foto){ b.innerHTML = `<img src="${esc(p.foto)}" alt="">`; b.classList.add('foto'); }
+  else if (p && p.handle){ b.innerHTML = `<i>${esc(p.handle.charAt(0).toUpperCase())}</i>`; b.classList.add('foto'); }
+}
 function desenharMeuPerfil(){
+  iconeConta();
   const el = $('meuPerfil'); if (!el) return;
   const p = S.perfil;
   const html = cartaoPerfil(p && p.handle ? p : null, true);
@@ -1047,7 +1053,7 @@ function rotear(){
   }else if (!ms){
     if (p === '/publicar'){ if (S.aba !== 'publicar') abrirPublicar(); }
     else{
-      const aba = p === '/destaques' ? 'destaques' : p === '/meus-sites' ? 'meus' : 'mural';
+      const aba = p === '/destaques' ? 'destaques' : (p === '/conta' || p === '/meus-sites') ? 'meus' : 'mural';
       if (document.body.classList.contains('modo-perfil') || S.aba !== aba) trocarAba(aba, true);
     }
   }

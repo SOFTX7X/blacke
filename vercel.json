@@ -31,6 +31,10 @@
     {
       "source": "/publicar",
       "destination": "/index.html"
+    },
+    {
+      "source": "/conta",
+      "destination": "/index.html"
     }
   ],
   "functions": {
