@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -248,7 +248,7 @@ function previa(){
   $('ptSelo').innerHTML = it.verificado ? SELO : '';
   $('ptTag').textContent = $('inputCat').value;
   const h = it.handle || (p && p.handle);
-  $('ptArroba').innerHTML = h ? `<span class="arroba"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</span>` : '<span class="anon">anônimo</span>';
+  $('ptArroba').innerHTML = h ? `<span class="arroba"><span>@${esc(h)}</span>${selosDe(h)}</span>` : '<span class="anon">anônimo</span>';
 }
 ['inputNome','inputCat'].forEach(id => $(id).addEventListener('input', previa));
 $('inputCat').addEventListener('change', previa);
@@ -348,17 +348,26 @@ function acoesDe(item){
 }
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const selo = it => it && it.verificado ? SELO : '';
-const META_SELO = 1000; // acessos somados nos sites do perfil para ganhar o Selo BLACKE
+const META_V = 1000;     // acessos somados nos sites do perfil para ganhar o selo azul (verificado)
+const META_SELO = 10000; // ... e o Selo BLACKE (ninja). O admin também pode dar os dois à mão.
 const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient><clipPath id="sbc"><circle cx="11.4" cy="12.4" r="6.3"/></clipPath></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><circle cx="11.4" cy="12.4" r="6.3" fill="url(#sbg)"/><g clip-path="url(#sbc)"><rect x="4" y="7.6" width="16" height="2.1" fill="#8a5a0c"/><path d="M5.5 11.2h12.2v3.1c0 .5-.4.8-.8.8H6.3c-.4 0-.8-.3-.8-.8z" fill="#1a1230"/></g><path d="M16.3 8.1l4.1-2.1-1.3 3.2 2 2.2-4.1-.5z" fill="#d99a2b"/><path d="M7.4 12.2l2.9.4c.5.1.6.7.2.9l-2.7.7c-.6.1-1-.4-.9-.9zM15.4 12.2l-2.9.4c-.5.1-.6.7-.2.9l2.7.7c.6.1 1-.4.9-.9z" fill="#6fd6ff"/></svg>';
+const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
-const VERIF = new Set();
-const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</button>`;
+const VERIF = new Set(), NINJA = new Set();
+const selosDe = h => (VERIF.has(h) ? SELO : '') + (NINJA.has(h) ? SELO_BLACKE : '');
+const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${selosDe(h)}</button>`;
 async function carregarVerificados(){
   try{
-    const { data } = await _supabase.rpc('perfis_verificados');
-    (data || []).forEach(h => VERIF.add(h));
-    document.querySelectorAll('.arroba[data-h]').forEach(b => { if (VERIF.has(b.dataset.h) && !b.querySelector('.selo')) b.insertAdjacentHTML('beforeend', SELO); });
+    let v = null, n = [];
+    const r = await _supabase.rpc('perfis_selos');
+    if (!r.error && r.data && Array.isArray(r.data.v)){ v = r.data.v; n = r.data.n || []; }
+    else { const r2 = await _supabase.rpc('perfis_verificados'); v = r2.data || []; }
+    v.forEach(h => VERIF.add(h)); n.forEach(h => NINJA.add(h));
+    document.querySelectorAll('.arroba[data-h]').forEach(b => {
+      const h = b.dataset.h, novo = selosDe(h); if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/<svg/g) || []).length) return;
+      b.querySelectorAll('.selo,.selo-b').forEach(x => x.remove()); b.insertAdjacentHTML('beforeend', novo);
+    });
   }catch(_){}
 }
 function criarCard(item, i){
@@ -804,7 +813,7 @@ function atualizarPerfilUI(){
   const p = S.perfil; desenharMeuPerfil();
   const m = $('meuArroba');
   if (!p?.handle) m.textContent = 'Você ainda não tem um @';
-  else m.innerHTML = `<span class="ma"><span translate="no">@${esc(p.handle)}</span>${p.verificado ? SELO : ''}</span>${p.suspenso ? ' <span>(suspenso)</span>' : ''}${p.pendente ? ` <small class="pendente">Troca para @${esc(p.pendente)} em análise</small>` : ''}`;
+  else m.innerHTML = `<span class="ma"><span translate="no">@${esc(p.handle)}</span>${temVerif(p) ? SELO : ''}${seloElite(p)}</span>${p.suspenso ? ' <span>(suspenso)</span>' : ''}${p.pendente ? ` <small class="pendente">Troca para @${esc(p.pendente)} em análise</small>` : ''}`;
   $('btnArroba').innerHTML = '<i class="fa-solid fa-at"></i> ' + (p?.handle ? 'Trocar @' : 'Reservar @');
 }
 async function mostrarPerfil(h){
@@ -814,7 +823,8 @@ async function mostrarPerfil(h){
   try{ ({ data } = await _supabase.rpc('perfil_publico', { p_handle:h })); }catch(_){}
   if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
   if (!data){ box.hidden = true; return; }
-  if (data.verificado) VERIF.add(data.handle);
+  if (temVerif(data)) VERIF.add(data.handle);
+  if (temSeloB(data)) NINJA.add(data.handle);
   $('pfCard').innerHTML = cartaoPerfil(data, false);
   box.hidden = false;
 }
@@ -846,10 +856,10 @@ function cartaoPerfil(p, dono){
   }
   const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
   const desde = p.desde ? new Date(p.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '';
-  return `<div class="ig${p.verificado ? ' pc-ver' : ''}">
+  return `<div class="ig${temVerif(p) ? ' pc-ver' : ''}">
     <div class="ig-fundo" aria-hidden="true">${p.foto ? `<img src="${esc(p.foto)}" alt="" decoding="async">` : ''}</div>
     <div class="ig-av">${avatarHTML(p)}</div>
-    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${seloElite(p)}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
+    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${temVerif(p) ? SELO : ''}${seloElite(p)}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
     <ul class="ig-nums">
       ${num(p.sites, 'site', 'sites')}
       ${num(p.acessos, 'acesso', 'acessos', dono && TREND ? ' ' + chipTendencia(TREND.hj, TREND.ontem) : '')}
@@ -904,8 +914,10 @@ function painelNumeros(){
     return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(s.n14 / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(s.n14)}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
   }).join('');
   const vida = (S.perfil && +S.perfil.acessos) || S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
-  const pct = Math.min(100, Math.round(vida / META_SELO * 100)), tem = temSeloB(S.perfil) || vida >= META_SELO;
-  const meta = `<div class="nm-meta${tem ? ' ok' : ''}"><div class="nm-meta-t">${tem ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>Meta do Selo BLACKE</b><span><b>${fmtN(vida)}</b> / ${fmtN(META_SELO)}</span>`}</div><span class="nm-br"><i style="--w:${tem ? 100 : Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
+  const base = Object.assign({}, S.perfil || {}, { acessos:vida });
+  const tem = temSeloB(base), azul = temVerif(base), alvo = azul ? META_SELO : META_V;
+  const pct = tem ? 100 : Math.min(100, Math.round(vida / alvo * 100));
+  const meta = `<div class="nm-meta${tem ? ' ok' : ''}"><div class="nm-meta-t">${tem ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>${azul ? 'Meta do Selo BLACKE' : 'Meta do selo verificado'}</b><span><b>${fmtN(vida)}</b> / ${fmtN(alvo)}</span>`}</div><span class="nm-br"><i style="--w:${tem ? 100 : Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
   return `<details class="nm" data-nm${S.nmAberto ? ' open' : ''} aria-label="Seus números">
     <summary class="nm-h"><div><h3>Seus números</h3><small class="nm-sub"><b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> · <b>${fmtN(hoje)}</b> <span>hoje</span></small></div><div class="nm-ch">${chip}<i class="nm-cv" aria-hidden="true"></i></div></summary>
     <div class="nm-b">

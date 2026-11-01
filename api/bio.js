@@ -9,7 +9,7 @@ const BASE = 'https://blackelavex.online';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
 const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient><clipPath id="sbc"><circle cx="11.4" cy="12.4" r="6.3"/></clipPath></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><circle cx="11.4" cy="12.4" r="6.3" fill="url(#sbg)"/><g clip-path="url(#sbc)"><rect x="4" y="7.6" width="16" height="2.1" fill="#8a5a0c"/><path d="M5.5 11.2h12.2v3.1c0 .5-.4.8-.8.8H6.3c-.4 0-.8-.3-.8-.8z" fill="#1a1230"/></g><path d="M16.3 8.1l4.1-2.1-1.3 3.2 2 2.2-4.1-.5z" fill="#d99a2b"/><path d="M7.4 12.2l2.9.4c.5.1.6.7.2.9l-2.7.7c-.6.1-1-.4-.9-.9zM15.4 12.2l-2.9.4c-.5.1-.6.7-.2.9l2.7.7c.6.1 1-.4.9-.9z" fill="#6fd6ff"/></svg>';
-const META_SELO = 1000;
+const META_V = 1000, META_SELO = 10000;
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
 const CT = {
@@ -197,7 +197,7 @@ function render(p, sites){
   return `
   <section class="cab">
     <div class="av e" style="--i:0"><span>${p.foto ? `<img src="${esc(p.foto)}" alt="">` : ini}</span></div>
-    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado ? SELO : ''}${p.selo || (+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
+    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado || (+p.acessos || 0) >= META_V ? SELO : ''}${p.selo || (+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
     ${p.bio ? `<p class="bio e" style="--i:2" translate="no">${esc(p.bio)}</p>` : ''}
     <div class="num e" style="--i:3"><span><b>${fmt(p.sites)}</b>${+p.sites === 1 ? 'site' : 'sites'}</span><span><b>${fmt(p.acessos)}</b>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
     ${ct.length ? `<nav class="ct e" style="--i:4" aria-label="Contatos">${ct.map(c => `<a class="${esc(c.tipo)}" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${(CT[c.tipo] || {}).ic || 'fa-solid fa-link'}"></i>${nomeContato(c)}</a>`).join('')}</nav>` : ''}

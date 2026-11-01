@@ -3,6 +3,7 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['Meta do selo verificado','Verified badge goal','Meta del sello verificado'],
     ['Para colocar no seu site ou loja','To put on your site or store','Para poner en tu sitio o tienda'],
     ['Selo BLACKE conquistado','BLACKE Badge earned','Sello BLACKE conseguido'],
     ['Meta do Selo BLACKE','BLACKE Badge goal','Meta del Sello BLACKE'],
