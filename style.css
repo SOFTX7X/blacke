@@ -1489,3 +1489,24 @@ main{overflow-x:clip}
   .sw-v{min-width:52px}
 }
 @media (prefers-reduced-motion:reduce){.sw,.sw-br i{animation:none!important}}
+
+/* ---------- Selo "Estou no BLACKE" (Conta) ---------- */
+.sl{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"t t" "pv a";gap:14px 22px;align-items:center;margin:12px 0 4px;padding:18px 20px;border-radius:20px!important;background:linear-gradient(135deg,rgba(123,108,255,.12),rgba(111,214,255,.04));box-shadow:inset 0 0 0 1px rgba(123,108,255,.28)}
+.sl-t{grid-area:t;display:flex;flex-direction:column;gap:3px}
+.sl-t b{font:600 16px var(--display);color:#fff}
+.sl-t span{font-size:13px;color:var(--muted)}
+.sl-pv{grid-area:pv;display:grid;place-items:center;padding:14px 18px;border-radius:16px!important;transition:background .3s}
+.sl-pv.escuro{background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.sl-pv.claro{background:#eceef8}
+.sl-pv img{display:block;max-width:100%;height:auto}
+.sl-a{grid-area:a;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.sl-seg{display:inline-flex;padding:3px;border-radius:12px!important;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.sl-seg button{height:34px;padding:0 16px;border:0;border-radius:9px!important;background:none;color:var(--muted);font:600 13px var(--display);cursor:pointer;transition:background .2s,color .2s}
+.sl-seg button.on{background:linear-gradient(135deg,#4a3fd6,#7b6cff);color:#fff}
+.sl-a .pc-btn{flex:none;min-width:0;min-height:40px;border-radius:10px;padding:0 16px;text-decoration:none}
+@media (max-width:700px){
+  .sl{grid-template-columns:1fr;grid-template-areas:"t" "pv" "a";padding:14px}
+  .sl-a{flex-direction:column;align-items:stretch}
+  .sl-seg{display:grid;grid-template-columns:1fr 1fr}
+  .sl-a .pc-btn{justify-content:center}
+}

@@ -3,6 +3,13 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['Selo "Estou no BLACKE"','"I\'m on BLACKE" badge','Sello "Estoy en BLACKE"'],
+    ['Coloque no seu site, loja ou página. Quem clicar vai direto para a sua página de links.','Put it on your site, store or page. Anyone who clicks goes straight to your link page.','Ponlo en tu sitio, tienda o página. Quien haga clic irá directo a tu página de enlaces.'],
+    ['Escuro','Dark','Oscuro'],
+    ['Claro','Light','Claro'],
+    ['Copiar código','Copy code','Copiar código'],
+    ['Baixar','Download','Descargar'],
+    ['Código copiado','Code copied','Código copiado'],
     ['7 dias','7 days','7 días'],
     ['Seus números','Your numbers','Tus números'],
     ['Últimos 14 dias','Last 14 days','Últimos 14 días'],

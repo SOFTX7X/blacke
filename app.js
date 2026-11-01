@@ -868,7 +868,7 @@ function cartaoPerfil(p, dono){
       <div class="ig-lk-t"><b>Sua página de links</b><small translate="no">blackelavex.online/bio/${esc(p.handle)}</small><span>Coloque na bio do Instagram, TikTok ou onde quiser.</span></div>
       <div class="ig-lk-a"><button class="pc-btn" type="button" data-act="copiarbio" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar</span></button><a class="pc-btn pri" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><span>Abrir</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
     </div>` : ''}
-  </div>${dono ? painelNumeros() : ''}
+  </div>${dono ? painelNumeros() + blocoSelo(p) : ''}
   <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
 }
 /* ---------- Seus números (Conta) ---------- */
@@ -908,6 +908,19 @@ function painelNumeros(){
     </div>
     ${tot ? `<div class="nm-g" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos nos últimos 14 dias. Compartilhe sua página de links para começar.</p>'}
     ${rank ? `<h4 class="nm-t">Sites mais acessados</h4><ol class="nm-r">${rank}</ol>` : ''}
+  </section>`;
+}
+function seloURL(h, t){ return `${location.origin}/selo/${h}${t === 'claro' ? '?t=claro' : ''}`; }
+function blocoSelo(p){
+  const t = S.seloTema === 'claro' ? 'claro' : 'escuro';
+  return `<section class="sl" aria-label="Selo para o seu site">
+    <div class="sl-t"><b>Selo "Estou no BLACKE"</b><span>Coloque no seu site, loja ou página. Quem clicar vai direto para a sua página de links.</span></div>
+    <div class="sl-pv ${t}"><img src="${esc(seloURL(p.handle, t))}" alt="Estou no BLACKE LAVEX" width="292" loading="lazy" decoding="async"></div>
+    <div class="sl-a">
+      <div class="sl-seg" role="group" aria-label="Tema do selo"><button type="button" data-act="temaselo" data-t="escuro" class="${t === 'escuro' ? 'on' : ''}">Escuro</button><button type="button" data-act="temaselo" data-t="claro" class="${t === 'claro' ? 'on' : ''}">Claro</button></div>
+      <button class="pc-btn" type="button" data-act="copiarselo" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar código</span></button>
+      <a class="pc-btn" data-act="baixarselo" data-h="${esc(p.handle)}" href="${esc(seloURL(p.handle, t))}" download="selo-blacke-${esc(p.handle)}.svg"><i class="fa-solid fa-download"></i> <span>Baixar</span></a>
+    </div>
   </section>`;
 }
 function iconeConta(){
@@ -1124,6 +1137,20 @@ document.addEventListener('click', e => {
     case 'compartilhar': compartilhar(id); break;
     case 'linkmural': linkMural(id); break;
     case 'linkperfil': linkPerfil(el.dataset.h); break;
+    case 'temaselo': {
+      const t = el.dataset.t === 'claro' ? 'claro' : 'escuro'; S.seloTema = t;
+      const bl = el.closest('.sl'); if (!bl) break;
+      bl.querySelectorAll('.sl-seg button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+      const pv = bl.querySelector('.sl-pv'); pv.classList.toggle('claro', t === 'claro'); pv.classList.toggle('escuro', t !== 'claro');
+      const h = bl.querySelector('[data-h]').dataset.h; pv.querySelector('img').src = seloURL(h, t);
+      const dl = bl.querySelector('[data-act="baixarselo"]'); if (dl) dl.href = seloURL(h, t);
+      break;
+    }
+    case 'copiarselo': {
+      const h = el.dataset.h, t = S.seloTema === 'claro' ? 'claro' : 'escuro';
+      const cod = `<a href="https://blackelavex.online/bio/${h}" target="_blank" rel="noopener"><img src="https://blackelavex.online/selo/${h}${t === 'claro' ? '?t=claro' : ''}" alt="Estou no BLACKE LAVEX" width="292" height="${/^[a-z0-9_]{3,20}$/.test(h) ? 84 : 72}"></a>`;
+      (navigator.clipboard ? navigator.clipboard.writeText(cod) : Promise.reject()).then(() => aviso('Código copiado'), () => prompt('Copie o código:', cod)); break;
+    }
     case 'copiarbio': { const u = `${location.origin}/bio/${el.dataset.h}`; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => aviso('Link copiado'), () => prompt('Copie o link:', u)); break; }
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;

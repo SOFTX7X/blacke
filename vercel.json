@@ -9,6 +9,10 @@
       "destination": "/api/bio?h=:h"
     },
     {
+      "source": "/selo/:h",
+      "destination": "/api/selo?h=:h"
+    },
+    {
       "source": "/s/:id",
       "destination": "/api/p?s=:id"
     },
