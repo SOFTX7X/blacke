@@ -1512,11 +1512,8 @@ main{overflow-x:clip}
 }
 
 /* ---------- Selo BLACKE (conquista) ---------- */
-.selo-b{display:inline-block;flex:none;width:1.2em;height:1.2em;margin-left:.35em;vertical-align:-.22em;filter:drop-shadow(0 0 7px rgba(242,184,75,.55));animation:sbBrilho 3.4s ease-in-out infinite}
-@keyframes sbBrilho{50%{filter:drop-shadow(0 0 12px rgba(255,226,154,.85))}}
-.ig-nome .selo-b{width:36px;height:36px;margin:0 0 0 4px}
+.ig-nome .selo-b{width:32px;height:32px;margin:0 0 0 4px}
 .card h3 .selo-b{width:17px;height:17px}
-@media (prefers-reduced-motion:reduce){.selo-b{animation:none}}
 
 /* ---------- Conta: blocos recolhíveis ---------- */
 details.nm{padding:0}
@@ -1549,19 +1546,16 @@ details.sl{display:block;padding:0}
 .sl-b{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px 22px;align-items:center;padding:2px 20px 18px;animation:nmIn .4s cubic-bezier(.2,.8,.2,1) both}
 .sl-b .sl-pv,.sl-b .sl-a{grid-area:auto}
 @media (max-width:700px){.sl-b{grid-template-columns:1fr;padding:2px 14px 14px}.sl-h{padding:12px 14px}}
-.arroba .selo-b{flex:none;width:1.8em;height:1.8em;margin-left:.35em;vertical-align:-.3em;animation:none;filter:drop-shadow(0 0 4px rgba(242,184,75,.45))}
+.arroba .selo-b{width:1.6em;height:1.6em;margin-left:.35em;vertical-align:-.28em}
 /* mini foto de perfil ao lado do @ */
 .arroba .amini{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;margin-right:7px;border-radius:50%!important;overflow:hidden;background:linear-gradient(135deg,#4a3fd6,#7b6cff);box-shadow:0 0 0 1.5px rgba(123,108,255,.55);color:#fff;font:700 10px var(--display);line-height:1}
 .arroba .amini img{width:100%;height:100%;object-fit:cover;display:block}
 .sw-nm .arroba .amini{width:22px;height:22px}
 
-/* Selo BLACKE (ninja): rótulo redondo com fumaça preta saindo das bordas */
-.selo-b{position:relative;isolation:isolate;display:inline-block;flex:none;box-sizing:border-box;border-radius:50%!important;padding:.13em;background:linear-gradient(135deg,#fff0b8,#f2b84b 55%,#b9780f);vertical-align:-.3em;margin-left:.3em;box-shadow:0 0 .55em rgba(242,184,75,.4);filter:none!important;animation:none!important;overflow:visible!important;text-overflow:clip}
-.selo-b img{position:relative;z-index:2;display:block;width:100%;height:100%;border-radius:50%!important;background:#16121f;object-fit:cover}
-.selo-b i{position:absolute;z-index:1;width:82%;height:82%;border-radius:50%!important;pointer-events:none;opacity:0;filter:blur(.9px);background:radial-gradient(circle,rgba(0,0,0,.97) 0 34%,rgba(112,98,190,.6) 56%,rgba(112,98,190,.18) 68%,transparent 76%);animation:sbFumo 3.2s ease-out infinite!important;animation-delay:var(--d)}
-.selo-b i:nth-of-type(1){left:-38%;top:28%;--d:0s;--x:-55%}
-.selo-b i:nth-of-type(2){right:-38%;top:22%;--d:.8s;--x:55%}
-.selo-b i:nth-of-type(3){left:10%;top:-42%;--d:1.6s;--x:18%}
-.selo-b i:nth-of-type(4){left:-4%;bottom:-40%;--d:2.4s;--x:-28%}
-@keyframes sbFumo{0%{opacity:0;transform:translate(0,0) scale(.5)}22%{opacity:.95}100%{opacity:0;transform:translate(var(--x,0),-115%) scale(1.9)}}
-@media (prefers-reduced-motion:reduce){.selo-b i{animation:none!important;opacity:.55}}
+/* Selo BLACKE (ninja): rótulo em hexágono com fumaça preta saindo das bordas */
+.selo-b{position:relative;display:inline-block;flex:none;width:1.2em;height:1.2em;margin-left:.35em;vertical-align:-.22em;overflow:visible!important;text-overflow:clip}
+.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(123,108,255,.55))}
+.selo-b .sb-fumo{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 1.1px rgba(150,138,255,.95))}
+.selo-b .w{fill:#000;stroke:#000;stroke-width:.7;stroke-linejoin:round;opacity:0;transform-origin:0 0;animation:sbW 3.6s ease-out infinite}
+@keyframes sbW{0%{opacity:0;transform:translate(0,0) scale(.8,.4)}18%{opacity:1}50%{opacity:.75;transform:translate(calc(var(--dx)*.35),-3.6px) rotate(calc(var(--r)*-.5)) scale(1.05,1)}100%{opacity:0;transform:translate(var(--dx),-8px) rotate(var(--r)) scale(2,1.55)}}
+@media (prefers-reduced-motion:reduce){.selo-b .w{animation:none;opacity:.55;transform:scale(1)}}
