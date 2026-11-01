@@ -1554,8 +1554,9 @@ details.sl{display:block;padding:0}
 
 /* Selo BLACKE (ninja): rótulo em hexágono com fumaça preta saindo das bordas */
 .selo-b{position:relative;display:inline-block;flex:none;width:1.35em;height:1.35em;margin-left:.35em;vertical-align:-.26em;overflow:visible!important;text-overflow:clip}
-.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 5px rgba(123,108,255,.55))}
+.selo-b .sb-hex{display:block;width:100%;height:100%;animation:sbArde 1.9s ease-in-out infinite}
+@keyframes sbArde{0%,100%{filter:drop-shadow(0 0 4px rgba(123,108,255,.5))}50%{filter:drop-shadow(0 0 8px rgba(123,108,255,.95))}}
 .selo-b .sb-fumo{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 2.2px rgba(123,108,255,.9))}
-.selo-b .w{fill:#7b6cff;stroke:#7b6cff;stroke-width:.8;stroke-linejoin:round;opacity:0;transform-origin:0 0;animation:sbW 3.6s ease-out infinite}
-@keyframes sbW{0%{opacity:0;transform:translate(0,0) scale(1,.5)}16%{opacity:1}50%{opacity:.85;transform:translate(calc(var(--dx)*.4),-6px) rotate(calc(var(--r)*-.5)) scale(1.3,1.25)}100%{opacity:0;transform:translate(calc(var(--dx)*1.5),-13px) rotate(var(--r)) scale(2.3,1.9)}}
+.selo-b .w{fill:#7b6cff;stroke:#7b6cff;stroke-width:.8;stroke-linejoin:round;opacity:0;transform-origin:0 0;animation:sbW 1.9s ease-out infinite}
+@keyframes sbW{0%{opacity:0;transform:translate(0,0) scale(.9,.35)}14%{opacity:1}55%{opacity:.9;transform:translate(calc(var(--dx)*.5),-4px) rotate(calc(var(--r)*-.6)) scale(1.1,1.25)}100%{opacity:0;transform:translate(var(--dx),-8px) rotate(var(--r)) scale(1.2,1.5)}}
 @media (prefers-reduced-motion:reduce){.selo-b .w{animation:none;opacity:.55;transform:scale(1)}}
