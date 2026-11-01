@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -872,23 +872,27 @@ function cartaoPerfil(p, dono){
   <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
 }
 /* ---------- Seus números (Conta) ---------- */
+function barrasHTML(dias){
+  const dt = d => new Date(d + 'T12:00:00');
+  const max = Math.max(1, ...dias.map(d => +d.n || 0));
+  return dias.map((d, i) => {
+    const n = +d.n || 0, h = n ? Math.max(8, Math.round(n / max * 100)) : 3, ult_ = i === dias.length - 1;
+    const rot = dt(d.d).toLocaleDateString(LOC(), { weekday:'narrow' });
+    return `<div class="nm-c${ult_ ? ' hj' : ''}${n === max && n ? ' pico' : ''}" style="--i:${i}" title="${esc(dt(d.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' }))} · ${n} ${n === 1 ? 'acesso' : 'acessos'}"><em>${n ? fmtN(n) : ''}</em><i style="--h:${h}%"></i><span>${esc(rot)}</span></div>`;
+  }).join('');
+}
 function painelNumeros(){
   if (!SERIE || !S.meus.length) return '';
   const dias = SERIE, soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
   const tot = soma(dias), ult = soma(dias.slice(-7)), ant = soma(dias.slice(0, Math.max(0, dias.length - 7)).slice(-7));
   const hoje = dias.length ? +dias[dias.length - 1].n || 0 : 0;
-  const max = Math.max(1, ...dias.map(d => +d.n || 0));
   const melhor = dias.reduce((m, d) => (+d.n > (m ? +m.n : 0) ? d : m), null);
   const dt = d => new Date(d + 'T12:00:00');
   let chip;
   if (!ult && !ant) chip = '';
   else if (!ant) chip = '<span class="tend sobe">▲ novo</span>';
   else { const p = Math.round((ult - ant) / ant * 100); chip = p > 0 ? `<span class="tend sobe">▲ ${p}%</span>` : p < 0 ? `<span class="tend desce">▼ ${-p}%</span>` : '<span class="tend igual">= 0%</span>'; }
-  const barras = dias.map((d, i) => {
-    const n = +d.n || 0, h = n ? Math.max(8, Math.round(n / max * 100)) : 3, ult_ = i === dias.length - 1;
-    const rot = dt(d.d).toLocaleDateString(LOC(), { weekday:'narrow' });
-    return `<div class="nm-c${ult_ ? ' hj' : ''}${n === max && n ? ' pico' : ''}" style="--i:${i}" title="${esc(dt(d.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' }))} · ${n} ${n === 1 ? 'acesso' : 'acessos'}"><em>${n ? fmtN(n) : ''}</em><i style="--h:${h}%"></i><span>${esc(rot)}</span></div>`;
-  }).join('');
+  const barras = barrasHTML(dias);
   const sites = [...STATS.values()].filter(s => s.n14 > 0).sort((x, y) => y.n14 - x.n14 || y.total - x.total).slice(0, 5);
   const topo = sites.length ? sites[0].n14 : 1;
   const rank = sites.map((s, i) => {
@@ -1350,13 +1354,31 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
 
 
 /* ---------- Site da semana (escolhido no admin) ---------- */
-let SEMANA = null;
+let SEMANA = null, SEMANA_ST = null;
 async function carregarSemana(){
   try{
     const { data } = await _supabase.rpc('site_da_semana');
     SEMANA = data && data.id ? data : null;
   }catch(_){ SEMANA = null; }
-  desenharSemana();
+  SEMANA_ST = null; desenharSemana();
+  if (SEMANA){
+    const id = SEMANA.id;
+    try{
+      const { data, error } = await _supabase.rpc('site_stats_publico', { p_id:String(id) });
+      if (!error && data && data.dias && SEMANA && SEMANA.id === id){ SEMANA_ST = data.dias; desenharSemana(); }
+    }catch(_){}
+  }
+}
+function semanaNums(it){
+  const total = +it.cliques || 0, d = SEMANA_ST;
+  if (!d) return `<div class="sm-k"><div><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span></div></div>`;
+  const s7 = d.slice(-7).reduce((t, x) => t + (+x.n || 0), 0), hoje = d.length ? +d[d.length - 1].n || 0 : 0;
+  return `<div class="sm-k">
+      <div><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span></div>
+      <div><b>${fmtN(hoje)}</b><span>hoje</span></div>
+      <div><b>${fmtN(s7)}</b><span>7 dias</span></div>
+    </div>
+    <div class="nm-g sm-g" role="img" aria-label="Acessos por dia">${barrasHTML(d)}</div>`;
 }
 function desenharSemana(){
   const el = $('semana'); if (!el) return;
@@ -1371,9 +1393,10 @@ function desenharSemana(){
       <h2 translate="no">${esc(it.brand_name)}${selo(it)}</h2>
       ${it.handle ? `<div class="sm-ar">${arrobaBtn(it.handle)}</div>` : ''}
       <p translate="no">${esc(it.nota || it.caption || '')}</p>
+      ${semanaNums(it)}
       <div class="sm-acts">
         <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
-        <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Ver detalhes</button>
+        <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Detalhes</button>
       </div>
     </div>`;
 }

@@ -3,6 +3,7 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['7 dias','7 days','7 días'],
     ['Seus números','Your numbers','Tus números'],
     ['Últimos 14 dias','Last 14 days','Últimos 14 días'],
     ['vs semana anterior','vs previous week','vs semana anterior'],
