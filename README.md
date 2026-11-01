@@ -23,3 +23,6 @@ O banco já tem: `denuncias` (motivo, detalhe, data, resolvida), `perfis.suspens
 Moderação manual por enquanto: veja os comandos no final do `supabase-2-arroba.sql`.
 
 - Botão **Comunidade** no topo, ao lado de "Publicar link", leva ao Telegram (https://t.me/BlackeLavex). No celular aparece só o ícone.
+
+## Créditos
+O ninja do Selo BLACKE usa o emoji do Noto Emoji (Google), licença Apache 2.0: https://github.com/googlefonts/noto-emoji

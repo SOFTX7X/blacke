@@ -350,7 +350,7 @@ const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verif
 const selo = it => it && it.verificado ? SELO : '';
 const META_V = 1000;     // acessos somados nos sites do perfil para ganhar o selo azul (verificado)
 const META_SELO = 10000; // ... e o Selo BLACKE (ninja). O admin também pode dar os dois à mão.
-const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient><clipPath id="sbc"><circle cx="11.4" cy="12.4" r="6.3"/></clipPath></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><circle cx="11.4" cy="12.4" r="6.3" fill="url(#sbg)"/><g clip-path="url(#sbc)"><rect x="4" y="7.6" width="16" height="2.1" fill="#8a5a0c"/><path d="M5.5 11.2h12.2v3.1c0 .5-.4.8-.8.8H6.3c-.4 0-.8-.3-.8-.8z" fill="#1a1230"/></g><path d="M16.3 8.1l4.1-2.1-1.3 3.2 2 2.2-4.1-.5z" fill="#d99a2b"/><path d="M7.4 12.2l2.9.4c.5.1.6.7.2.9l-2.7.7c-.6.1-1-.4-.9-.9zM15.4 12.2l-2.9.4c-.5.1-.6.7-.2.9l2.7.7c.6.1 1-.4.9-.9z" fill="#6fd6ff"/></svg>';
+const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo BLACKE" title="Selo BLACKE"><i></i><i></i><i></i><i></i><img src="/ninja.png" alt="" width="64" height="64" decoding="async"></span>';
 const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
@@ -368,7 +368,7 @@ async function carregarVerificados(){
     document.querySelectorAll('.arroba[data-h]').forEach(b => {
       const h = b.dataset.h, novo = selosDe(h);
       const av = b.querySelector('.amini'); if (av && av.outerHTML !== miniAv(h)) av.outerHTML = miniAv(h); else if (!av) b.insertAdjacentHTML('afterbegin', miniAv(h));
-      if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/<svg/g) || []).length) return;
+      if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/class="selo/g) || []).length) return;
       b.querySelectorAll('.selo,.selo-b').forEach(x => x.remove()); b.insertAdjacentHTML('beforeend', novo);
     });
   }catch(_){}
