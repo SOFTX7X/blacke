@@ -350,7 +350,8 @@ const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verif
 const selo = it => it && it.verificado ? SELO : '';
 const META_SELO = 1000; // acessos somados nos sites do perfil para ganhar o Selo BLACKE
 const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><g fill="url(#sbg)"><circle cx="12" cy="8.4" r="1.75"/><circle cx="7.9" cy="10.3" r="1.3"/><circle cx="16.1" cy="10.3" r="1.3"/><path d="M8.7 17v-3.1a3.3 3.3 0 0 1 6.6 0V17z"/><path d="M5.5 16.6v-2.1a2.3 2.3 0 0 1 3.5-2 3.9 3.9 0 0 0-.8 2.4v1.7zM18.5 16.6v-2.1a2.3 2.3 0 0 0-3.5-2 3.9 3.9 0 0 1 .8 2.4v1.7z" opacity=".75"/></g></svg>';
-const seloElite = n => (+n || 0) >= META_SELO ? SELO_BLACKE : '';
+const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
+const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
 const VERIF = new Set();
 const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</button>`;
 async function carregarVerificados(){
@@ -848,7 +849,7 @@ function cartaoPerfil(p, dono){
   return `<div class="ig${p.verificado ? ' pc-ver' : ''}">
     <div class="ig-fundo" aria-hidden="true">${p.foto ? `<img src="${esc(p.foto)}" alt="" decoding="async">` : ''}</div>
     <div class="ig-av">${avatarHTML(p)}</div>
-    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${seloElite(p.acessos)}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
+    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${seloElite(p)}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
     <ul class="ig-nums">
       ${num(p.sites, 'site', 'sites')}
       ${num(p.acessos, 'acesso', 'acessos', dono && TREND ? ' ' + chipTendencia(TREND.hj, TREND.ontem) : '')}
@@ -903,8 +904,8 @@ function painelNumeros(){
     return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(s.n14 / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(s.n14)}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
   }).join('');
   const vida = (S.perfil && +S.perfil.acessos) || S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
-  const pct = Math.min(100, Math.round(vida / META_SELO * 100));
-  const meta = `<div class="nm-meta${vida >= META_SELO ? ' ok' : ''}"><div class="nm-meta-t">${vida >= META_SELO ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>Meta do Selo BLACKE</b><span><b>${fmtN(vida)}</b> / ${fmtN(META_SELO)}</span>`}</div><span class="nm-br"><i style="--w:${Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
+  const pct = Math.min(100, Math.round(vida / META_SELO * 100)), tem = temSeloB(S.perfil) || vida >= META_SELO;
+  const meta = `<div class="nm-meta${tem ? ' ok' : ''}"><div class="nm-meta-t">${tem ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>Meta do Selo BLACKE</b><span><b>${fmtN(vida)}</b> / ${fmtN(META_SELO)}</span>`}</div><span class="nm-br"><i style="--w:${tem ? 100 : Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
   return `<details class="nm" data-nm${S.nmAberto ? ' open' : ''} aria-label="Seus números">
     <summary class="nm-h"><div><h3>Seus números</h3><small class="nm-sub"><b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> · <b>${fmtN(hoje)}</b> <span>hoje</span></small></div><div class="nm-ch">${chip}<i class="nm-cv" aria-hidden="true"></i></div></summary>
     <div class="nm-b">

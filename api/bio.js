@@ -197,7 +197,7 @@ function render(p, sites){
   return `
   <section class="cab">
     <div class="av e" style="--i:0"><span>${p.foto ? `<img src="${esc(p.foto)}" alt="">` : ini}</span></div>
-    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado ? SELO : ''}${(+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
+    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado ? SELO : ''}${p.selo || (+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
     ${p.bio ? `<p class="bio e" style="--i:2" translate="no">${esc(p.bio)}</p>` : ''}
     <div class="num e" style="--i:3"><span><b>${fmt(p.sites)}</b>${+p.sites === 1 ? 'site' : 'sites'}</span><span><b>${fmt(p.acessos)}</b>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
     ${ct.length ? `<nav class="ct e" style="--i:4" aria-label="Contatos">${ct.map(c => `<a class="${esc(c.tipo)}" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${(CT[c.tipo] || {}).ic || 'fa-solid fa-link'}"></i>${nomeContato(c)}</a>`).join('')}</nav>` : ''}
