@@ -8,6 +8,8 @@ const pos = s => { const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m ?
 const BASE = 'https://blackelavex.online';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
+const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><g fill="url(#sbg)"><circle cx="12" cy="8.4" r="1.75"/><circle cx="7.9" cy="10.3" r="1.3"/><circle cx="16.1" cy="10.3" r="1.3"/><path d="M8.7 17v-3.1a3.3 3.3 0 0 1 6.6 0V17z"/><path d="M5.5 16.6v-2.1a2.3 2.3 0 0 1 3.5-2 3.9 3.9 0 0 0-.8 2.4v1.7zM18.5 16.6v-2.1a2.3 2.3 0 0 0-3.5-2 3.9 3.9 0 0 1 .8 2.4v1.7z" opacity=".75"/></g></svg>';
+const META_SELO = 1000;
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
 const CT = {
@@ -79,6 +81,7 @@ button{font:inherit;color:inherit}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .nome{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;font:600 clamp(22px,6vw,27px) var(--mono);letter-spacing:-.01em;word-break:break-all}
 .selo{flex:none;width:22px;height:22px;color:var(--ice)}
+.selo-b{flex:none;width:27px;height:27px;filter:drop-shadow(0 0 7px rgba(242,184,75,.55))}
 .bio{max-width:460px;margin-top:10px;color:#cdd1ea;font-size:15.5px;white-space:pre-line;overflow-wrap:anywhere}
 .num{display:flex;gap:18px;margin-top:14px;color:var(--dim);font-size:13.5px}
 .num b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;margin-right:4px}
@@ -194,7 +197,7 @@ function render(p, sites){
   return `
   <section class="cab">
     <div class="av e" style="--i:0"><span>${p.foto ? `<img src="${esc(p.foto)}" alt="">` : ini}</span></div>
-    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado ? SELO : ''}</h1>
+    <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado ? SELO : ''}${(+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
     ${p.bio ? `<p class="bio e" style="--i:2" translate="no">${esc(p.bio)}</p>` : ''}
     <div class="num e" style="--i:3"><span><b>${fmt(p.sites)}</b>${+p.sites === 1 ? 'site' : 'sites'}</span><span><b>${fmt(p.acessos)}</b>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
     ${ct.length ? `<nav class="ct e" style="--i:4" aria-label="Contatos">${ct.map(c => `<a class="${esc(c.tipo)}" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${(CT[c.tipo] || {}).ic || 'fa-solid fa-link'}"></i>${nomeContato(c)}</a>`).join('')}</nav>` : ''}

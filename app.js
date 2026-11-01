@@ -348,6 +348,9 @@ function acoesDe(item){
 }
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const selo = it => it && it.verificado ? SELO : '';
+const META_SELO = 1000; // acessos somados nos sites do perfil para ganhar o Selo BLACKE
+const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-label="Selo BLACKE"><title>Selo BLACKE</title><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f2b84b"/><stop offset="1" stop-color="#b9780f"/></linearGradient></defs><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="url(#sbg)"/><path d="M12 3l7.8 4.5v9L12 21 4.2 16.5v-9z" fill="#1a1230"/><g fill="url(#sbg)"><circle cx="12" cy="8.4" r="1.75"/><circle cx="7.9" cy="10.3" r="1.3"/><circle cx="16.1" cy="10.3" r="1.3"/><path d="M8.7 17v-3.1a3.3 3.3 0 0 1 6.6 0V17z"/><path d="M5.5 16.6v-2.1a2.3 2.3 0 0 1 3.5-2 3.9 3.9 0 0 0-.8 2.4v1.7zM18.5 16.6v-2.1a2.3 2.3 0 0 0-3.5-2 3.9 3.9 0 0 1 .8 2.4v1.7z" opacity=".75"/></g></svg>';
+const seloElite = n => (+n || 0) >= META_SELO ? SELO_BLACKE : '';
 const VERIF = new Set();
 const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${VERIF.has(h) ? SELO : ''}</button>`;
 async function carregarVerificados(){
@@ -845,7 +848,7 @@ function cartaoPerfil(p, dono){
   return `<div class="ig${p.verificado ? ' pc-ver' : ''}">
     <div class="ig-fundo" aria-hidden="true">${p.foto ? `<img src="${esc(p.foto)}" alt="" decoding="async">` : ''}</div>
     <div class="ig-av">${avatarHTML(p)}</div>
-    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
+    <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${seloElite(p.acessos)}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
     <ul class="ig-nums">
       ${num(p.sites, 'site', 'sites')}
       ${num(p.acessos, 'acesso', 'acessos', dono && TREND ? ' ' + chipTendencia(TREND.hj, TREND.ontem) : '')}
@@ -899,8 +902,13 @@ function painelNumeros(){
     const it = S.meus.find(x => String(x.id) === String(s.id));
     return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(s.n14 / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(s.n14)}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
   }).join('');
-  return `<section class="nm" aria-label="Seus números">
-    <header class="nm-h"><div><h3>Seus números</h3><small>Últimos 14 dias</small></div>${chip ? `<div class="nm-ch">${chip}<small>vs semana anterior</small></div>` : ''}</header>
+  const vida = (S.perfil && +S.perfil.acessos) || S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
+  const pct = Math.min(100, Math.round(vida / META_SELO * 100));
+  const meta = `<div class="nm-meta${vida >= META_SELO ? ' ok' : ''}"><div class="nm-meta-t">${vida >= META_SELO ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>Meta do Selo BLACKE</b><span><b>${fmtN(vida)}</b> / ${fmtN(META_SELO)}</span>`}</div><span class="nm-br"><i style="--w:${Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
+  return `<details class="nm" data-nm${S.nmAberto ? ' open' : ''} aria-label="Seus números">
+    <summary class="nm-h"><div><h3>Seus números</h3><small class="nm-sub"><b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> · <b>${fmtN(hoje)}</b> <span>hoje</span></small></div><div class="nm-ch">${chip}<i class="nm-cv" aria-hidden="true"></i></div></summary>
+    <div class="nm-b">
+    ${meta}
     <div class="nm-k">
       <div><b>${fmtN(tot)}</b><span>${tot === 1 ? 'acesso' : 'acessos'}</span></div>
       <div><b>${fmtN(hoje)}</b><span>hoje</span></div>
@@ -908,20 +916,24 @@ function painelNumeros(){
     </div>
     ${tot ? `<div class="nm-g" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos nos últimos 14 dias. Compartilhe sua página de links para começar.</p>'}
     ${rank ? `<h4 class="nm-t">Sites mais acessados</h4><ol class="nm-r">${rank}</ol>` : ''}
-  </section>`;
+    </div>
+  </details>`;
 }
+document.addEventListener('toggle', e => { const d = e.target; if (!d || !d.matches) return; if (d.matches('details.nm')) S.nmAberto = d.open; else if (d.matches('details.sl')) S.slAberto = d.open; }, true);
 function seloURL(h, t){ return `${location.origin}/selo/${h}${t === 'claro' ? '?t=claro' : ''}`; }
 function blocoSelo(p){
   const t = S.seloTema === 'claro' ? 'claro' : 'escuro';
-  return `<section class="sl" aria-label="Selo para o seu site">
-    <div class="sl-t"><b>Selo "Estou no BLACKE"</b><span>Coloque no seu site, loja ou página. Quem clicar vai direto para a sua página de links.</span></div>
+  return `<details class="sl" data-sl${S.slAberto ? ' open' : ''}>
+    <summary class="sl-h"><span class="sl-ic"><i class="fa-solid fa-id-badge"></i></span><div class="sl-t"><b>Selo "Estou no BLACKE"</b><span>Para colocar no seu site ou loja</span></div><i class="nm-cv" aria-hidden="true"></i></summary>
+    <div class="sl-b">
     <div class="sl-pv ${t}"><img src="${esc(seloURL(p.handle, t))}" alt="Estou no BLACKE LAVEX" width="292" loading="lazy" decoding="async"></div>
     <div class="sl-a">
       <div class="sl-seg" role="group" aria-label="Tema do selo"><button type="button" data-act="temaselo" data-t="escuro" class="${t === 'escuro' ? 'on' : ''}">Escuro</button><button type="button" data-act="temaselo" data-t="claro" class="${t === 'claro' ? 'on' : ''}">Claro</button></div>
       <button class="pc-btn" type="button" data-act="copiarselo" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar código</span></button>
       <a class="pc-btn" data-act="baixarselo" data-h="${esc(p.handle)}" href="${esc(seloURL(p.handle, t))}" download="selo-blacke-${esc(p.handle)}.svg"><i class="fa-solid fa-download"></i> <span>Baixar</span></a>
     </div>
-  </section>`;
+    </div>
+  </details>`;
 }
 function iconeConta(){
   const b = $('bnAv'); if (!b) return; const p = S.perfil;

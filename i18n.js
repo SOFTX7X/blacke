@@ -3,6 +3,9 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['Para colocar no seu site ou loja','To put on your site or store','Para poner en tu sitio o tienda'],
+    ['Selo BLACKE conquistado','BLACKE Badge earned','Sello BLACKE conseguido'],
+    ['Meta do Selo BLACKE','BLACKE Badge goal','Meta del Sello BLACKE'],
     ['Selo "Estou no BLACKE"','"I\'m on BLACKE" badge','Sello "Estoy en BLACKE"'],
     ['Coloque no seu site, loja ou página. Quem clicar vai direto para a sua página de links.','Put it on your site, store or page. Anyone who clicks goes straight to your link page.','Ponlo en tu sitio, tienda o página. Quien haga clic irá directo a tu página de enlaces.'],
     ['Escuro','Dark','Oscuro'],
