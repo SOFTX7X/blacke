@@ -1369,34 +1369,25 @@ async function carregarSemana(){
     }catch(_){}
   }
 }
-function semanaNums(it){
-  const total = +it.cliques || 0, d = SEMANA_ST;
-  if (!d) return `<div class="sm-k"><div><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span></div></div>`;
-  const s7 = d.slice(-7).reduce((t, x) => t + (+x.n || 0), 0), hoje = d.length ? +d[d.length - 1].n || 0 : 0;
-  return `<div class="sm-k">
-      <div><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span></div>
-      <div><b>${fmtN(hoje)}</b><span>hoje</span></div>
-      <div><b>${fmtN(s7)}</b><span>7 dias</span></div>
-    </div>
-    <div class="nm-g sm-g" role="img" aria-label="Acessos por dia">${barrasHTML(d)}</div>`;
-}
 function desenharSemana(){
   const el = $('semana'); if (!el) return;
   const mostrar = SEMANA && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
   el.hidden = !mostrar; if (!mostrar) return;
   const it = SEMANA;
   if (!acharItem(it.id)) S.itens.push(it);
+  const total = +it.cliques || 0, hoje = SEMANA_ST && SEMANA_ST.length ? +SEMANA_ST[SEMANA_ST.length - 1].n || 0 : 0;
+  const topo = Math.max(total, 1, ...S.itens.map(s => +s.cliques || 0));
+  const nota = (it.nota || '').trim();
   el.innerHTML = `
-    <button type="button" class="sm-capa" data-act="detalhes" data-id="${esc(it.id)}" aria-label="Ver ${esc(it.brand_name)}"><img src="${esc(it.image_url)}" alt="" style="object-position:${posSegura(it.img_pos)}"></button>
-    <div class="sm-info">
-      <span class="sm-selo"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> Site da semana</span>
-      <h2 translate="no">${esc(it.brand_name)}${selo(it)}</h2>
-      ${it.handle ? `<div class="sm-ar">${arrobaBtn(it.handle)}</div>` : ''}
-      <p translate="no">${esc(it.nota || it.caption || '')}</p>
-      ${semanaNums(it)}
-      <div class="sm-acts">
-        <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
-        <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Detalhes</button>
-      </div>
+    <button type="button" class="sw-img" data-act="detalhes" data-id="${esc(it.id)}" aria-label="Ver ${esc(it.brand_name)}"><img src="${esc(it.image_url)}" alt="" style="object-position:${posSegura(it.img_pos)}"></button>
+    <div class="sw-in">
+      <div class="sw-top"><span class="sw-selo"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> Site da semana</span>${nota ? `<span class="sw-nota" translate="no">${esc(nota)}</span>` : ''}</div>
+      <div class="sw-nm"><h2 translate="no">${esc(it.brand_name)}${selo(it)}</h2>${it.handle ? arrobaBtn(it.handle) : ''}</div>
+      <span class="sw-br"><i style="--w:${Math.max(6, Math.round(total / topo * 100))}%"></i></span>
+    </div>
+    <div class="sw-v"><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span>${hoje ? `<small>+${fmtN(hoje)} hoje</small>` : ''}</div>
+    <div class="sw-acts">
+      <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Detalhes</button>
+      <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
     </div>`;
 }
