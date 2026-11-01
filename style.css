@@ -1454,7 +1454,7 @@ main{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){.nm,.nm-c i,.nm-r li,.nm-br i{animation:none!important}}
 
 /* Site da semana: linha compacta (estilo ranking) */
-.sw{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px 18px;margin:18px 0 6px;padding:14px 16px;border:1px solid rgba(123,108,255,.45);border-radius:18px!important;background:linear-gradient(135deg,rgba(123,108,255,.14),rgba(111,214,255,.04) 55%,transparent),var(--panel);animation:pcIn .4s ease both}
+.sw{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px 18px;margin:18px 0 6px;padding:12px 0;border:0;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);border-radius:0!important;background:none;animation:pcIn .4s ease both}
 .sw[hidden]{display:none}
 .sw-img{grid-row:1;width:92px;height:64px;padding:0;border:0;border-radius:12px!important;overflow:hidden;cursor:pointer;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .sw-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
@@ -1482,7 +1482,7 @@ main{overflow-x:clip}
   .sw-acts .btn-primary,.sw-acts .btn-ghost{flex:1}
 }
 @media (max-width:560px){
-  .sw{padding:12px;gap:10px 12px;margin:12px 0 4px}
+  .sw{padding:12px 0;gap:10px 12px;margin:12px 0 4px}
   .sw-img{width:64px;height:64px}
   .sw-nota{display:none}
   .sw-v b{font-size:18px}
