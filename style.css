@@ -1527,11 +1527,11 @@ details.nm[open] .nm-sub{display:none}
 .nm-cv{flex:none;width:8px;height:8px;margin:-3px 3px 0 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .25s,margin .25s}
 details[open]>summary .nm-cv{transform:rotate(-135deg);margin-top:4px}
 .nm-b{padding:0 22px 22px;animation:nmIn .4s cubic-bezier(.2,.8,.2,1) both}
-.nm-meta{display:flex;flex-direction:column;gap:9px;padding:12px 14px;margin-top:2px;border-radius:14px!important;background:rgba(242,184,75,.07);box-shadow:inset 0 0 0 1px rgba(242,184,75,.24)}
+.nm-meta{display:flex;flex-direction:column;gap:9px;padding:12px 14px;margin-top:2px;border-radius:14px!important;background:rgba(123,108,255,.08);box-shadow:inset 0 0 0 1px rgba(123,108,255,.32)}
 .nm-meta-t{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
-.nm-meta-t>b{font:600 13.5px var(--display);color:#ffe29a}
+.nm-meta-t>b{font:600 13.5px var(--display);color:#c9c1ff}
 .nm-meta-t span b{font:700 13.5px var(--display);color:#fff}
-.nm-meta .nm-br i{background:linear-gradient(90deg,#b9780f,#f2b84b,#fff0b8)}
+.nm-meta .nm-br i{background:linear-gradient(90deg,#4a3fd6,#7b6cff,#a99bff)}
 .nm-meta.ok .nm-meta-t{justify-content:flex-start}
 .nm-meta-t .selo-b{width:25px;height:25px;margin:0}
 .nm-k{margin-top:14px}
@@ -1553,10 +1553,6 @@ details.sl{display:block;padding:0}
 .sw-nm .arroba .amini{width:22px;height:22px}
 
 /* Selo BLACKE (ninja): rótulo em hexágono com fumaça preta saindo das bordas */
-.selo-b{position:relative;display:inline-block;flex:none;width:1.35em;height:1.35em;margin-left:.35em;vertical-align:-.26em;overflow:visible!important;text-overflow:clip}
-.selo-b .sb-hex{display:block;width:100%;height:100%;animation:sbArde 1.9s ease-in-out infinite}
-@keyframes sbArde{0%,100%{filter:drop-shadow(0 0 4px rgba(123,108,255,.5))}50%{filter:drop-shadow(0 0 8px rgba(123,108,255,.95))}}
-.selo-b .sb-fumo{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 2.2px rgba(123,108,255,.9))}
-.selo-b .w{fill:#7b6cff;stroke:#7b6cff;stroke-width:.8;stroke-linejoin:round;opacity:0;transform-origin:0 0;animation:sbW 1.9s ease-out infinite}
-@keyframes sbW{0%{opacity:0;transform:translate(0,0) scale(.9,.35)}14%{opacity:1}55%{opacity:.9;transform:translate(calc(var(--dx)*.5),-4px) rotate(calc(var(--r)*-.6)) scale(1.1,1.25)}100%{opacity:0;transform:translate(var(--dx),-8px) rotate(var(--r)) scale(1.2,1.5)}}
-@media (prefers-reduced-motion:reduce){.selo-b .w{animation:none;opacity:.55;transform:scale(1)}}
+/* Selo BLACKE: rótulo roxo com ninja preto e olhos roxos */
+.selo-b{display:inline-block;flex:none;width:1.35em;height:1.35em;margin-left:.35em;vertical-align:-.26em;overflow:visible!important;text-overflow:clip}
+.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))}
