@@ -5,6 +5,10 @@
       "destination": "/api/sitemap"
     },
     {
+      "source": "/bio/:h",
+      "destination": "/api/bio?h=:h"
+    },
+    {
       "source": "/s/:id",
       "destination": "/api/p?s=:id"
     },
@@ -40,6 +44,10 @@
   "functions": {
     "api/p.js": {
       "includeFiles": "index.html"
+    },
+    "api/og.py": {
+      "includeFiles": "api/_og/**",
+      "maxDuration": 15
     }
   }
 }

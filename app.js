@@ -860,8 +860,13 @@ function cartaoPerfil(p, dono){
       ${dono ? `<button class="pc-btn" type="button" data-pc="editar">Editar perfil</button>
       <button class="pc-btn" type="button" data-pc="arroba">Trocar @</button><span class="so-m">${TOOLS(p.handle)}</span>${ct.length ? '<i class="ig-quebra"></i>' : ''}` : ''}
       ${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}
-      ${dono ? '' : `<button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
+      ${dono ? '' : `<a class="pc-btn" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i> <span>Página de links</span></a><button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
     </div>
+    ${dono ? `<div class="ig-lk">
+      <span class="ig-lk-ic"><i class="fa-solid fa-link"></i></span>
+      <div class="ig-lk-t"><b>Sua página de links</b><small translate="no">blackelavex.online/bio/${esc(p.handle)}</small><span>Coloque na bio do Instagram, TikTok ou onde quiser.</span></div>
+      <div class="ig-lk-a"><button class="pc-btn" type="button" data-act="copiarbio" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar</span></button><a class="pc-btn pri" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><span>Abrir</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
+    </div>` : ''}
   </div>
   <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
 }
@@ -1079,6 +1084,7 @@ document.addEventListener('click', e => {
     case 'compartilhar': compartilhar(id); break;
     case 'linkmural': linkMural(id); break;
     case 'linkperfil': linkPerfil(el.dataset.h); break;
+    case 'copiarbio': { const u = `${location.origin}/bio/${el.dataset.h}`; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => aviso('Link copiado'), () => prompt('Copie o link:', u)); break; }
     case 'editar': abrirEditar(id); break;
     case 'excluir': excluirUm(id); break;
     case 'denunciar': denunciar(id); break;

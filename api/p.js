@@ -11,16 +11,16 @@ module.exports = async (req, res) => {
   const base = 'https://blackelavex.online';
   const q = req.query || {};
   let titulo = 'BLACKE LAVEX — Mural anônimo', desc = 'Publique seu link com capa e legenda. Sem conta, sem cadastro.';
-  let img = base + '/icon-512.png', url = base + '/', achou = false, destino = '/', grande = false;
+  let img = base + '/api/og', url = base + '/', achou = false, destino = '/';
   try{
     if (q.s && /^\d{1,12}$/.test(q.s)){
       url = base + '/s/' + q.s; destino = '/?s=' + q.s;
       const it = await db.site(q.s);
       if (it){
-        achou = true; grande = true;
+        achou = true;
         titulo = it.brand_name + ' — BLACKE LAVEX';
         desc = cortar(it.caption, 180) || ('Site da categoria ' + (it.categoria || 'Outros') + ' no mural BLACKE LAVEX.');
-        img = base + '/api/img?s=' + it.id;
+        img = base + '/api/og?s=' + it.id;
       }
     }else if (q.p){
       const h = String(q.p).replace(/^@/, '').toLowerCase();
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
           achou = true;
           titulo = '@' + pf.handle + ' — BLACKE LAVEX';
           desc = cortar(pf.bio, 160) || (pf.sites + (pf.sites === 1 ? ' site' : ' sites') + ' publicados no mural · ' + pf.acessos + (pf.acessos === 1 ? ' acesso' : ' acessos'));
-          if (pf.foto && /^https:\/\//.test(pf.foto)) img = pf.foto;
+          img = base + '/api/og?p=' + pf.handle;
         }
       }
     }
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
     .replace(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${esc(img)}">`)
     .replace(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${esc(url)}">`)
     .replace(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${esc(url)}">`)
-    .replace(/<meta name="twitter:card" content="[^"]*">/, `<meta name="twitter:card" content="${grande ? 'summary_large_image' : 'summary'}">`)
+    .replace(/<meta name="twitter:card" content="[^"]*">/, '<meta name="twitter:card" content="summary_large_image">')
     .replace('</head>', achou ? '</head>' : '<meta name="robots" content="noindex"></head>');
   res.status(achou ? 200 : 404).send(html);
 };

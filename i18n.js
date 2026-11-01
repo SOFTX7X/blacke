@@ -3,6 +3,22 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['Crie a sua página grátis','Create your free page','Crea tu página gratis'],
+    ['Grupo no Telegram','Telegram group','Grupo de Telegram'],
+    ['Grupo no WhatsApp','WhatsApp group','Grupo de WhatsApp'],
+    ['Ainda não há links por aqui.','No links here yet.','Todavía no hay enlaces aquí.'],
+    ['Perfil não encontrado','Profile not found','Perfil no encontrado'],
+    ['Este @ não existe ou foi removido.','This @ does not exist or was removed.','Este @ no existe o fue eliminado.'],
+    ['Feito no','Made on','Hecho en'],
+    ['· sem cadastro','· no sign-up','· sin registro'],
+    ['Ir para o mural','Go to the wall','Ir al muro'],
+    ['Página de links','Link page','Página de enlaces'],
+    ['Sua página de links','Your link page','Tu página de enlaces'],
+    ['Coloque na bio do Instagram, TikTok ou onde quiser.','Put it in your Instagram or TikTok bio, or anywhere you like.','Ponla en la bio de Instagram, TikTok o donde quieras.'],
+    ['Copiar','Copy','Copiar'],
+    ['site','site','sitio'],
+    ['acesso','visit','visita'],
+    ['Abrir','Open','Abrir'],
     ['carregando mural','loading wall','cargando muro'],
     ['Comunidade no Telegram','Telegram community','Comunidad en Telegram'],
     ['Comunidade','Community','Comunidad'],
