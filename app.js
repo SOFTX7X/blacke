@@ -248,7 +248,7 @@ function previa(){
   $('ptSelo').innerHTML = it.verificado ? SELO : '';
   $('ptTag').textContent = $('inputCat').value;
   const h = it.handle || (p && p.handle);
-  $('ptArroba').innerHTML = h ? `<span class="arroba"><span>@${esc(h)}</span>${selosDe(h)}</span>` : '<span class="anon">anônimo</span>';
+  $('ptArroba').innerHTML = h ? `<span class="arroba">${miniAv(h)}<span>@${esc(h)}</span>${selosDe(h)}</span>` : '<span class="anon">anônimo</span>';
 }
 ['inputNome','inputCat'].forEach(id => $(id).addEventListener('input', previa));
 $('inputCat').addEventListener('change', previa);
@@ -354,18 +354,21 @@ const SELO_BLACKE = '<svg class="selo-b" viewBox="0 0 24 24" role="img" aria-lab
 const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
-const VERIF = new Set(), NINJA = new Set();
+const VERIF = new Set(), NINJA = new Set(), FOTOS = new Map();
 const selosDe = h => (VERIF.has(h) ? SELO : '') + (NINJA.has(h) ? SELO_BLACKE : '');
-const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no"><span>@${esc(h)}</span>${selosDe(h)}</button>`;
+const miniAv = h => { const f = FOTOS.get(h); return `<span class="amini" aria-hidden="true">${f ? `<img src="${esc(f)}" alt="" loading="lazy" decoding="async">` : esc(String(h).charAt(0).toUpperCase())}</span>`; };
+const arrobaBtn = h => `<button class="arroba" type="button" data-act="perfil" data-h="${esc(h)}" translate="no">${miniAv(h)}<span>@${esc(h)}</span>${selosDe(h)}</button>`;
 async function carregarVerificados(){
   try{
     let v = null, n = [];
     const r = await _supabase.rpc('perfis_selos');
-    if (!r.error && r.data && Array.isArray(r.data.v)){ v = r.data.v; n = r.data.n || []; }
+    if (!r.error && r.data && Array.isArray(r.data.v)){ v = r.data.v; n = r.data.n || []; Object.entries(r.data.f || {}).forEach(([h, u]) => { if (/^https:\/\//.test(u)) FOTOS.set(h, u); }); }
     else { const r2 = await _supabase.rpc('perfis_verificados'); v = r2.data || []; }
     v.forEach(h => VERIF.add(h)); n.forEach(h => NINJA.add(h));
     document.querySelectorAll('.arroba[data-h]').forEach(b => {
-      const h = b.dataset.h, novo = selosDe(h); if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/<svg/g) || []).length) return;
+      const h = b.dataset.h, novo = selosDe(h);
+      const av = b.querySelector('.amini'); if (av && av.outerHTML !== miniAv(h)) av.outerHTML = miniAv(h); else if (!av) b.insertAdjacentHTML('afterbegin', miniAv(h));
+      if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/<svg/g) || []).length) return;
       b.querySelectorAll('.selo,.selo-b').forEach(x => x.remove()); b.insertAdjacentHTML('beforeend', novo);
     });
   }catch(_){}
