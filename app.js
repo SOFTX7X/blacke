@@ -843,6 +843,7 @@ function cartaoPerfil(p, dono){
   const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
   const desde = p.desde ? new Date(p.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '';
   return `<div class="ig${p.verificado ? ' pc-ver' : ''}">
+    <div class="ig-fundo" aria-hidden="true">${p.foto ? `<img src="${esc(p.foto)}" alt="" decoding="async">` : ''}</div>
     <div class="ig-av">${avatarHTML(p)}</div>
     <div class="ig-nome"><h2 translate="no">${esc(p.handle)}</h2>${p.verificado ? SELO : ''}${dono ? `<span class="so-pc">${TOOLS(p.handle)}</span>` : ''}</div>
     <ul class="ig-nums">

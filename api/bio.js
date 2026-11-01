@@ -172,7 +172,7 @@ ${corpo}
   });
 })();
 </script>
-<script src="/i18n.js?v=1793562977"></script>
+<script src="/i18n.js?v=1793563299"></script>
 </body>
 </html>`;
 }
