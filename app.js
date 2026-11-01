@@ -838,7 +838,7 @@ function cartaoPerfil(p, dono){
       <ul class="ig-nums">${num(n, 'site', 'sites')}${num(ac, 'acesso', 'acessos')}${num(Math.max(0, LIMITE - n), 'vaga livre', 'vagas livres')}</ul>
       <div class="ig-bio"><p class="dim">Reserve um @ para ter um perfil público com foto, bio e botões de contato.</p></div>
       <div class="ig-btns"><button class="pc-btn pri" type="button" data-pc="arroba"><i class="fa-solid fa-at"></i> Reservar @</button></div>
-    </div>`;
+    </div>${dono ? painelNumeros() : ''}`;
   }
   const ct = Array.isArray(p.contatos) ? p.contatos.filter(c => /^https:\/\//.test(c.url || '')) : [];
   const desde = p.desde ? new Date(p.desde).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '';
@@ -868,8 +868,43 @@ function cartaoPerfil(p, dono){
       <div class="ig-lk-t"><b>Sua página de links</b><small translate="no">blackelavex.online/bio/${esc(p.handle)}</small><span>Coloque na bio do Instagram, TikTok ou onde quiser.</span></div>
       <div class="ig-lk-a"><button class="pc-btn" type="button" data-act="copiarbio" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar</span></button><a class="pc-btn pri" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><span>Abrir</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
     </div>` : ''}
-  </div>
+  </div>${dono ? painelNumeros() : ''}
   <div class="ig-tab"><span><i class="fa-solid fa-table-cells"></i> Sites</span></div>`;
+}
+/* ---------- Seus números (Conta) ---------- */
+function painelNumeros(){
+  if (!SERIE || !S.meus.length) return '';
+  const dias = SERIE, soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
+  const tot = soma(dias), ult = soma(dias.slice(-7)), ant = soma(dias.slice(0, Math.max(0, dias.length - 7)).slice(-7));
+  const hoje = dias.length ? +dias[dias.length - 1].n || 0 : 0;
+  const max = Math.max(1, ...dias.map(d => +d.n || 0));
+  const melhor = dias.reduce((m, d) => (+d.n > (m ? +m.n : 0) ? d : m), null);
+  const dt = d => new Date(d + 'T12:00:00');
+  let chip;
+  if (!ult && !ant) chip = '';
+  else if (!ant) chip = '<span class="tend sobe">▲ novo</span>';
+  else { const p = Math.round((ult - ant) / ant * 100); chip = p > 0 ? `<span class="tend sobe">▲ ${p}%</span>` : p < 0 ? `<span class="tend desce">▼ ${-p}%</span>` : '<span class="tend igual">= 0%</span>'; }
+  const barras = dias.map((d, i) => {
+    const n = +d.n || 0, h = n ? Math.max(8, Math.round(n / max * 100)) : 3, ult_ = i === dias.length - 1;
+    const rot = dt(d.d).toLocaleDateString(LOC(), { weekday:'narrow' });
+    return `<div class="nm-c${ult_ ? ' hj' : ''}${n === max && n ? ' pico' : ''}" style="--i:${i}" title="${esc(dt(d.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' }))} · ${n} ${n === 1 ? 'acesso' : 'acessos'}"><em>${n ? fmtN(n) : ''}</em><i style="--h:${h}%"></i><span>${esc(rot)}</span></div>`;
+  }).join('');
+  const sites = [...STATS.values()].filter(s => s.n14 > 0).sort((x, y) => y.n14 - x.n14 || y.total - x.total).slice(0, 5);
+  const topo = sites.length ? sites[0].n14 : 1;
+  const rank = sites.map((s, i) => {
+    const it = S.meus.find(x => String(x.id) === String(s.id));
+    return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(s.n14 / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(s.n14)}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
+  }).join('');
+  return `<section class="nm" aria-label="Seus números">
+    <header class="nm-h"><div><h3>Seus números</h3><small>Últimos 14 dias</small></div>${chip ? `<div class="nm-ch">${chip}<small>vs semana anterior</small></div>` : ''}</header>
+    <div class="nm-k">
+      <div><b>${fmtN(tot)}</b><span>${tot === 1 ? 'acesso' : 'acessos'}</span></div>
+      <div><b>${fmtN(hoje)}</b><span>hoje</span></div>
+      <div><b>${melhor && melhor.n > 0 ? esc(dt(melhor.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' })) : '—'}</b><span>melhor dia</span></div>
+    </div>
+    ${tot ? `<div class="nm-g" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos nos últimos 14 dias. Compartilhe sua página de links para começar.</p>'}
+    ${rank ? `<h4 class="nm-t">Sites mais acessados</h4><ol class="nm-r">${rank}</ol>` : ''}
+  </section>`;
 }
 function iconeConta(){
   const b = $('bnAv'); if (!b) return; const p = S.perfil;
@@ -1225,14 +1260,14 @@ $('destaques').addEventListener('click', e => {
 });
 
 /* ---------- Desempenho dos meus sites (últimos 14 dias) ---------- */
-const STATS = new Map(); let TREND = null;
+const STATS = new Map(); let TREND = null, SERIE = null;
 async function carregarStats(){
   if (!S.token || !S.meus.length) return;
   try{
     const { data, error } = await _supabase.rpc('meus_stats', { p_token:S.token });
     if (error || !data) return;
     STATS.clear(); (data.sites || []).forEach(s => STATS.set(String(s.id), s));
-    const d = data.dias || []; TREND = d.length >= 2 ? { hj:d[d.length - 1].n, ontem:d[d.length - 2].n } : null;
+    const d = data.dias || []; SERIE = d.length ? d : null; TREND = d.length >= 2 ? { hj:d[d.length - 1].n, ontem:d[d.length - 2].n } : null;
     if (S.aba === 'meus'){ marcarInsights(); desenharMeuPerfil(); }
   }catch(_){}
 }

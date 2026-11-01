@@ -3,6 +3,12 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
+    ['Seus números','Your numbers','Tus números'],
+    ['Últimos 14 dias','Last 14 days','Últimos 14 días'],
+    ['vs semana anterior','vs previous week','vs semana anterior'],
+    ['melhor dia','best day','mejor día'],
+    ['Sites mais acessados','Most visited sites','Sitios más visitados'],
+    ['Ainda sem acessos nos últimos 14 dias. Compartilhe sua página de links para começar.','No visits in the last 14 days yet. Share your link page to get started.','Aún sin visitas en los últimos 14 días. Comparte tu página de enlaces para empezar.'],
     ['Crie a sua página grátis','Create your free page','Crea tu página gratis'],
     ['Grupo no Telegram','Telegram group','Grupo de Telegram'],
     ['Grupo no WhatsApp','WhatsApp group','Grupo de WhatsApp'],
