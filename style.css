@@ -1762,7 +1762,7 @@ body[data-aba="chat"]::before{display:none}
 .ch-lado{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--ch-linha)}
 .ch-lado-h{flex:none;display:flex;align-items:center;gap:6px;padding:12px 12px 8px}
 .ch-lado-h .ch-busca{flex:1;min-width:0}
-.ch-lado-h .ch-menu{min-width:170px;padding:10px 12px}
+.ch-lado-h .ch-menu{min-width:220px;width:max-content;max-width:calc(100vw - 24px);padding:10px 12px}
 .ch-busca{display:flex;align-items:center;gap:10px;height:42px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted)}
 .ch-busca input{flex:1;min-width:0;border:0;background:none;color:var(--text);font:400 15px system-ui,sans-serif;outline:0}
 .ch-busca input::-webkit-search-cancel-button{display:none}
@@ -1928,5 +1928,5 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .bq-li{display:flex;align-items:center;gap:12px;padding:8px 2px}
 .bq-li .ch-av .amini{width:44px;height:44px}
 .bq-n{flex:1;min-width:0;display:flex;align-items:center;gap:6px;font:600 15px var(--display)}
-#chOpcBloq{display:flex;align-items:center;gap:10px}
+#chOpcBloq{display:flex;align-items:center;gap:10px;white-space:nowrap}
 .ch-menu .ch-vis{padding:10px 12px}
