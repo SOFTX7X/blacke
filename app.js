@@ -1860,9 +1860,7 @@ function chMsgsHtml(msgs){
     if (!ant || ant.dia !== dia) out += `<div class="ch-dia"><b>${chDia(m.at)}</b></div>`;
     const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
     const q = m.r ? `<button type="button" class="ch-q" data-chat-ir="${m.r.id || ''}"><b translate="no">${m.r.m ? '<span>Você</span>' : '@' + esc(CH.h)}</b><span class="ch-qt" translate="no">${m.r.ap ? '' : esc(m.r.t)}</span>${m.r.ap ? '<span class="ch-qt"><i>Mensagem apagada</i></span>' : ''}</button>` : '';
-    const bsel = `<button type="button" data-chat-sel="${m.id}" aria-label="Selecionar" title="Selecionar"><i class="fa-regular fa-square-check"></i></button>`;
-    const ac = m.ap ? `<span class="ch-ac">${bsel}<button type="button" data-chat-rm="${m.id}" aria-label="Remover" title="Remover"><i class="fa-regular fa-trash-can"></i></button></span>`
-      : `<span class="ch-ac"><button type="button" data-chat-resp="${m.id}" aria-label="Responder" title="Responder"><i class="fa-solid fa-reply"></i></button>${bsel}${m.m ? `<button type="button" data-chat-del="${m.id}" aria-label="Apagar mensagem" title="Apagar"><i class="fa-regular fa-trash-can"></i></button>` : ''}</span>`;
+    const ac = '';
     out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${ac}</div>`;
     ant = { dia, m:m.m, t:new Date(m.at) };
   });
@@ -1873,7 +1871,7 @@ function chLinha(x){
   const H = esc(x.handle);
   const l2 = x.t != null ? (x.ap ? '<i>Mensagem apagada</i>' : (x.meu ? '<span class="ch-vc">Você</span>: ' : '') + `<span translate="no">${esc(x.t)}</span>`) : chStatus(x);
   const ic = (x.fx ? '<i class="fa-solid fa-thumbtack ch-ic" aria-hidden="true"></i>' : '') + (x.si ? '<i class="fa-solid fa-bell-slash ch-ic" aria-hidden="true"></i>' : '');
-  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}${CH.lsel.has(x.handle) ? ' ck' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-ckl" aria-hidden="true"><i class="fa-solid fa-check"></i></span><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span><span class="ch-fim">${ic}${x.nl ? `<span class="ch-nl${x.si ? ' mudo' : ''}">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></span></button><button type="button" class="ch-rmb" data-chat-rmenu="${H}" aria-label="Opções da conversa" title="Opções"><i class="fa-solid fa-ellipsis-vertical"></i></button></li>`;
+  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}${CH.lsel.has(x.handle) ? ' ck' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-ckl" aria-hidden="true"><i class="fa-solid fa-check"></i></span><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span><span class="ch-fim">${ic}${x.nl ? `<span class="ch-nl${x.si ? ' mudo' : ''}">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></span></button></li>`;
 }
 async function chLista(){
   CH.h = null; clearInterval(CH.t); chSelMsgs(false);
@@ -2126,7 +2124,6 @@ document.addEventListener('click', async e => {
     try{ const r = await _supabase.rpc('chat_remover', { p_id:+rm.dataset.chatRm, p_token:S.token }); if (r.error) aviso(chErro(r)); }catch(_){ aviso('Não foi possível agora.'); }
     CH.sig = ''; chCarregar(false); return;
   }
-  const bm = e.target.closest('#chMsgs .ch-m'); if (bm && !e.target.closest('button') && matchMedia('(hover:none)').matches){ const on = bm.classList.contains('ac'); document.querySelectorAll('#chMsgs .ch-m.ac').forEach(x => x.classList.remove('ac')); if (!on) bm.classList.add('ac'); }
   const d = e.target.closest('[data-chat-del]'); if (d){ chApagarMsgs([+d.dataset.chatDel]); return; }
   const sl = e.target.closest('[data-chat-sel]'); if (sl){ chSelMsgs(true, +sl.dataset.chatSel); return; }
 });
@@ -2179,7 +2176,7 @@ async function chLimparApagar(handles, acao){
 function chRowMenu(h, x, y){
   const c = CH.cont && CH.cont.get(h), m = $('chRowM'); if (!c) return;
   const it = (a, ic, t, cls) => `<button type="button" role="menuitem" data-rm="${a}"${cls ? ` class="${cls}"` : ''}><i class="${ic}" aria-hidden="true"></i> ${t}</button>`;
-  m.dataset.h = h;
+  m.dataset.h = h; m.dataset.kind = 'row';
   m.innerHTML = [
     it(c.fx ? 'desfixar' : 'fixar', 'fa-solid fa-thumbtack', c.fx ? 'Desafixar' : 'Fixar'),
     it(c.si ? 'dessilenciar' : 'silenciar', c.si ? 'fa-solid fa-bell' : 'fa-solid fa-bell-slash', c.si ? 'Reativar notificações' : 'Silenciar'),
@@ -2192,10 +2189,31 @@ function chRowMenu(h, x, y){
   m.style.left = Math.max(8, Math.min(x, innerWidth - m.offsetWidth - 8)) + 'px';
   m.style.top = Math.max(8, Math.min(y, innerHeight - m.offsetHeight - 8)) + 'px';
 }
+function chMsgMenu(id, x, y){
+  const m = CH.msgs.get(id), box = $('chRowM'); if (!m) return;
+  const it = (a, ic, t, cls) => `<button type="button" role="menuitem" data-rm="${a}"${cls ? ` class="${cls}"` : ''}><i class="${ic}" aria-hidden="true"></i> ${t}</button>`;
+  box.dataset.kind = 'msg'; box.dataset.id = id;
+  box.innerHTML = [
+    m.ap ? '' : it('responder', 'fa-solid fa-reply', 'Responder'),
+    m.ap ? '' : it('copiar', 'fa-regular fa-copy', 'Copiar texto'),
+    it('selecionar', 'fa-regular fa-square-check', 'Selecionar'),
+    it('apagar', 'fa-regular fa-trash-can', 'Apagar', 'perigo')].join('');
+  box.hidden = false;
+  box.style.left = Math.max(8, Math.min(x, innerWidth - box.offsetWidth - 8)) + 'px';
+  box.style.top = Math.max(8, Math.min(y, innerHeight - box.offsetHeight - 8)) + 'px';
+}
 const chRowFechar = () => { const m = $('chRowM'); if (m) m.hidden = true; };
 $('chRowM').addEventListener('click', async e => {
   const b = e.target.closest('[data-rm]'); if (!b) return;
   const h = $('chRowM').dataset.h, a = b.dataset.rm; chRowFechar();
+  if ($('chRowM').dataset.kind === 'msg'){
+    const id = +$('chRowM').dataset.id, m = CH.msgs.get(id); if (!m) return;
+    if (a === 'responder') chResponder(id);
+    else if (a === 'copiar'){ try{ await navigator.clipboard.writeText(m.t); aviso('Texto copiado.'); }catch(_){ aviso('Não foi possível copiar.'); } }
+    else if (a === 'selecionar') chSelMsgs(true, id);
+    else if (a === 'apagar') chApagarMsgs([id]);
+    return;
+  }
   if (a === 'selecionar'){ chLSel(true, h); return; }
   if (a === 'limpar' || a === 'apagar'){ await chLimparApagar([h], a); return; }
   if (await chAcaoRpc([h], a)){
@@ -2235,6 +2253,8 @@ document.addEventListener('click', e => {
   if (CH.selOn){ const m = e.target.closest('#chMsgs .ch-m[id^="chm-"]'); if (m && !e.target.closest('.ch-q')){ const id = +m.id.slice(4); CH.sel.has(id) ? CH.sel.delete(id) : CH.sel.add(id); chSelPintar(); e.stopImmediatePropagation(); return; } }
 }, true);
 document.addEventListener('contextmenu', e => {
+  const mm = e.target.closest('#chMsgs .ch-m[id^="chm-"]');
+  if (mm && !CH.selOn && !(window.getSelection && String(getSelection()).length > 0 && mm.contains(getSelection().anchorNode))){ e.preventDefault(); chMsgMenu(+mm.id.slice(4), e.clientX, e.clientY); return; }
   const r = e.target.closest('#chConv .ch-li'); if (!r || CH.lselOn) return;
   const h = r.querySelector('[data-chat-abrir]'); if (!h) return; e.preventDefault(); chRowMenu(h.dataset.chatAbrir, e.clientX, e.clientY);
 });
@@ -2246,7 +2266,7 @@ document.addEventListener('contextmenu', e => {
     const r = e.target.closest('#chConv [data-chat-abrir]'), m = e.target.closest('#chMsgs .ch-m[id^="chm-"]');
     if (!r && !m) return; if (r && CH.lselOn) return; const p = e.touches[0]; x0 = p.clientX; y0 = p.clientY; limpa();
     t = setTimeout(() => { CH.lp = true; setTimeout(() => { CH.lp = false; }, 700); if (navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
-      if (r) chRowMenu(r.dataset.chatAbrir, x0, y0); else if (!CH.selOn) chSelMsgs(true, +m.id.slice(4)); }, 450);
+      if (r) chRowMenu(r.dataset.chatAbrir, x0, y0); else if (!CH.selOn) chMsgMenu(+m.id.slice(4), x0, y0); }, 450);
   }, { passive:true });
   document.addEventListener('touchmove', e => { const p = e.touches[0]; if (t && (Math.abs(p.clientX - x0) > 10 || Math.abs(p.clientY - y0) > 10)) limpa(); }, { passive:true });
   document.addEventListener('touchend', limpa, { passive:true }); document.addEventListener('touchcancel', limpa, { passive:true });

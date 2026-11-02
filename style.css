@@ -2010,3 +2010,7 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-lado.selm .ch-r{padding-right:10px}
 .ch-menu button,.ch-menu{transition:none}
 .chp-x{transition:none!important;transform:none!important}
+/* gestos: sem botões ao lado da bolha nem ⋮ na linha */
+.ch-ac,.ch-rmb{display:none!important}
+.ch-r{padding-right:10px!important}
+.ch-m{-webkit-touch-callout:none;-webkit-user-select:text}
