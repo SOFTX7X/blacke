@@ -1890,3 +1890,4 @@ body[data-aba="chat"]::before{display:none}
 .ch-pts i{width:4px;height:4px;border-radius:50%;background:#3ddc84;animation:chpt 1.2s infinite}
 .ch-pts i:nth-child(2){animation-delay:.2s}.ch-pts i:nth-child(3){animation-delay:.4s}
 @keyframes chpt{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+.ch-digb{padding:12px 14px!important;margin-top:8px}.ch-digb .ch-pts{margin:0;gap:4px}.ch-digb .ch-pts i{width:7px;height:7px;background:#a99bff}

@@ -1925,6 +1925,14 @@ async function chConversa(h){
   CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 3000);
   if (matchMedia('(hover:hover)').matches && !$('chForm').hidden) $('chTexto').focus();
 }
+function chDigBolha(){
+  const box = $('chMsgs'); let el = $('chDig');
+  if (!CH.dig){ if (el) el.remove(); return; }
+  if (el) return;
+  const perto = box.scrollHeight - box.scrollTop - box.clientHeight < 90;
+  el = document.createElement('div'); el.id = 'chDig'; el.className = 'ch-m ele ch-digb'; el.innerHTML = '<b class="ch-pts"><i></i><i></i><i></i></b>';
+  box.appendChild(el); if (perto) box.scrollTop = box.scrollHeight;
+}
 async function chCarregar(rolar){
   const h = CH.h; let d = null;
   try{
@@ -1936,12 +1944,13 @@ async function chCarregar(rolar){
   CH.bloqueei = !!d.bloqueei; $('chBloq').textContent = CH.bloqueei ? 'Desbloquear' : 'Bloquear';
   $('chForm').hidden = !d.pode; $('chAviso').hidden = !!d.pode;
   $('chAviso').textContent = d.bloqueei ? 'Você bloqueou este usuário.' : 'Vocês precisam se seguir mutuamente para conversar.';
-  const dig = !!d.dig; if (dig !== CH.dig){ CH.dig = dig; chStatusTopo(); }
+  const dig = !!d.dig; if (dig !== CH.dig){ CH.dig = dig; chStatusTopo(); chDigBolha(); }
   const sig = msgs.map(m => m.id + (m.ap ? 'x' : '') + (m.r ? 'r' + (m.r.ap ? 'x' : '') : '')).join(',') + '|' + d.pode + d.bloqueei;
   if (sig === CH.sig) return; CH.sig = sig;
   const box = $('chMsgs'), perto = rolar || box.scrollHeight - box.scrollTop - box.clientHeight < 90;
   box.innerHTML = msgs.length ? chMsgsHtml(msgs) : '<div class="sg-vz">Diga oi 👋</div>';
   if (perto) box.scrollTop = box.scrollHeight;
+  chDigBolha();
   chNaoLidas();
 }
 
