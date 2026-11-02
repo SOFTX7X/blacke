@@ -1814,7 +1814,7 @@ function abrirUsuarios(){
 $('usrBusca').addEventListener('input', e => {
   const v = e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, '').replace(/@/g, ''); if (v !== e.target.value.toLowerCase()) e.target.value = v;
   clearTimeout(USR.t); $('usrSub').textContent = v ? 'Resultados' : 'Em destaque';
-  USR.t = setTimeout(() => buscarUsuarios(v), 300);
+  USR.t = setTimeout(() => buscarUsuarios(v), 120);
 });
 
 /* ---------- Destaques: seção própria (mais acessados e novos) ---------- */

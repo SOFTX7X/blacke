@@ -1314,7 +1314,7 @@ body.ficha-open::before{display:none}
   .card .ins{padding:22px 12px 10px;font-size:11.5px}.card .ins b{font-size:15px}.card .ins em{display:inline}
 }
 /* lupa só onde faz sentido (fora de Publicar e Conta) */
-body[data-aba="publicar"] .tb-busca,body[data-aba="meus"] .tb-busca,body[data-aba="publicar"] .topbar .searchbar,body[data-aba="meus"] .topbar .searchbar{display:none!important}
+body[data-aba="usuarios"] .tb-busca,body[data-aba="usuarios"] .topbar .searchbar,body[data-aba="publicar"] .tb-busca,body[data-aba="meus"] .tb-busca,body[data-aba="publicar"] .topbar .searchbar,body[data-aba="meus"] .topbar .searchbar{display:none!important}
 
 /* ===== Reações (estilo Telegram) ===== */
 .rx{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
@@ -1724,3 +1724,21 @@ details.sl{display:block;padding:0}
   .bnav svg{width:22px;height:22px}
 }
 @media (max-width:380px){ .bnav button,.bnav a{font-size:8.5px} }
+
+/* usuários: acabamento */
+.usr{padding-top:4px}
+.usr .dest-head{margin:6px 0 12px!important}
+.usr .dest-tit h1{font-size:clamp(26px,3vw,36px)}
+.usr-busca{height:54px;margin:8px 0 4px;padding:0 18px;gap:12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015)),var(--panel)}
+.usr-busca i{font-size:16px;color:var(--ice);opacity:.9}
+.usr-busca:focus-within i{opacity:1}
+.usr-busca input{font-size:16px}
+.usr-busca input::-webkit-search-cancel-button{filter:invert(.7);cursor:pointer}
+.usr-sub{margin:18px 4px 6px}
+.usr-li{border-bottom:0;border-radius:14px;padding:0 6px;transition:background .2s}
+.usr-li:hover{background:rgba(255,255,255,.035)}
+.usr-li .sg-r{padding:10px 4px;gap:14px}
+.usr-li .sg-r .amini{width:48px;height:48px}
+.usr-li .sg-n{font:700 16.5px var(--display);letter-spacing:-.005em}
+.usr-l2{font-size:13px}
+@media (max-width:640px){.usr-li .sg-r .amini{width:44px;height:44px}.usr-li .sg-n{font-size:15.5px}.usr-busca{height:50px}}
