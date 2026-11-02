@@ -1,14 +1,17 @@
 const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
-/* Bancos de segurança, em ordem: (1) PC próprio, cópia a cada 6 h; (2) projeto reserva, cópia semanal.
-   Se o principal não responder, o site lê do primeiro que responder (só leitura). */
+/* Bancos. PC_PRIMARIO=false: Supabase é o principal e o PC (cópia a cada 10 min) é a segurança.
+   PC_PRIMARIO=true: o PC (db.forgeaioficial.online) é o principal e o Supabase fica como espelho de leitura.
+   Teste sem afetar ninguém: abrir o site com ?banco=pc */
+const PRIM_URL = 'https://db.forgeaioficial.online';
+const PC_PRIMARIO = /[?&]banco=pc\b/.test(location.search) || false;
 const PC_URL = 'https://desktop-muskj8q.tail4de325.ts.net';
 const PC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6ImJsYWNrZS1yZXNlcnZhIiwiaWF0IjoxNzkzNjE0MjM0LCJleHAiOjIxMDg5NzQyMzR9.JFrbmZKNJyj2LPfBj8w63U2OzcnEHn1ewv_RCsg_UP4';
 const RESERVA_URL = 'https://ldghexvlbkiqduzlpdss.supabase.co';
 const RESERVA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZ2hleHZsYmtpcWR1emxwZHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjgzNzAsImV4cCI6MjEwMjkwNDM3MH0.MJOsPqcyc5J5TRH_JxvpH0Eul_v9bwfSeab-bFLe6vM';
-let _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const MODO = { reserva:false, trocou:false };   // reserva: só leitura (projeto reserva) · trocou: o site saiu do principal
+let _supabase = PC_PRIMARIO ? clientePC(PRIM_URL) : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const MODO = { reserva:false, trocou:false, pcPrim:PC_PRIMARIO };   // reserva: só leitura · trocou: o site saiu do principal
 async function responde(url, key, ms, pc){
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
   const h = pc ? { Authorization:'Bearer ' + key } : { apikey:key, Authorization:'Bearer ' + key };
@@ -16,19 +19,27 @@ async function responde(url, key, ms, pc){
   catch(_){ return false; } finally{ clearTimeout(t); }
 }
 /* o PostgREST do PC atende na raiz (sem /rest/v1) e não aceita os cabeçalhos extras do supabase-js */
-function clientePC(){
-  return supabase.createClient(PC_URL, PC_KEY, { global:{ fetch:(u, o = {}) => {
+function clientePC(url = PC_URL){
+  return supabase.createClient(url, PC_KEY, { global:{ fetch:(u, o = {}) => {
     const h = new Headers(o.headers || {}); h.delete('apikey'); h.delete('x-client-info');
     return fetch(String(u).replace('/rest/v1/', '/'), { ...o, headers:h });
   } } });
 }
 async function escolherBanco(){
-  if (!/[?&]simularqueda\b/.test(location.search) && await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;   // ?simularqueda=1 só para testar o banco de segurança
+  const sim = /[?&]simularqueda\b/.test(location.search);   // ?simularqueda=1 só para testar o banco de segurança
   let cli, nome;
-  if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }
-  else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
-  else return;                                                            // todos fora: segue no principal e mostra o erro normal
-  MODO.trocou = true; MODO.reserva = (nome === 'reserva');
+  if (PC_PRIMARIO){
+    if (!sim && await responde(PRIM_URL, PC_KEY, 6000, true)) return;
+    if (await responde(SUPABASE_URL, SUPABASE_KEY, 5000)){ cli = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); nome = 'espelho'; }
+    else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
+    else return;
+  } else {
+    if (!sim && await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;
+    if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }
+    else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
+    else return;
+  }                                                            // todos fora: segue no principal e mostra o erro normal
+  MODO.trocou = true; MODO.reserva = (nome !== 'pc');
   const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta','meu_aviso'];
   const rpcOrig = cli.rpc.bind(cli);
   const ESCRITA = ['salvar_site','seguir','reservar_arroba','remover_seguidor','registrar_clique','reagir','publicar_site','ajustar_posicao_foto','marcar_notificacoes_lidas','marcar_corrigido','liberar_arroba','excluir_meus_sites','excluir_meu_site','editar_perfil','editar_meu_site','denunciar_site'];
@@ -59,13 +70,26 @@ async function escolherBanco(){
     if (nome === 'pc' && s.startsWith(CAPA)){            // imagens copiadas no PC; se faltar, cai no projeto reserva
       img.addEventListener('error', () => img.setAttribute('src', reserva), { once:true });
       img.setAttribute('src', PC_URL + '/capas/' + s.slice(CAPA.length));
-    } else img.setAttribute('src', reserva);
+    } else if (nome === 'reserva') img.setAttribute('src', reserva);
   };
   document.querySelectorAll('img').forEach(troca);
   new MutationObserver(ms => ms.forEach(m => {
     if (m.type === 'attributes') troca(m.target);
     else m.addedNodes.forEach(n => { if (n.nodeType === 1){ if (n.tagName === 'IMG') troca(n); n.querySelectorAll && n.querySelectorAll('img').forEach(troca); } });
   })).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['src'] });
+}
+/* PC principal: imagens antigas (Storage do Supabase) passam a vir do banco do PC */
+if (PC_PRIMARIO){
+  const ANT = SUPABASE_URL + '/storage/v1/object/public/capas/';
+  const trocaPC = img => { const s = img.getAttribute('src'); if (s && s.startsWith(ANT)) img.setAttribute('src', PRIM_URL + '/rpc/capa?nome=' + s.slice(ANT.length)); };
+  const iniciar = () => {
+    document.querySelectorAll('img').forEach(trocaPC);
+    new MutationObserver(ms => ms.forEach(m => {
+      if (m.type === 'attributes') trocaPC(m.target);
+      else m.addedNodes.forEach(n => { if (n.nodeType === 1){ if (n.tagName === 'IMG') trocaPC(n); n.querySelectorAll && n.querySelectorAll('img').forEach(trocaPC); } });
+    })).observe(document.body, { subtree:true, childList:true, attributes:true, attributeFilter:['src'] });
+  };
+  if (document.body) iniciar(); else document.addEventListener('DOMContentLoaded', iniciar);
 }
 const $ = id => document.getElementById(id);
 const LOC = () => ({ pt:'pt-BR', en:'en-US', es:'es-ES' })[window.blLang ? window.blLang() : 'pt'];
@@ -292,6 +316,12 @@ async function enviarImagem(dataUrl){
   try{
     const blob = await (await fetch(dataUrl)).blob();
     const nome = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)).replace(/-/g, '') + '.jpg';
+    if (MODO.pcPrim && !MODO.trocou){            // o PC é o principal: a imagem fica guardada no banco dele
+      const b64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+      const { error:e2 } = await _supabase.rpc('subir_capa', { p_nome:nome, p_b64:b64, p_tipo:'image/jpeg' });
+      if (e2) throw e2;
+      return PRIM_URL + '/rpc/capa?nome=' + nome;
+    }
     const { error } = await _supabase.storage.from('capas').upload(nome, blob, { contentType:'image/jpeg', cacheControl:'31536000' });
     if (error) throw error;
     return _supabase.storage.from('capas').getPublicUrl(nome).data.publicUrl;
