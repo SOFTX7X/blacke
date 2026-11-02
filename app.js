@@ -5,7 +5,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
    PC_PRIMARIO=true: o PC (db.forgeaioficial.online) é o principal e o Supabase fica como espelho de leitura.
    Teste sem afetar ninguém: abrir o site com ?banco=pc */
 const PRIM_URL = 'https://db.forgeaioficial.online';
-const PC_PRIMARIO = /[?&]banco=pc\b/.test(location.search) || false;
+const PC_PRIMARIO = true;   // PC é o servidor principal; Supabase = espelho
 const PC_URL = 'https://desktop-muskj8q.tail4de325.ts.net';
 const PC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6ImJsYWNrZS1yZXNlcnZhIiwiaWF0IjoxNzkzNjE0MjM0LCJleHAiOjIxMDg5NzQyMzR9.JFrbmZKNJyj2LPfBj8w63U2OzcnEHn1ewv_RCsg_UP4';
 const RESERVA_URL = 'https://ldghexvlbkiqduzlpdss.supabase.co';

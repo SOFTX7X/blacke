@@ -1,7 +1,7 @@
 // Bancos (chaves anon: já são públicas no site).
 // PC_PRIMARIO=false: principal = Supabase; segurança = PC (cópia a cada 10 min) e projeto reserva.
 // PC_PRIMARIO=true : principal = PC (db.forgeaioficial.online); espelho = Supabase; último recurso = projeto reserva.
-const PC_PRIMARIO = false;
+const PC_PRIMARIO = true;
 const SUP = { nome:'sup', url:'https://wyjrjioipqfltdyupfna.supabase.co', key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU' };
 const PCT = { nome:'pct', pc:true, url:'https://desktop-muskj8q.tail4de325.ts.net', key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6ImJsYWNrZS1yZXNlcnZhIiwiaWF0IjoxNzkzNjE0MjM0LCJleHAiOjIxMDg5NzQyMzR9.JFrbmZKNJyj2LPfBj8w63U2OzcnEHn1ewv_RCsg_UP4' };
 const PCP = { nome:'pcp', pc:true, url:'https://db.forgeaioficial.online', key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6ImJsYWNrZS1yZXNlcnZhIiwiaWF0IjoxNzkzNjE0MjM0LCJleHAiOjIxMDg5NzQyMzR9.JFrbmZKNJyj2LPfBj8w63U2OzcnEHn1ewv_RCsg_UP4' };
