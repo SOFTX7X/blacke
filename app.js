@@ -955,6 +955,7 @@ function pintarSeguir(b){
   const on = SEGUINDO.has(b.dataset.h), volta = !on && SEGUEME.has(b.dataset.h);
   b.classList.toggle('on', on); b.classList.toggle('pri', !on); b.setAttribute('aria-pressed', on);
   b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : `<i class="fa-solid fa-user-plus"></i> <span>${volta && !b.classList.contains('seg-lnk') ? 'Seguir de volta' : 'Seguir'}</span>`;
+  const hh = b.dataset.h; document.querySelectorAll(`[data-chat-btn][data-h="${CSS.escape(hh)}"]`).forEach(x => { x.hidden = !(SEGUINDO.has(hh) && SEGUEME.has(hh)); });
 }
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-seg-btn]'); if (!b || b.dataset.busy) return;
@@ -1233,6 +1234,7 @@ function desenharNotif(){
   const b = $('ntN'); b.textContent = NT.n > 9 ? '9+' : String(NT.n); b.hidden = !NT.n;
   $('ntTodas').hidden = !NT.n; atualizarTitulo(); ntPerm();
   $('ntBtn').hidden = !(NT.itens.length || (S.perfil && S.perfil.handle));
+  const tinha = !$('msgBtn').hidden; $('msgBtn').hidden = !chAtivo(); if (!tinha && !$('msgBtn').hidden) chNaoLidas();
 }
 async function carregarNotif(){
   if (!S.token) return;
@@ -1367,6 +1369,7 @@ function cartaoPerfil(p, dono){
       ${dono ? `<button class="pc-btn" type="button" data-pc="editar">Editar perfil</button>
       <button class="pc-btn" type="button" data-pc="arroba">Trocar @</button><span class="so-m">${TOOLS(p.handle)}</span>${ct.length ? '<i class="ig-quebra"></i>' : ''}` : ''}
       ${dono ? '' : `<button class="pc-btn seg-btn" type="button" data-seg-btn data-h="${esc(p.handle)}"></button>`}
+      ${dono ? '' : `<button class="pc-btn" type="button" data-chat-btn data-h="${esc(p.handle)}" hidden><i class="fa-regular fa-message"></i> <span>Mensagem</span></button>`}
       ${dono ? '' : '<i class="ig-quebra seg-q"></i>'}
       ${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}
       ${dono ? '' : `<a class="pc-btn" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i> <span>Página de links</span></a><button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
@@ -1782,6 +1785,105 @@ async function abrirLinkDireto(){
   if (location.pathname.startsWith('/s/')) S.fichaEntrada = true;
   rotear();
 }
+
+/* ---------- Chat: mensagens entre quem se segue mutuamente ---------- */
+const CH = { h:null, sig:'', t:0, enviando:false, bloqueei:false };
+const chAtivo = () => !!(S.token && S.perfil && S.perfil.handle);
+const chErro = r => (r && r.error && r.error.message) || 'Não foi possível agora.';
+const chHora = d => { try{ return new Date(d).toLocaleTimeString(LOC(), { hour:'2-digit', minute:'2-digit' }); }catch(_){ return ''; } };
+function chBadge(n){ const el = $('msgN'); el.textContent = n > 99 ? '99+' : String(n); el.hidden = !n; }
+async function chNaoLidas(){
+  if (!chAtivo() || document.hidden) return;
+  try{ const { data, error } = await _supabase.rpc('chat_nao_lidas', { p_token:S.token }); if (!error && typeof data === 'number') chBadge(data); }catch(_){}
+}
+setInterval(chNaoLidas, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) chNaoLidas(); });
+function chAbrir(h){
+  if (!chAtivo()){ aviso('Reserve seu @ para usar o chat'); return; }
+  abrir('modalChat'); if (h) chConversa(h); else chLista();
+}
+function chLinha(h, l2, nl){
+  const H = esc(h);
+  return `<li class="sg-li ch-li"><button type="button" class="sg-r" data-chat-abrir="${H}">${miniAv(h)}<span class="usr-info"><span class="usr-l1"><span class="sg-n" translate="no">@${H}</span>${selosDe(h)}</span>${l2 ? `<span class="usr-l2">${l2}</span>` : ''}</span>${nl ? `<span class="ch-nl">${nl}</span>` : ''}</button></li>`;
+}
+async function chLista(){
+  CH.h = null; clearInterval(CH.t);
+  $('chTitulo').textContent = 'Mensagens'; $('chVoltar').hidden = $('chMais').hidden = $('chMenu').hidden = true;
+  $('chConversa').hidden = true; $('chListaBox').hidden = false;
+  const ul = $('chConv'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>';
+  let lista = [], ok = false;
+  try{ const { data, error } = await _supabase.rpc('chat_conversas', { p_token:S.token }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
+  if (CH.h || $('modalChat').hidden) return;
+  if (!ok){ ul.innerHTML = '<li class="sg-vz">Não foi possível carregar agora.</li>'; return; }
+  lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
+  const com = new Set(lista.map(x => x.handle));
+  const amigos = [...SEGUINDO].filter(h => SEGUEME.has(h) && !com.has(h));
+  let html = lista.map(x => chLinha(x.handle, x.ap ? 'Mensagem apagada' : (x.meu ? 'Você: ' : '') + esc(x.t), x.nl)).join('');
+  if (amigos.length) html += '<li class="usr-sub ch-sub">Começar uma conversa</li>' + amigos.map(h => chLinha(h, '', 0)).join('');
+  ul.innerHTML = html || '<li class="sg-vz">Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.</li>';
+  chNaoLidas();
+}
+async function chConversa(h){
+  CH.h = h; CH.sig = ''; clearInterval(CH.t);
+  $('chTitulo').innerHTML = `<span translate="no">@${esc(h)}</span>`; $('chVoltar').hidden = $('chMais').hidden = false; $('chMenu').hidden = true;
+  $('chListaBox').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
+  await chCarregar(true);
+  CH.t = setInterval(() => { if ($('modalChat').hidden || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000);
+  if (matchMedia('(hover:hover)').matches && !$('chForm').hidden) $('chTexto').focus();
+}
+async function chCarregar(rolar){
+  const h = CH.h; let d = null;
+  try{
+    const r = await _supabase.rpc('chat_mensagens', { p_handle:h, p_token:S.token, p_apos:0, p_limite:60 });
+    if (!r.error) d = r.data; else if (rolar){ aviso(chErro(r)); chLista(); return; }
+  }catch(_){}
+  if (!d || CH.h !== h) return;
+  const msgs = Array.isArray(d.msgs) ? d.msgs : [];
+  CH.bloqueei = !!d.bloqueei; $('chBloq').textContent = CH.bloqueei ? 'Desbloquear' : 'Bloquear';
+  $('chForm').hidden = !d.pode; $('chAviso').hidden = !!d.pode;
+  $('chAviso').textContent = d.bloqueei ? 'Você bloqueou este usuário.' : 'Vocês precisam se seguir mutuamente para conversar.';
+  const sig = msgs.map(m => m.id + (m.ap ? 'x' : '')).join(',') + '|' + d.pode + d.bloqueei;
+  if (sig === CH.sig) return; CH.sig = sig;
+  const box = $('chMsgs'), perto = rolar || box.scrollHeight - box.scrollTop - box.clientHeight < 90;
+  box.innerHTML = msgs.length ? msgs.map(m => `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}">${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${m.m && !m.ap ? `<button type="button" class="ch-del" data-chat-del="${m.id}" aria-label="Apagar mensagem"><i class="fa-regular fa-trash-can"></i></button>` : ''}</div>`).join('') : '<div class="sg-vz">Diga oi 👋</div>';
+  if (perto) box.scrollTop = box.scrollHeight;
+  chNaoLidas();
+}
+$('chForm').addEventListener('submit', async e => {
+  e.preventDefault(); const inp = $('chTexto'), t = inp.value.trim(); if (!t || CH.enviando || !CH.h) return;
+  CH.enviando = true;
+  try{
+    const r = await _supabase.rpc('chat_enviar', { p_handle:CH.h, p_token:S.token, p_texto:t });
+    if (r.error) aviso(chErro(r)); else { inp.value = ''; await chCarregar(true); }
+  }catch(_){ aviso('Não foi possível enviar agora.'); }
+  CH.enviando = false;
+});
+$('msgBtn').addEventListener('click', () => chAbrir());
+$('chVoltar').addEventListener('click', chLista);
+$('chMais').addEventListener('click', e => { e.stopPropagation(); $('chMenu').hidden = !$('chMenu').hidden; });
+document.addEventListener('click', e => { if (!e.target.closest('#chMais,#chMenu')) $('chMenu').hidden = true; });
+$('chBloq').addEventListener('click', async () => {
+  const h = CH.h; $('chMenu').hidden = true; if (!h) return;
+  const bloquear = !CH.bloqueei;
+  if (bloquear && !await confirmar({ titulo:`Bloquear @${h}?`, texto:'Vocês não poderão mais trocar mensagens.', botao:'Bloquear' })) return;
+  try{ const r = await _supabase.rpc('chat_bloquear', { p_handle:h, p_token:S.token, p_on:bloquear }); if (r.error){ aviso(chErro(r)); return; } }catch(_){ aviso('Não foi possível agora.'); return; }
+  if (bloquear){ aviso('Usuário bloqueado.'); chLista(); } else { CH.sig = ''; chCarregar(false); }
+});
+$('chDen').addEventListener('click', async () => {
+  const h = CH.h; $('chMenu').hidden = true; if (!h) return;
+  if (!await confirmar({ titulo:`Denunciar a conversa com @${h}?`, texto:'A conversa será enviada para análise e o usuário será bloqueado para você.', botao:'Denunciar' })) return;
+  try{ const r = await _supabase.rpc('chat_denunciar', { p_handle:h, p_token:S.token, p_motivo:'denúncia pelo chat' }); if (r.error){ aviso(chErro(r)); return; } }catch(_){ aviso('Não foi possível agora.'); return; }
+  aviso('Denúncia enviada. Obrigado.'); chLista();
+});
+document.addEventListener('click', async e => {
+  const a = e.target.closest('[data-chat-abrir]'); if (a){ chConversa(a.dataset.chatAbrir); return; }
+  const b = e.target.closest('[data-chat-btn]'); if (b){ chAbrir(b.dataset.h); return; }
+  const d = e.target.closest('[data-chat-del]'); if (d){
+    d.disabled = true;
+    try{ const r = await _supabase.rpc('chat_apagar', { p_id:+d.dataset.chatDel, p_token:S.token }); if (r.error) aviso(chErro(r)); }catch(_){ aviso('Não foi possível agora.'); }
+    CH.sig = ''; chCarregar(false);
+  }
+});
 
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };

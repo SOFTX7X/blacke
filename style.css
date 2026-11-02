@@ -737,7 +737,7 @@ body.carregando{overflow:hidden}
 .lang-menu button:hover,.lang-menu button.on{background:rgba(123,108,255,.2)}
 @media (max-width:640px){
   .top-actions{display:flex!important;position:absolute;right:12px;top:50%;transform:translateY(-50%)}
-  .top-actions > :not(.lang):not(.nt-btn){display:none!important}
+  .top-actions > :not(.lang):not(.nt-btn):not(.ms-btn){display:none!important}
   .lang-btn{width:auto!important;height:36px!important;padding:0 11px!important}
 }
 /* barra de ações da ficha no celular: 5 ícones + botão principal sem quebrar */
@@ -1742,3 +1742,40 @@ details.sl{display:block;padding:0}
 .usr-li .sg-n{font:700 16.5px var(--display);letter-spacing:-.005em}
 .usr-l2{font-size:13px}
 @media (max-width:640px){.usr-li .sg-r .amini{width:44px;height:44px}.usr-li .sg-n{font-size:15.5px}.usr-busca{height:50px}}
+
+/* chat */
+.ms-btn svg{color:var(--violet)}
+.ms-btn[hidden]{display:none!important}
+[data-chat-btn][hidden]{display:none!important}
+.ch{display:flex;flex-direction:column;height:min(640px,86vh);height:min(640px,86dvh);padding-bottom:0!important}
+.ch .sheet-head{flex:none}
+.ch .sheet-head h3{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-acoes{position:relative;display:flex;gap:4px;align-items:center}
+.ch-menu{position:absolute;right:0;top:100%;z-index:5;min-width:190px;padding:6px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);box-shadow:0 20px 40px -10px rgba(0,0,0,.6)}
+.ch-menu button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--text);font:500 14px var(--display);padding:10px 12px;border-radius:10px;cursor:pointer}
+.ch-menu button:hover{background:rgba(123,108,255,.2)}
+.ch-menu .perigo{color:#ff8a9b}
+.ch-box{flex:1;min-height:0;display:flex;flex-direction:column}
+#chListaBox{overflow-y:auto}
+.ch-li .sg-r{padding:10px 4px;gap:14px}
+.ch-li .amini{width:46px!important;height:46px!important}
+.ch-sub{list-style:none;margin:16px 4px 4px!important}
+.ch-nl{margin-left:auto;min-width:22px;height:22px;padding:0 7px;display:grid;place-items:center;border-radius:999px;background:linear-gradient(135deg,#ff5d8a,#ff8a4c);color:#fff;font:700 12px var(--display)}
+.ch-msgs{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;padding:12px 2px}
+.ch-m{position:relative;max-width:78%;padding:8px 12px 6px;border-radius:16px;font:500 15px/1.35 var(--display);word-break:break-word;overflow-wrap:anywhere}
+.ch-m.eu{align-self:flex-end;background:linear-gradient(135deg,#4a3fd6,#7b6cff);color:#fff;border-bottom-right-radius:5px}
+.ch-m.ele{align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);border-bottom-left-radius:5px}
+.ch-m.ap{opacity:.6;font-size:13px}
+.ch-t{white-space:pre-wrap}
+.ch-h{display:block;margin-top:2px;font:500 10.5px var(--mono);opacity:.65;text-align:right}
+.ch-del{position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#ffb3bf;cursor:pointer;opacity:0;transition:opacity .15s;font-size:12px}
+.ch-m.eu:hover .ch-del,.ch-del:focus-visible{opacity:1}
+@media (hover:none){.ch-del{opacity:.55}}
+.ch-form{flex:none;display:flex;gap:8px;padding:10px 0 4px}
+.ch-form input{flex:1;min-width:0;height:46px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);color:var(--text);font:500 15px var(--display);outline:0}
+.ch-form input:focus{border-color:#3a3f87;box-shadow:0 0 0 3px rgba(123,108,255,.16)}
+.ch-env{flex:none;width:46px;height:46px;border:0;border-radius:50%;background:linear-gradient(135deg,#4a3fd6,#7b6cff);color:#fff;cursor:pointer}
+.ch-form[hidden],.ch-aviso[hidden]{display:none!important}
+.ch-aviso{flex:none;margin:8px 0;padding:12px 14px;border-radius:12px;background:rgba(242,184,75,.1);border:1px solid rgba(242,184,75,.3);color:#f2d28b;font:500 13.5px var(--display);text-align:center}
+.ch-reg{flex:none;margin:2px 0 10px;font:500 11px var(--display);color:var(--muted);text-align:center;opacity:.8}
+@media (max-width:640px){.ch{height:92dvh;max-height:92dvh}.ch-del{left:auto;right:calc(100% + 6px)}}

@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="/style.css?v=1793631839">
+  <link rel="stylesheet" href="/style.css?v=1793632724">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -50,6 +50,10 @@
       <span class="brand-name">BLACKE <b>LAVEX</b></span>
     </a>
     <div class="top-actions">
+        <button type="button" class="btn-ghost nt-btn ms-btn" id="msgBtn" hidden aria-haspopup="dialog" aria-label="Mensagens" title="Mensagens">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+          <span class="nt-n" id="msgN" hidden>0</span>
+        </button>
         <button type="button" class="btn-ghost nt-btn" id="ntBtn" hidden aria-haspopup="dialog" aria-expanded="false" aria-label="Notificações" title="Notificações">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
           <span class="nt-n" id="ntN" hidden>0</span>
@@ -332,6 +336,34 @@
     </div>
   </div>
 
+  <!-- Chat -->
+  <div id="modalChat" class="modal" hidden>
+    <div class="sheet ch" role="dialog" aria-modal="true" aria-labelledby="chTitulo">
+      <div class="sheet-head">
+        <button class="icon-btn" id="chVoltar" type="button" hidden aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></button>
+        <h3 id="chTitulo">Mensagens</h3>
+        <div class="ch-acoes">
+          <button class="icon-btn" id="chMais" type="button" hidden aria-label="Mais opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i></button>
+          <div class="ch-menu" id="chMenu" hidden role="menu">
+            <button type="button" role="menuitem" id="chBloq"></button>
+            <button type="button" role="menuitem" id="chDen" class="perigo">Denunciar conversa</button>
+          </div>
+          <button class="icon-btn" type="button" onclick="fechar('modalChat')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div id="chListaBox" class="ch-box"><ul id="chConv" class="sg-l"></ul></div>
+      <div id="chConversa" class="ch-box" hidden>
+        <div class="ch-msgs" id="chMsgs"></div>
+        <div class="ch-aviso" id="chAviso" hidden></div>
+        <form class="ch-form" id="chForm" autocomplete="off">
+          <input id="chTexto" type="text" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
+          <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+        <p class="ch-reg">Sem links e sem arquivos. Conversas só são vistas por quem participa; denúncias vão para análise.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Denúncia -->
   <div id="modalDenuncia" class="modal" hidden>
     <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="dnTitulo">
@@ -406,7 +438,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="/i18n.js?v=1793631839"></script>
-  <script src="/app.js?v=1793631839"></script>
+  <script src="/i18n.js?v=1793632724"></script>
+  <script src="/app.js?v=1793632724"></script>
 </body>
 </html>
