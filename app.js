@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -667,6 +667,7 @@ setTimeout(fecharSplash, 7000);
 /* ---------- Mural ---------- */
 async function buscarMural(reset){
   if (typeof desenharSemana === 'function') setTimeout(desenharSemana, 0);
+  if (typeof desenharRanking === 'function') setTimeout(desenharRanking, 0);
   const meu = ++S.seq;
   if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
   try{
@@ -732,7 +733,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharSemana, 0);
+  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharSemana, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
@@ -935,7 +936,7 @@ function painelNumeros(){
     </div>
   </details>`;
 }
-document.addEventListener('toggle', e => { const d = e.target; if (!d || !d.matches) return; if (d.matches('details.nm')) S.nmAberto = d.open; else if (d.matches('details.sl')) S.slAberto = d.open; }, true);
+document.addEventListener('toggle', e => { const d = e.target; if (!d || !d.matches) return; if (d.matches('details.rk')) S.rkAberto = d.open; else if (d.matches('details.nm')) S.nmAberto = d.open; else if (d.matches('details.sl')) S.slAberto = d.open; }, true);
 function seloURL(h, t){ return `${location.origin}/selo/${h}${t === 'claro' ? '?t=claro' : ''}`; }
 function blocoSelo(p){
   const t = S.seloTema === 'claro' ? 'claro' : 'escuro';
@@ -1222,7 +1223,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
   escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSemana();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSemana(); carregarRanking();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }
@@ -1445,4 +1446,27 @@ function desenharSemana(){
       <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Detalhes</button>
       <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
     </div>`;
+}
+
+/* ---------- Ranking da semana (top sites dos últimos 7 dias) ---------- */
+let RANK = null;
+async function carregarRanking(){
+  try{
+    const { data, error } = await _supabase.rpc('ranking_semana', { p_limite:10 });
+    RANK = !error && Array.isArray(data) && data.length ? data : null;
+  }catch(_){ RANK = null; }
+  desenharRanking();
+}
+function desenharRanking(){
+  const el = $('ranking'); if (!el) return;
+  const mostrar = RANK && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
+  el.hidden = !mostrar; if (!mostrar) return;
+  RANK.forEach(it => { if (!acharItem(it.id)) S.itens.push(it); });
+  const topo = Math.max(1, +RANK[0].n7 || 1), tot = RANK.reduce((t, s) => t + (+s.n7 || 0), 0);
+  const faces = RANK.slice(0, 3).map(s => `<img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}">`).join('');
+  const linhas = RANK.map((s, i) => `<li style="--i:${i}" data-act="detalhes" data-id="${esc(s.id)}" role="button" tabindex="0"><span class="nm-pos">${i + 1}</span><span class="nm-im"><img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}"></span><div class="nm-nm"><b translate="no">${esc(s.brand_name)}${selo(s)}</b>${s.handle ? `<small class="rk-h" translate="no">@${esc(s.handle)}</small>` : ''}<span class="nm-br"><i style="--w:${Math.max(4, Math.round((+s.n7 || 0) / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(+s.n7 || 0)}</b>${+s.hj ? `<small>+${fmtN(+s.hj)} hoje</small>` : ''}</span></li>`).join('');
+  el.innerHTML = `<details class="nm rk" data-rk${S.rkAberto ? ' open' : ''}>
+    <summary class="nm-h"><div><h3>Ranking da semana</h3><small class="nm-sub">Top ${RANK.length} · <b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> <span>em 7 dias</span></small></div><div class="nm-ch"><span class="rk-f">${faces}</span><i class="nm-cv" aria-hidden="true"></i></div></summary>
+    <div class="nm-b"><ol class="nm-r">${linhas}</ol></div>
+  </details>`;
 }

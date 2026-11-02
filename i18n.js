@@ -163,6 +163,7 @@
     ['Os sites mais novos aparecem aqui.','The newest sites appear here.','Los sitios más nuevos aparecen aquí.'],
     ['Reagir','React','Reaccionar'],['Não foi possível reagir.','Could not react.','No se pudo reaccionar.'],
     ['muitas reações em pouco tempo. Tente mais tarde.','too many reactions in a short time. Try again later.','demasiadas reacciones en poco tiempo. Inténtalo más tarde.'],
+    ['Ranking da semana','Weekly ranking','Ranking de la semana'],['em 7 dias','in 7 days','en 7 días'],
     ['Site da semana','Site of the week','Sitio de la semana'],['Ver detalhes','See details','Ver detalles'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],

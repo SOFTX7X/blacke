@@ -1556,3 +1556,18 @@ details.sl{display:block;padding:0}
 /* Selo BLACKE: rótulo roxo com ninja preto e olhos roxos */
 .selo-b{display:inline-block;flex:none;width:1.35em;height:1.35em;margin-left:.35em;vertical-align:-.26em;overflow:visible!important;text-overflow:clip}
 .selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))}
+
+/* Ranking da semana */
+.rk{margin:10px 0 6px}
+.rk[hidden],#ranking[hidden]{display:none}
+.rk-f{display:inline-flex}
+.rk-f img{width:28px;height:28px;border-radius:50%!important;object-fit:cover;border:2px solid #0c0e1b;margin-left:-8px;background:#11142a}
+.rk-f img:first-child{margin-left:0}
+.rk .nm-r li[data-act]{cursor:pointer;border-radius:10px;transition:background .2s}
+.rk .nm-r li[data-act]:hover{background:rgba(255,255,255,.03)}
+.rk .nm-r li:nth-child(2) .nm-pos{color:#c9c1ff}
+.rk .nm-r li:nth-child(3) .nm-pos{color:#a9714a}
+.rk .nm-nm{gap:4px}
+.rk .nm-nm b{display:flex;align-items:center;gap:6px}
+.rk .nm-nm b .selo{width:.85em;height:.85em;flex:none}
+.rk-h{font:500 11.5px var(--mono);color:var(--muted)}
