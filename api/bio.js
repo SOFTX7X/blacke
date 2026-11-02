@@ -172,7 +172,14 @@ ${corpo}
   });
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[data-id]'); if (!a) return;
-    try{ fetch(${JSON.stringify(db.BANCO0 + '/rest/v1/rpc/registrar_clique')}, { method:'POST', keepalive:true, headers:{ 'Content-Type':'application/json', apikey:${JSON.stringify(KEY)}, Authorization:'Bearer ' + ${JSON.stringify(KEY)} }, body:JSON.stringify({ p_id:a.dataset.id }) }).catch(function(){}); }catch(_){}
+    var id = a.dataset.id, hj = { 'Content-Type':'application/json', apikey:${JSON.stringify(KEY)}, Authorization:'Bearer ' + ${JSON.stringify(KEY)} };
+    // principal fora do ar: o clique vai para o PC (fila) e é reenviado quando o principal voltar
+    function pc(){
+      var H = { 'Content-Type':'application/json', Authorization:'Bearer ' + ${JSON.stringify(db.PC.key)} }, U = ${JSON.stringify(db.PC.url)};
+      fetch(U + '/rpc/pc_enfileirar', { method:'POST', keepalive:true, headers:H, body:JSON.stringify({ p_nome:'registrar_clique', p_args:{ p_id:id } }) })
+        .then(function(){ return fetch(U + '/rpc/registrar_clique', { method:'POST', keepalive:true, headers:H, body:JSON.stringify({ p_id:id }) }); }).catch(function(){});
+    }
+    try{ fetch(${JSON.stringify(db.BANCO0 + '/rest/v1/rpc/registrar_clique')}, { method:'POST', keepalive:true, headers:hj, body:JSON.stringify({ p_id:id }) }).then(function(r){ if (!r.ok) pc(); }).catch(pc); }catch(_){ pc(); }
   });
 })();
 </script>
