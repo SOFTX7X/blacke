@@ -43,6 +43,7 @@
     ['Publicar link','Publish link','Publicar enlace'],
     ['Mural de sites e marcas','Wall of sites and brands','Muro de sitios y marcas'],
     ['Publique seu link com capa e legenda. Sem conta, sem cadastro.','Publish your link with a cover and caption. No account, no sign-up.','Publica tu enlace con portada y descripción. Sin cuenta, sin registro.'],
+    ['Buscar por nome, categoria ou @perfil','Search by name, category or @profile','Buscar por nombre, categoría o @perfil'],['Perfis','Profiles','Perfiles'],
     ['Buscar por nome, legenda ou @perfil','Search by name, caption or @profile','Buscar por nombre, descripción o @perfil'],
     ['Mural','Wall','Muro'],
     ['Destaques','Featured','Destacados'],

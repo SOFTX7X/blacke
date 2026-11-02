@@ -696,7 +696,7 @@ async function buscarMural(reset){
       if (reset) mostrarPerfil(h);
     }else{
       const t = S.busca.replace(/[%,()*\\]/g, ' ').trim();
-      if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%,handle.ilike.%${t}%`);
+      if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%,handle.ilike.%${t}%,categoria.ilike.%${t}%`);
       if (reset) $('perfilBox').hidden = true;
     }
     // "Em alta": mais acessados nos últimos 7 dias (ordem vem do banco; sem dados, cai em "mais acessados")
@@ -1549,3 +1549,30 @@ function desenharRanking(){
     <div class="nm-b"><ol class="nm-r">${linhas}</ol></div>
   </details>`;
 }
+
+/* ---------- Sugestões de @ enquanto digita ---------- */
+let _sgT, _sgSeq = 0;
+function fecharSug(){ const b = $('sugestoes'); if (b) b.hidden = true; }
+$('busca').addEventListener('input', e => {
+  clearTimeout(_sgT);
+  const t = String(e.target.value || '').trim().replace(/^@/, '').toLowerCase();
+  if (!/^[a-z0-9_]{2,30}$/.test(t)){ fecharSug(); return; }
+  _sgT = setTimeout(async () => {
+    const meu = ++_sgSeq;
+    try{
+      const { data } = await _supabase.from('sites_publicos').select('handle').lt('denuncias', 5).eq('oculto', false).not('handle', 'is', null).ilike('handle', t.replace(/_/g, '\\_') + '%').limit(40);
+      if (meu !== _sgSeq || !$('busca').value.trim()) return;
+      const hs = [...new Set((data || []).map(x => x.handle).filter(Boolean))].sort((x, y) => (VERIF.has(y) - VERIF.has(x)) || x.localeCompare(y)).slice(0, 6);
+      const box = $('sugestoes');
+      if (!hs.length){ box.hidden = true; return; }
+      box.innerHTML = '<div class="sug-t">Perfis</div>' + hs.map(h => `<button type="button" class="sug-i" data-sug="${esc(h)}">${miniAv(h)}<span class="sug-n" translate="no">@${esc(h)}</span>${selosDe(h)}</button>`).join('');
+      box.hidden = false;
+    }catch(_){}
+  }, 220);
+});
+$('busca').addEventListener('blur', () => setTimeout(fecharSug, 180));
+$('busca').addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === 'Enter') fecharSug(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-sug]'); if (!b) return;
+  fecharSug(); $('busca').value = ''; S.busca = ''; irParaPerfil(b.dataset.sug);
+});
