@@ -2046,15 +2046,45 @@ document.addEventListener('click', e => { if (!e.target.closest('#chMais,#chMenu
 $('chBloq').addEventListener('click', async () => {
   const h = CH.h; $('chMenu').hidden = true; if (!h) return;
   const bloquear = !CH.bloqueei;
-  if (bloquear && !await confirmar({ titulo:`Bloquear @${h}?`, texto:'Vocês não poderão mais trocar mensagens.', botao:'Bloquear' })) return;
+  if (bloquear && !await confirmar({ titulo:`Bloquear @${h}?`, texto:'Vocês deixam de se seguir e não poderão trocar mensagens nem se seguir de novo. Você pode desbloquear depois em "Usuários bloqueados".', botao:'Bloquear', quem:h })) return;
   try{ const r = await _supabase.rpc('chat_bloquear', { p_handle:h, p_token:S.token, p_on:bloquear }); if (r.error){ aviso(chErro(r)); return; } }catch(_){ aviso('Não foi possível agora.'); return; }
-  if (bloquear){ aviso('Usuário bloqueado.'); chLista(); } else { CH.sig = ''; chCarregar(false); }
+  if (bloquear){ aviso('Usuário bloqueado.'); await carregarSeguindo(); chLista(); } else { CH.sig = ''; chCarregar(false); }
 });
-$('chDen').addEventListener('click', async () => {
+/* denunciar: a conversa continua aberta; bloquear junto é opcional */
+$('chDen').addEventListener('click', () => {
   const h = CH.h; $('chMenu').hidden = true; if (!h) return;
-  if (!await confirmar({ titulo:`Denunciar a conversa com @${h}?`, texto:'A conversa será enviada para análise e o usuário será bloqueado para você.', botao:'Denunciar' })) return;
-  try{ const r = await _supabase.rpc('chat_denunciar', { p_handle:h, p_token:S.token, p_motivo:'denúncia pelo chat' }); if (r.error){ aviso(chErro(r)); return; } }catch(_){ aviso('Não foi possível agora.'); return; }
-  aviso('Denúncia enviada. Obrigado.'); chLista();
+  $('cdQuem').textContent = '@' + h; $('cdBloq').checked = false; abrir('modalChatDen');
+  $('cdNo').onclick = () => { fechar('modalChatDen'); $('cdOk').onclick = $('cdNo').onclick = null; };
+  $('cdOk').onclick = async () => {
+    const bloq = $('cdBloq').checked; $('cdOk').disabled = true;
+    try{
+      const r = await _supabase.rpc('chat_denunciar', { p_handle:h, p_token:S.token, p_motivo:'denúncia pelo chat', p_bloquear:bloq });
+      if (r.error){ aviso(chErro(r)); return; }
+      fechar('modalChatDen'); aviso(bloq ? 'Denúncia enviada e usuário bloqueado.' : 'Denúncia enviada. Obrigado.');
+      if (bloq){ await carregarSeguindo(); chLista(); }
+    }catch(_){ aviso('Não foi possível agora.'); }
+    finally{ $('cdOk').disabled = false; $('cdOk').onclick = $('cdNo').onclick = null; }
+  };
+});
+/* lista de bloqueados */
+async function chBloqueados(){
+  const ul = $('bqLista'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalBloq');
+  let lista = null;
+  try{ const { data, error } = await _supabase.rpc('chat_bloqueados', { p_token:S.token }); if (!error && Array.isArray(data)) lista = data; }catch(_){}
+  if (!lista){ ul.innerHTML = '<li class="sg-vz">Não foi possível carregar agora.</li>'; return; }
+  lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
+  ul.innerHTML = lista.length ? lista.map(x => `<li class="bq-li"><span class="ch-av">${miniAv(x.handle)}</span><span class="bq-n"><span translate="no">@${esc(x.handle)}</span>${selosDe(x.handle)}</span><button type="button" class="pc-btn" data-bq-un="${esc(x.handle)}">Desbloquear</button></li>`).join('') : '<li class="sg-vz">Você não bloqueou ninguém.</li>';
+}
+$('chOpcBloq').addEventListener('click', () => { $('chOpcM').hidden = true; chBloqueados(); });
+$('bqLista').addEventListener('click', async e => {
+  const b = e.target.closest('[data-bq-un]'); if (!b) return; b.disabled = true;
+  try{
+    const r = await _supabase.rpc('chat_bloquear', { p_handle:b.dataset.bqUn, p_token:S.token, p_on:false });
+    if (r.error){ aviso(chErro(r)); b.disabled = false; return; }
+    b.closest('li').remove(); aviso('Desbloqueado. Para conversar, sigam-se de novo.');
+    if (!$('bqLista').children.length) $('bqLista').innerHTML = '<li class="sg-vz">Você não bloqueou ninguém.</li>';
+    chPessoas(false);
+  }catch(_){ aviso('Não foi possível agora.'); b.disabled = false; }
 });
 $('chMsgs').addEventListener('dblclick', e => { const m = e.target.closest('.ch-m'); if (m && !e.target.closest('button')) chResponder(+m.id.slice(4)); });
 document.addEventListener('click', async e => {

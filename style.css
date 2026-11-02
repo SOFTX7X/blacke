@@ -1922,3 +1922,11 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .chp-v{display:block;font:400 15px/1.35 system-ui,sans-serif;color:#eceef8;overflow-wrap:anywhere;white-space:pre-wrap}
 .chp-l small{display:block;margin-top:1px;font:400 12.5px system-ui,sans-serif;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 .chp .sg-vz{padding:30px 16px}
+.cd-chk{display:flex;align-items:center;gap:10px;margin:4px 0 16px;font:500 14.5px var(--display);cursor:pointer}
+.cd-chk input{width:18px;height:18px;accent-color:#7b6cff}
+.bq-l{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:50dvh;overflow-y:auto}
+.bq-li{display:flex;align-items:center;gap:12px;padding:8px 2px}
+.bq-li .ch-av .amini{width:44px;height:44px}
+.bq-n{flex:1;min-width:0;display:flex;align-items:center;gap:6px;font:600 15px var(--display)}
+#chOpcBloq{display:flex;align-items:center;gap:10px}
+.ch-menu .ch-vis{padding:10px 12px}
