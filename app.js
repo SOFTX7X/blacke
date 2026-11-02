@@ -52,7 +52,15 @@ async function escolherBanco(){
   document.body.prepend(b);
   // capas guardadas no armazenamento do principal passam a vir do projeto reserva
   const DE = SUPABASE_URL + '/storage/', PARA = RESERVA_URL + '/storage/';
-  const troca = img => { const s = img.getAttribute('src'); if (s && s.startsWith(DE)) img.setAttribute('src', PARA + s.slice(DE.length)); };
+  const CAPA = SUPABASE_URL + '/storage/v1/object/public/capas/';
+  const troca = img => {
+    const s = img.getAttribute('src'); if (!s || !s.startsWith(DE)) return;
+    const reserva = PARA + s.slice(DE.length);
+    if (nome === 'pc' && s.startsWith(CAPA)){            // imagens copiadas no PC; se faltar, cai no projeto reserva
+      img.addEventListener('error', () => img.setAttribute('src', reserva), { once:true });
+      img.setAttribute('src', PC_URL + '/capas/' + s.slice(CAPA.length));
+    } else img.setAttribute('src', reserva);
+  };
   document.querySelectorAll('img').forEach(troca);
   new MutationObserver(ms => ms.forEach(m => {
     if (m.type === 'attributes') troca(m.target);
