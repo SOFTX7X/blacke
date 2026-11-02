@@ -403,8 +403,11 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             img = gerar(parse_qs(urlparse(self.path).query))
-            buf = io.BytesIO(); img.save(buf, 'JPEG', quality=88, optimize=True, progressive=True)
-            corpo = buf.getvalue()
+            # o WhatsApp ignora imagens de prévia acima de ~300 KB: reduz a qualidade até caber
+            for qual in (88, 80, 72, 64, 56):
+                buf = io.BytesIO(); img.save(buf, 'JPEG', quality=qual, optimize=True, progressive=True)
+                corpo = buf.getvalue()
+                if len(corpo) <= 280_000: break
             self.send_response(200)
             self.send_header('Content-Type', 'image/jpeg')
             self.send_header('Cache-Control', 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400')
