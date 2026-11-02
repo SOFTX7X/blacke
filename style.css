@@ -688,7 +688,7 @@ body.carregando{overflow:hidden}
   .dest-head h2{font-size:15px}
 }
 @media (max-width:640px){
-  .bnav{grid-template-columns:repeat(6,1fr);left:10px;right:10px}
+  .bnav{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:1fr;left:10px;right:10px}
   .bnav button,.bnav a{min-width:0}
 }
 @media (max-width:640px){
@@ -1779,3 +1779,6 @@ details.sl{display:block;padding:0}
 .ch-aviso{flex:none;margin:8px 0;padding:12px 14px;border-radius:12px;background:rgba(242,184,75,.1);border:1px solid rgba(242,184,75,.3);color:#f2d28b;font:500 13.5px var(--display);text-align:center}
 .ch-reg{flex:none;margin:2px 0 10px;font:500 11px var(--display);color:var(--muted);text-align:center;opacity:.8}
 @media (max-width:640px){.ch{height:92dvh;max-height:92dvh}.ch-del{left:auto;right:calc(100% + 6px)}}
+
+.bnav #msgBtn{position:relative}.bnav .bn-n{position:absolute;top:4px;left:calc(50% + 4px);min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#ff4d6d;color:#fff;font:700 10px/16px var(--display);text-align:center}
+@media (min-width:901px){.bnav .bn-n{top:6px;left:30px}}
