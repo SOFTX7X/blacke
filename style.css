@@ -1760,7 +1760,9 @@ body[data-aba="chat"]::before{display:none}
 .chat-sec[hidden]{display:none!important}
 .chat-sec .ch-emo,.chat-sec .ch-t,.chat-sec input,.chat-sec .ch-e,.chat-sec .ch-emj-t button{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Color Emoji',sans-serif}
 .ch-lado{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--ch-linha)}
-.ch-lado-h{flex:none;padding:12px 12px 8px}
+.ch-lado-h{flex:none;display:flex;align-items:center;gap:6px;padding:12px 12px 8px}
+.ch-lado-h .ch-busca{flex:1;min-width:0}
+.ch-lado-h .ch-menu{min-width:170px;padding:10px 12px}
 .ch-busca{display:flex;align-items:center;gap:10px;height:42px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted)}
 .ch-busca input{flex:1;min-width:0;border:0;background:none;color:var(--text);font:400 15px system-ui,sans-serif;outline:0}
 .ch-busca input::-webkit-search-cancel-button{display:none}
@@ -1891,3 +1893,18 @@ body[data-aba="chat"]::before{display:none}
 .ch-pts i:nth-child(2){animation-delay:.2s}.ch-pts i:nth-child(3){animation-delay:.4s}
 @keyframes chpt{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
 .ch-digb{padding:12px 14px!important;margin-top:8px}.ch-digb .ch-pts{margin:0;gap:4px}.ch-digb .ch-pts i{width:7px;height:7px;background:#a99bff}
+
+.ch-m.pend{opacity:.75}
+.ch-quem{cursor:pointer}
+.ch-perf{position:absolute;top:0;right:0;bottom:0;z-index:8;width:min(400px,100%);display:flex;flex-direction:column;background:var(--bg);border-left:1px solid var(--ch-linha);box-shadow:-20px 0 40px -20px rgba(0,0,0,.6)}
+.ch-perf[hidden]{display:none}
+.ch-perf-h{flex:none;display:flex;align-items:center;gap:10px;height:58px;padding:0 12px;border-bottom:1px solid var(--ch-linha);font:600 16px system-ui,sans-serif}
+.ch-perf-c{flex:1;min-height:0;overflow-y:auto;padding:10px 14px 24px}
+.ch-perf .ig-fundo,.ch-perf .ig-tab,.ch-perf [data-chat-btn]{display:none!important}
+.ch-perf .ig{margin:0;padding:8px 0 0;border:0;background:none;box-shadow:none}
+.ch-perf .ig{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.ch-perf .ig-av{width:112px;height:112px;margin:0}
+.ch-perf .ig-nome{justify-content:center}
+.ch-perf .ig-nums{justify-content:center;gap:16px}
+.ch-perf .ig-btns{justify-content:center}
+.ch-perf .ig-bio{width:100%}

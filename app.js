@@ -846,7 +846,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
     ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
     scrollTo({ top:0 }); if (!chAtivo()){ aviso('Reserve seu @ para usar o chat'); trocarAba('mural'); return; }
-    chPing(); if (!CH.h) chLista(); else { chPessoas(false); if (CH.t) clearInterval(CH.t); const h = CH.h; CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 3000); chCarregar(false); } return;
+    chPing(); if (!CH.h) chLista(); else { chPessoas(false); if (CH.t) clearInterval(CH.t); const h = CH.h; CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 1500); chCarregar(false); } return;
   }
   if (aba === 'usuarios'){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
@@ -1850,7 +1850,7 @@ function chLinha(x){
 }
 async function chLista(){
   CH.h = null; clearInterval(CH.t);
-  $('chatSec').classList.remove('abriu'); document.body.classList.remove('ch-aberto'); chEmjAbrir(false); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
+  $('chatSec').classList.remove('abriu'); document.body.classList.remove('ch-aberto'); chEmjAbrir(false); chPerfilFechar(); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
   await chPessoas(true);
 }
 function chDesenharLista(){
@@ -1864,6 +1864,8 @@ function chDesenharLista(){
     : `<li class="sg-vz">${lista.length ? 'Ninguém encontrado.' : 'Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.'}</li>`;
 }
 $('chBusca').addEventListener('input', chDesenharLista);
+$('chOpc').addEventListener('click', e => { e.stopPropagation(); $('chOpcM').hidden = !$('chOpcM').hidden; });
+document.addEventListener('click', e => { if (!e.target.closest('#chOpc,#chOpcM')) $('chOpcM').hidden = true; });
 /* ---------- Emojis (fonte Noto Color Emoji, via Google Fonts) ---------- */
 const EMOJIS = [
  ['😀','Carinhas','😀 😃 😄 😁 😆 😅 😂 🤣 🥲 ☺️ 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🫣 🤭 🫢 🫡 🤫 🫠 🤥 😶 😐 😑 😬 🫨 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃'],
@@ -1876,6 +1878,26 @@ const EMOJIS = [
  ['💡','Objetos','⌚ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💾 📷 📹 🎥 📺 📻 ⏰ 🔋 🔌 💡 🔦 💰 💵 💳 💎 ⚖️ 🔧 🔨 ⚙️ 🔒 🔓 🔑 🛡️ 💊 🧬 🔬 🔭 📡 🚪 🛏️ 🛋️ 🚿 🧹 🛒 📦 ✉️ 📧 📝 📁 📅 📌 📎 ✂️ 📖 📚 🔔 🔕 🎓 👑 👒 🎩 👓 🕶️ 👕 👖 👟 👜 🎒'],
  ['✅','Símbolos','✅ ❌ ❎ ⭕ ❗ ❓ ‼️ ⁉️ ⚠️ 🚫 ⛔ 🔞 ♻️ ➕ ➖ ✖️ ➡️ ⬅️ ⬆️ ⬇️ ↩️ 🔄 ▶️ ⏸️ ⏹️ 🔊 🔇 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜ 🔶 🔷 ♾️ 💲 ™️ ©️ ®️ 🆗 🆒 🆕 🔝 🏁 🚩 🏳️ 🏴 🇧🇷 🇺🇸 🇵🇹 🇪🇸']
 ];
+
+/* painel de perfil dentro do chat (como no Telegram/WhatsApp) */
+async function chPerfilAbrir(h){
+  if (!h) return;
+  const box = $('chPerf'), c = $('chPerfC'); box.hidden = false; CH.perf = h;
+  c.innerHTML = '<div class="sg-vz">Carregando…</div>';
+  let data = null;
+  try{ ({ data } = await _supabase.rpc('perfil_publico', { p_handle:h })); }catch(_){}
+  if (CH.perf !== h) return;
+  if (!data){ c.innerHTML = '<div class="sg-vz">Não foi possível carregar agora.</div>'; return; }
+  if (temVerif(data)) VERIF.add(data.handle);
+  if (temSeloB(data)) NINJA.add(data.handle);
+  c.innerHTML = cartaoPerfil(data, false);
+  c.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
+}
+function chPerfilFechar(){ CH.perf = null; $('chPerf').hidden = true; }
+$('chPerfX').addEventListener('click', chPerfilFechar);
+$('chPerf').addEventListener('click', e => { if (e.target.closest('[data-chat-btn]')){ e.stopPropagation(); chPerfilFechar(); } });
+document.querySelector('.ch-quem').addEventListener('click', () => chPerfilAbrir(CH.h));
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('chPerf').hidden && S.aba === 'chat') chPerfilFechar(); });
 let chEmjCat = 0;
 function chEmjDesenhar(){
   const g = $('chEmjG'), t = $('chEmjT');
@@ -1917,12 +1939,12 @@ function chStatusTopo(){
   el.className = 'ch-st' + (x.on ? ' on' : ''); el.innerHTML = x.on ? '<span>Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
 }
 async function chConversa(h){
-  CH.h = h; CH.sig = ''; CH.dig = false; chRespLimpar(); clearInterval(CH.t);
+  CH.h = h; CH.sig = ''; CH.dig = false; chRespLimpar(); clearInterval(CH.t); if (!$('chPerf').hidden) chPerfilAbrir(h);
   $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
   $('chatSec').classList.add('abriu'); document.body.classList.add('ch-aberto'); chEmjAbrir(false); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
   await chCarregar(true); chPessoas(false);
-  CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 3000);
+  CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 1500);
   if (matchMedia('(hover:hover)').matches && !$('chForm').hidden) $('chTexto').focus();
 }
 function chDigBolha(){
@@ -1969,14 +1991,22 @@ $('chTexto').addEventListener('input', () => {
   try{ _supabase.rpc('chat_digitando', { p_handle:h, p_token:S.token }).then(() => {}, () => {}); }catch(_){}
 });
 $('chForm').addEventListener('submit', async e => {
-  e.preventDefault(); const inp = $('chTexto'), t = inp.value.trim(); if (!t || CH.enviando || !CH.h) return;
+  e.preventDefault(); const inp = $('chTexto'), t = inp.value.trim(); if (!t || !CH.h) return;
+  const h = CH.h, resp = CH.resp, box = $('chMsgs');
+  // mostra na hora (otimista); a próxima leitura troca pela mensagem real
+  const tmp = document.createElement('div'); tmp.className = 'ch-m eu pend';
+  tmp.innerHTML = `${resp ? `<div class="ch-q"><b translate="no">${resp.quem ? '<span>Você</span>' : '@' + esc(h)}</b><span class="ch-qt" translate="no">${esc(resp.t.slice(0, 90))}</span></div>` : ''}<span class="ch-t" translate="no">${esc(t)}</span><span class="ch-h" translate="no">${chHora(new Date())}</span>`;
+  const vz = box.querySelector('.sg-vz'); if (vz) vz.remove();
+  box.appendChild(tmp); box.scrollTop = box.scrollHeight; inp.value = ''; chRespLimpar(); chEmjAbrir(false); CH.tdig = 0;
   CH.enviando = true;
   try{
-    const r = await _supabase.rpc('chat_enviar', { p_handle:CH.h, p_token:S.token, p_texto:t, ...(CH.resp ? { p_resp:CH.resp.id } : {}) });
-    if (r.error) aviso(chErro(r)); else { inp.value = ''; chRespLimpar(); await chCarregar(true); chPessoas(false); }
-  }catch(_){ aviso('Não foi possível enviar agora.'); }
+    const r = await _supabase.rpc('chat_enviar', { p_handle:h, p_token:S.token, p_texto:t, ...(resp ? { p_resp:resp.id } : {}) });
+    if (r.error){ tmp.remove(); aviso(chErro(r)); if (!inp.value) inp.value = t; }
+    else if (CH.h === h){ CH.sig = ''; chCarregar(true); chPessoas(false); }
+  }catch(_){ tmp.remove(); aviso('Não foi possível enviar agora.'); if (!inp.value) inp.value = t; }
   CH.enviando = false;
 });
+
 $('msgBtn').addEventListener('click', () => chAbrir());
 $('chVoltar').addEventListener('click', chLista);
 $('chMais').addEventListener('click', e => { e.stopPropagation(); $('chMenu').hidden = !$('chMenu').hidden; });
