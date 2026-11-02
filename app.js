@@ -755,6 +755,7 @@ async function buscarMural(reset){
   if (reset){ S.pagina = 0; S.itens = []; if (S.aba === 'mural') skeleton(); }
   try{
     let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
+    if (BLOQ.size) q = q.or('handle.is.null,handle.not.in.(' + [...BLOQ].join(',') + ')');
     if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
     else if (S.cat === 'Seguindo') q = q.in('handle', SEGUINDO.size ? [...SEGUINDO].slice(0, 200) : ['-']);
     else if (S.cat === 'Verificados' || S.cat === 'Selo BLACKE'){
@@ -785,7 +786,7 @@ async function buscarMural(reset){
     if (meu !== S.seq) return;            // chegou uma busca mais nova
     if (error) throw error;
     if (S.aba !== 'mural'){ fecharSplash(); return; }   // já saiu do mural (ex.: abriu a Conta): não joga sites de outros @ na tela
-    let lote = (data || []).slice(0, alta ? 200 : PAGE);
+    let lote = semBloq((data || []).slice(0, alta ? 200 : PAGE));
     if (alta){ const pos = new Map(ALTA.map((id, i) => [String(id), i])); lote.sort((x, y) => pos.get(String(x.id)) - pos.get(String(y.id))); lote = lote.slice(de, de + PAGE); }
     S.temMais = alta ? (data || []).length > de + PAGE : (data || []).length > PAGE; S.total = count ?? lote.length;
     S.itens = S.itens.concat(lote);
@@ -932,7 +933,7 @@ function atualizarPerfilUI(){
 }
 async function mostrarPerfil(h){
   const box = $('perfilBox');
-  if (!h || h.length < 3){ box.hidden = true; return; }
+  if (!h || h.length < 3 || BLOQ.has(h)){ box.hidden = true; return; }
   let data = null;
   try{ ({ data } = await _supabase.rpc('perfil_publico', { p_handle:h })); }catch(_){}
   if (!S.busca.startsWith('@') || normArroba(S.busca) !== h) return;   // a busca mudou enquanto carregava
@@ -950,14 +951,29 @@ function segNum(p, tipo){
   const v = +p[tipo] || 0, rot = tipo === 'seguidores' ? (v === 1 ? 'seguidor' : 'seguidores') : 'seguindo';
   return `<li><button type="button" class="ig-sg" data-seg-ver="${tipo}" data-h="${esc(p.handle)}"><b data-segn="${esc(p.handle)}:${tipo}">${fmtN(v)}</b> <span>${rot}</span></button></li>`;
 }
+const BLOQ = new Set();      // quem eu bloqueei: some de tudo
+const bloqSemPapel = h => !!h && BLOQ.has(h);
+const semBloq = arr => BLOQ.size ? arr.filter(x => !BLOQ.has(x && x.handle)) : arr;
 const SEGUEME = new Set();   // quem me segue (para "Seguir de volta")
 async function carregarSeguindo(){
   SEGUINDO.clear(); SEGUEME.clear();
+  const antes = [...BLOQ].sort().join(',');
   if (S.token){
+    try{ const { data, error } = await _supabase.rpc('chat_bloqueados', { p_token:S.token }); if (!error && Array.isArray(data)){ BLOQ.clear(); data.forEach(x => BLOQ.add(x.handle)); } }catch(_){}
     try{ const { data, error } = await _supabase.rpc('meus_seguindo', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUINDO.add(h)); }catch(_){}
     try{ const { data, error } = await _supabase.rpc('meus_seguidores', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUEME.add(h)); }catch(_){}
   }
   document.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
+  if ([...BLOQ].sort().join(',') !== antes) bloqMudou();
+}
+/* a lista de bloqueados mudou: refaz o que está na tela */
+function bloqMudou(){
+  S.dest.top = semBloq(S.dest.top || []); S.dest.novos = semBloq(S.dest.novos || []);
+  if (RANK){ RANK = semBloq(RANK); if (!RANK.length) RANK = null; }
+  if (S.aba === 'destaques') abrirDestaques();
+  if (S.aba === 'mural') buscarMural(true);
+  if (S.aba === 'usuarios'){ USR.sug = null; abrirUsuarios(); }
+  if (typeof carregarNotif === 'function') carregarNotif();
 }
 function pintarSeguir(b){
   const on = SEGUINDO.has(b.dataset.h), volta = !on && SEGUEME.has(b.dataset.h);
@@ -1069,6 +1085,7 @@ async function abrirListaSeg(h, tipo, quieto){
   const ul = $('sgLista'); if (!quieto){ $('sgBusca').value = ''; ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg'); }
   let lista = [], ok = false;
   try{ const { data, error } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
+  lista = semBloq(lista);
   if (quieto && !ok) return;
   if (quieto && ($('modalSeg').hidden || !SGATUAL || SGATUAL.h !== h || SGATUAL.tipo !== tipo)) return;
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
@@ -1249,7 +1266,7 @@ async function carregarNotif(){
   try{
     const { data, error } = await _supabase.rpc('minhas_notificacoes', { p_token:S.token, p_limite:30 });
     if (error || !data) return;
-    NT.itens = Array.isArray(data.itens) ? data.itens : []; NT.n = +data.nao_lidas || 0;
+    NT.itens = Array.isArray(data.itens) ? data.itens.filter(x => !BLOQ.has(((x && x.dados) || {}).handle)) : []; NT.n = +data.nao_lidas || 0;
     desenharNotif();
     const max = NT.itens.reduce((m, x) => Math.max(m, +x.id || 0), 0), visto = +(lerLS('bl_nt_visto') || 0);
     if (max > visto){
@@ -2081,7 +2098,7 @@ $('bqLista').addEventListener('click', async e => {
   try{
     const r = await _supabase.rpc('chat_bloquear', { p_handle:b.dataset.bqUn, p_token:S.token, p_on:false });
     if (r.error){ aviso(chErro(r)); b.disabled = false; return; }
-    b.closest('li').remove(); aviso('Desbloqueado. Para conversar, sigam-se de novo.');
+    b.closest('li').remove(); BLOQ.delete(b.dataset.bqUn); bloqMudou(); aviso('Desbloqueado. Para conversar, sigam-se de novo.');
     if (!$('bqLista').children.length) $('bqLista').innerHTML = '<li class="sg-vz">Você não bloqueou ninguém.</li>';
     chPessoas(false);
   }catch(_){ aviso('Não foi possível agora.'); b.disabled = false; }
@@ -2108,6 +2125,7 @@ document.addEventListener('click', async e => {
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };
 function desenharUsuarios(lista, vazio){
+  lista = semBloq(lista);
   const ul = $('usrLista'), eu = S.perfil && S.perfil.handle;
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
   ul.innerHTML = lista.length ? lista.map(x => {
@@ -2161,7 +2179,7 @@ async function abrirDestaques(){
       base().order('created_at', { ascending:false }).order('id', { ascending:false }).limit(12)
     ]);
     if (S.aba !== 'destaques') return;
-    S.dest.top = t.data || []; S.dest.novos = n.data || [];
+    S.dest.top = semBloq(t.data || []); S.dest.novos = semBloq(n.data || []);
     if (!S.dest.top.length) S.destAba = 'novos';
   }catch(_){ S.dest = { top:[], novos:[] }; }
   desenharDestaques();
@@ -2266,7 +2284,7 @@ let RANK = null;
 async function carregarRanking(){
   try{
     const { data, error } = await _supabase.rpc('ranking_semana', { p_limite:10 });
-    RANK = !error && Array.isArray(data) && data.length ? data : null;
+    RANK = !error && Array.isArray(data) && data.length ? (semBloq(data).length ? semBloq(data) : null) : null;
   }catch(_){ RANK = null; }
   desenharRanking();
 }
