@@ -23,7 +23,7 @@ function clientePC(){
   } } });
 }
 async function escolherBanco(){
-  if (await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;
+  if (!/[?&]simularqueda\b/.test(location.search) && await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;   // ?simularqueda=1 só para testar o banco de segurança
   let cli, nome;
   if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }
   else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
