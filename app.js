@@ -930,10 +930,19 @@ document.addEventListener('click', async e => {
   }catch(_){ if (eu0) ajustarN(eu0, 'seguidores', 1); if (li0) li0.style.display = ''; aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
 });
 let SGATUAL = null;
+function filtrarSeg(){
+  const q = ($('sgBusca').value || '').trim().toLowerCase().replace(/^@/, '');
+  const lis = [...$('sgLista').querySelectorAll('.sg-li')]; let n = 0;
+  lis.forEach(li => { const h = (li.querySelector('.sg-n') || {}).textContent || ''; const ok = !q || h.toLowerCase().replace(/^@/, '').includes(q); li.hidden = !ok; if (ok) n++; });
+  let vz = $('sgLista').querySelector('.sg-nr');
+  if (lis.length && !n){ if (!vz){ vz = document.createElement('li'); vz.className = 'sg-vz sg-nr'; vz.textContent = 'Nenhum resultado.'; $('sgLista').appendChild(vz); } }
+  else if (vz) vz.remove();
+}
+document.addEventListener('input', e => { if (e.target && e.target.id === 'sgBusca') filtrarSeg(); });
 async function abrirListaSeg(h, tipo, quieto){
   SGATUAL = { h, tipo };
   $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span>`;
-  const ul = $('sgLista'); if (!quieto){ ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg'); }
+  const ul = $('sgLista'); if (!quieto){ $('sgBusca').value = ''; ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg'); }
   let lista = [], ok = false;
   try{ const { data, error } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
   if (quieto && !ok) return;
@@ -949,6 +958,7 @@ async function abrirListaSeg(h, tipo, quieto){
       }).join('')
     : `<li class="sg-vz">${tipo === 'seguindo' ? 'Não segue ninguém ainda.' : 'Nenhum seguidor ainda.'}</li>`;
   ul.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
+  filtrarSeg();
 }
 document.addEventListener('click', e => {
   const v = e.target.closest('[data-seg-ver]');
