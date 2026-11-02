@@ -682,6 +682,12 @@ async function buscarMural(reset){
     let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
     if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
     else if (S.cat === 'Seguindo') q = q.in('handle', SEGUINDO.size ? [...SEGUINDO].slice(0, 200) : ['-']);
+    else if (S.cat === 'Verificados' || S.cat === 'Selo BLACKE'){
+      if (!VERIF.size && !NINJA.size) await carregarVerificados();
+      if (meu !== S.seq) return;
+      const conj = S.cat === 'Verificados' ? VERIF : NINJA;
+      q = q.in('handle', conj.size ? [...conj].slice(0, 200) : ['-']);
+    }
     else if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
     const porArroba = S.busca.startsWith('@');
     if (porArroba){
@@ -713,7 +719,8 @@ async function buscarMural(reset){
     vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
-      setEstado(S.cat === 'Seguindo' && !S.busca ? vazio('coracao', 'Você ainda não segue ninguém', S.perfil && S.perfil.handle ? 'Abra um perfil e toque em Seguir para ver os sites dele aqui.' : 'Reserve seu @ e siga perfis para ver os sites deles aqui.', ['mural'])
+      setEstado((S.cat === 'Verificados' || S.cat === 'Selo BLACKE') && !S.busca ? vazio('busca', 'Nenhum perfil com esse selo ainda', S.cat === 'Selo BLACKE' ? 'O Selo BLACKE é conquistado aos 10 mil acessos.' : 'O selo verificado é conquistado aos mil acessos.', ['mural'])
+        : S.cat === 'Seguindo' && !S.busca ? vazio('coracao', 'Você ainda não segue ninguém', S.perfil && S.perfil.handle ? 'Abra um perfil e toque em Seguir para ver os sites dele aqui.' : 'Reserve seu @ e siga perfis para ver os sites deles aqui.', ['mural'])
         : S.cat === 'Salvos' && !S.busca ? vazio('coracao', 'Nenhum site salvo', 'Toque no ♥ de um card para guardar aqui.', ['mural'])
         : filtrando ? vazio('busca', 'Nada encontrado', 'Tente outra busca ou categoria.', ['limpar'])
         : vazio('grade', 'O mural está vazio', 'Seja o primeiro a publicar um site.', ['publicar']));
@@ -1274,7 +1281,7 @@ document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('c
   if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil')) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
-$('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c}</button>`).join('');
+$('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', 'Verificados', 'Selo BLACKE', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c === 'Verificados' ? '✓ Verificados' : c}</button>`).join('');
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
