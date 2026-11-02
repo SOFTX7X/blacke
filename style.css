@@ -2060,3 +2060,10 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .usr-busca:focus-within i{color:var(--ice)}
 .usr-busca input{font-size:15px}
 .usr-sub{margin:14px 4px 2px}
+
+/* Chat mobile: botão voltar alinhado à foto, fundo roxo, mesma altura */
+@media (max-width:760px){
+  .chat-sec #chVoltar{display:grid;place-items:center;flex:none;width:40px;height:40px;min-width:40px;padding:0;margin:0 2px 0 0;border:0;border-radius:50%;background:#5b4fe0;color:#fff;font-size:15px;line-height:1}
+  .chat-sec #chVoltar i{display:block;line-height:1}
+  .chat-sec .ch-topo{gap:10px}
+}
