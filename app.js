@@ -570,6 +570,8 @@ function atualizarTitulo(){
   if (document.body.classList.contains('modo-perfil') && S.busca.startsWith('@')){ document.title = S.busca + ' — ' + B; return; }
   document.title = ({ destaques:'Destaques — ' + B, meus:'Conta — ' + B, publicar:'Publicar — ' + B })[S.aba] || B + ' — Mural anônimo';
 }
+const _tituloBase = atualizarTitulo;
+atualizarTitulo = function(){ _tituloBase(); if (typeof NT !== 'undefined' && NT.n > 0) document.title = `(${NT.n > 9 ? '9+' : NT.n}) ` + document.title; };
 const ROTA = { mural:'/', destaques:'/destaques', meus:'/conta', publicar:'/publicar' };
 // a Conta usa o endereço do próprio @ (/@nome); sem @ reservado, /conta
 const rotaDe = aba => aba === 'meus' && S.perfil && S.perfil.handle ? '/@' + S.perfil.handle : (ROTA[aba] || '/');
@@ -980,6 +982,40 @@ document.addEventListener('click', e => {
 });
 pintarSom();
 
+
+/* notificação do sistema (quando a aba está em segundo plano) */
+const NT_TXT = {
+  pt:{ seg:h => `@${h} começou a seguir você`, meta:(n, m) => `Seu site ${n} chegou a ${m} acessos`, ver:'Você conquistou o selo de Verificado', blk:'Você conquistou o Selo BLACKE' },
+  en:{ seg:h => `@${h} started following you`, meta:(n, m) => `Your site ${n} reached ${m} visits`, ver:'You earned the Verified badge', blk:'You earned the BLACKE Badge' },
+  es:{ seg:h => `@${h} empezó a seguirte`, meta:(n, m) => `Tu sitio ${n} llegó a ${m} visitas`, ver:'Conseguiste el sello de Verificado', blk:'Conseguiste el Sello BLACKE' }
+};
+function ntPlano(x){
+  const T = NT_TXT[window.blLang ? window.blLang() : 'pt'] || NT_TXT.pt, d = x.dados || {};
+  if (x.tipo === 'seguidor') return T.seg(d.handle);
+  if (x.tipo === 'meta_site') return T.meta(d.nome || '', fmtN(d.meta));
+  return d.selo === 'blacke' ? T.blk : T.ver;
+}
+function ntSistema(novos){
+  try{
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const x = novos[0], extra = novos.length > 1 ? ` (+${novos.length - 1})` : '';
+    const n = new Notification('BLACKE LAVEX', { body: ntPlano(x) + extra, icon:'/icon-192.png', tag:'bl-aviso', silent:true });
+    n.onclick = () => {
+      try{ window.focus(); n.close(); }catch(_){}
+      if (x.tipo === 'seguidor') irParaPerfil((x.dados || {}).handle); else trocarAba('meus');
+    };
+  }catch(_){}
+}
+function ntPerm(){
+  const b = $('ntPerm'); if (b) b.hidden = !('Notification' in window) || Notification.permission !== 'default';
+}
+document.addEventListener('click', async e => {
+  if (!e.target.closest('#ntPermBtn')) return;
+  try{ await Notification.requestPermission(); }catch(_){}
+  ntPerm(); acordarAudio();
+  if ('Notification' in window && Notification.permission === 'granted') aviso('Avisos fora da aba ativados');
+});
+
 /* bolha no topo (estilo notificação de celular) quando chega aviso novo */
 let ntTimer = 0;
 function ntBolha(novos){
@@ -997,7 +1033,7 @@ function desenharNotif(){
   const l = $('ntLista'); if (!l) return;
   l.innerHTML = NT.itens.length ? NT.itens.map(ntItem).join('') : `<li class="nt-vz"><i class="fa-regular fa-bell"></i><b>Tudo em dia</b><span>Avisos de novos seguidores e metas de acessos aparecem aqui.</span></li>`;
   const b = $('ntN'); b.textContent = NT.n > 9 ? '9+' : String(NT.n); b.hidden = !NT.n;
-  $('ntTodas').hidden = !NT.n;
+  $('ntTodas').hidden = !NT.n; atualizarTitulo(); ntPerm();
   $('ntBtn').hidden = !(NT.itens.length || (S.perfil && S.perfil.handle));
 }
 async function carregarNotif(){
@@ -1011,7 +1047,10 @@ async function carregarNotif(){
     if (max > visto){
       const novos = NT.itens.filter(x => +x.id > visto && !x.lida);
       gravarLS('bl_nt_visto', String(max));
-      if (novos.length && $('ntPanel').hidden) ntBolha(novos);
+      if (novos.length){
+        if (document.hidden){ ntSom(); ntSistema(novos); }           // em outra aba: som + notificação do sistema
+        else if ($('ntPanel').hidden) ntBolha(novos);
+      }
     }
   }catch(_){}
 }
@@ -1047,7 +1086,8 @@ function pintarSegn(h, d){
 }
 let sincOcupado = false;
 async function sincronizar(){
-  if (document.hidden || sincOcupado || !S.token) return;
+  if (sincOcupado || !S.token) return;
+  if (document.hidden){ carregarNotif(); return; }       // em outra aba: só confere os avisos
   sincOcupado = true;
   try{
     carregarNotif();

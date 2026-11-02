@@ -3,7 +3,7 @@
    textos de usuários (nomes, legendas) nunca são traduzidos. */
 (() => {
   const D = [ // [pt, en, es]
-    ['Notificações','Notifications','Notificaciones'],['Som das notificações','Notification sound','Sonido de notificaciones'],['Marcar todas como lidas','Mark all as read','Marcar todas como leídas'],
+    ['Notificações','Notifications','Notificaciones'],['Receber avisos fora da aba','Get alerts outside the tab','Recibe avisos fuera de la pestaña'],['Notificação do sistema quando você estiver em outra aba.','System notification when you are on another tab.','Notificación del sistema cuando estés en otra pestaña.'],['Ativar','Enable','Activar'],['Avisos fora da aba ativados','Alerts outside the tab enabled','Avisos fuera de la pestaña activados'],['Som das notificações','Notification sound','Sonido de notificaciones'],['Marcar todas como lidas','Mark all as read','Marcar todas como leídas'],
     ['começou a seguir você','started following you','empezó a seguirte'],['Seu site','Your site','Tu sitio'],['chegou a','reached','llegó a'],
     ['Você conquistou o Selo BLACKE','You earned the BLACKE Badge','Conseguiste el Sello BLACKE'],['Você conquistou o selo de Verificado','You earned the Verified badge','Conseguiste el sello de Verificado'],
     ['Tudo em dia','All caught up','Todo al día'],['Avisos de novos seguidores e metas de acessos aparecem aqui.','New follower and visit milestone alerts show up here.','Los avisos de nuevos seguidores y metas de visitas aparecen aquí.'],
