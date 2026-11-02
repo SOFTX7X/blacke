@@ -908,6 +908,79 @@ document.addEventListener('click', e => {
   if (r){ fechar('modalSeg'); irParaPerfil(r.dataset.sgp); }
 });
 
+
+/* ---------- notificações ---------- */
+const NT = { itens:[], n:0, t:0 };
+const ntTempo = d => {
+  const s = Math.round((new Date(d) - Date.now()) / 1000), a = Math.abs(s);
+  try{
+    const f = new Intl.RelativeTimeFormat(LOC(), { numeric:'auto' });
+    if (a < 60) return f.format(0, 'second');
+    if (a < 3600) return f.format(Math.round(s / 60), 'minute');
+    if (a < 86400) return f.format(Math.round(s / 3600), 'hour');
+    if (a < 604800) return f.format(Math.round(s / 86400), 'day');
+    return new Date(d).toLocaleDateString(LOC(), { day:'2-digit', month:'short' });
+  }catch(_){ return ''; }
+};
+function ntItem(x){
+  const d = x.dados || {}, tempo = `<time datetime="${esc(x.criado_em)}">${esc(ntTempo(x.criado_em))}</time>`;
+  let ic = '', txt = '', alvo = '';
+  if (x.tipo === 'seguidor'){
+    if (x.v) VERIF.add(d.handle); if (x.nj) NINJA.add(d.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(d.handle, x.f);
+    ic = miniAv(d.handle);
+    txt = `<b translate="no">@${esc(d.handle)}</b> <span>começou a seguir você</span>`; alvo = `data-ntp="${esc(d.handle)}"`;
+  } else if (x.tipo === 'meta_site'){
+    ic = '<i class="nt-ic am"><i class="fa-solid fa-trophy"></i></i>';
+    txt = `<span>Seu site</span> <b translate="no">${esc(d.nome || '')}</b> <span>chegou a</span> <b>${fmtN(d.meta)}</b> <span>acessos</span>`; alvo = 'data-ntm="1"';
+  } else {
+    const nj = d.selo === 'blacke';
+    ic = `<i class="nt-ic ${nj ? 'vi' : 'ci'}">${nj ? SELO_BLACKE : SELO}</i>`;
+    txt = nj ? '<span>Você conquistou o Selo BLACKE</span>' : '<span>Você conquistou o selo de Verificado</span>'; alvo = 'data-ntm="1"';
+  }
+  return `<li><button type="button" class="nt-i ${x.lida ? '' : 'nova'}" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><span class="nt-x">${txt}</span>${tempo}</span>${x.lida ? '' : '<i class="nt-d" aria-hidden="true"></i>'}</button></li>`;
+}
+function desenharNotif(){
+  const l = $('ntLista'); if (!l) return;
+  l.innerHTML = NT.itens.length ? NT.itens.map(ntItem).join('') : `<li class="nt-vz"><i class="fa-regular fa-bell"></i><b>Tudo em dia</b><span>Avisos de novos seguidores e metas de acessos aparecem aqui.</span></li>`;
+  const b = $('ntN'); b.textContent = NT.n > 9 ? '9+' : String(NT.n); b.hidden = !NT.n;
+  $('ntTodas').hidden = !NT.n;
+  $('ntBtn').hidden = !(NT.itens.length || (S.perfil && S.perfil.handle));
+}
+async function carregarNotif(){
+  if (!S.token) return;
+  try{
+    const { data, error } = await _supabase.rpc('minhas_notificacoes', { p_token:S.token, p_limite:30 });
+    if (error || !data) return;
+    NT.itens = Array.isArray(data.itens) ? data.itens : []; NT.n = +data.nao_lidas || 0;
+    desenharNotif();
+  }catch(_){}
+}
+function ntAbrir(on){
+  const p = $('ntPanel'); if (!p) return;
+  p.hidden = !on; $('ntBack').hidden = !on; $('ntBtn').setAttribute('aria-expanded', on);
+  if (on) carregarNotif();
+}
+async function ntLer(id){
+  try{ await _supabase.rpc('marcar_notificacoes_lidas', { p_token:S.token, p_id:id }); }catch(_){}
+  NT.itens.forEach(x => { if (id == null || x.id === id) x.lida = true; });
+  NT.n = NT.itens.filter(x => !x.lida).length; desenharNotif();
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('#ntBtn')){ ntAbrir($('ntPanel').hidden); return; }
+  if (e.target.closest('#ntTodas')){ ntLer(null); return; }
+  const i = e.target.closest('[data-nti]');
+  if (i){
+    const id = +i.dataset.nti; if (NT.itens.find(x => x.id === id && !x.lida)) ntLer(id);
+    ntAbrir(false);
+    if (i.dataset.ntp) irParaPerfil(i.dataset.ntp); else if (i.dataset.ntm) trocarAba('meus');
+    return;
+  }
+  if (!$('ntPanel').hidden && !e.target.closest('#ntPanel')) ntAbrir(false);
+});
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ntPanel').hidden) ntAbrir(false); });
+setInterval(() => { if (!document.hidden) carregarNotif(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) carregarNotif(); });
+
 /* ---------- cartão de perfil ---------- */
 const fmtN = n => { try{ return new Intl.NumberFormat(LOC(), { notation:'compact', maximumFractionDigits:1 }).format(n || 0); }catch(_){ return String(n || 0); } };
 const CT_ICO = { telegram:'fa-brands fa-telegram', whatsapp:'fa-brands fa-whatsapp', instagram:'fa-brands fa-instagram' };
@@ -1299,9 +1372,9 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
-  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); } });
+  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo(); carregarNotif();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }
