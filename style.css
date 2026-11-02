@@ -1903,7 +1903,10 @@ body[data-aba="chat"]::before{display:none}
 .chp-x:hover{background:rgba(255,255,255,.08)}
 .chp-av{display:grid;place-items:center}
 .chp-av .amini{width:96px!important;height:96px!important;font-size:36px!important}
-.chp-n{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 16px 2px;font:600 19px system-ui,sans-serif}
+.chp-n{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:8px;margin:12px 12px 2px;font:600 20px system-ui,sans-serif}
+.chp-nm{max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.chp-sl{display:flex;align-items:center;gap:5px;justify-self:start;min-width:0}
+.chp-sl svg,.chp-sl img{width:20px;height:20px;flex:none}
 .chp-st{text-align:center;font:400 13.5px system-ui,sans-serif;color:var(--muted);min-height:18px}
 .chp-ac{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 14px 12px}
 .chp-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;padding:0 4px;border:0;border-radius:12px;background:rgba(255,255,255,.07);color:#e3e5f6;font:500 12px system-ui,sans-serif;text-decoration:none;cursor:pointer}

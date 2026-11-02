@@ -1897,7 +1897,7 @@ async function chPerfilAbrir(h){
   const desde = data.desde ? new Date(data.desde).toLocaleDateString(LOC(), { month:'long', year:'numeric' }) : '';
   const linha = (ic, t, sub) => `<div class="chp-l"><i class="${ic}" aria-hidden="true"></i><div><span class="chp-v">${t}</span><small>${sub}</small></div></div>`;
   c.innerHTML = `<div class="chp-av ch-av">${miniAv(data.handle)}</div>
-    <h3 class="chp-n"><span translate="no">@${H}</span>${selosDe(data.handle)}</h3>
+    <h3 class="chp-n"><i></i><span class="chp-nm" translate="no">@${H}</span><span class="chp-sl">${selosDe(data.handle)}</span></h3>
     <div class="chp-st">${st}</div>
     <div class="chp-ac">
       <button type="button" class="chp-t" data-seg-btn data-h="${H}"></button>
