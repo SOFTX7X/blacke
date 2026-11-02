@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','lista_seguir','ids_em_alta'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -93,9 +93,11 @@ addEventListener('keydown', e => {
 });
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) fecharTopo(m); }));
 
-function confirmar({titulo, texto, botao}){
+function confirmar({titulo, texto, botao, quem}){
   return new Promise(res => {
     $('cfTitulo').textContent = titulo; $('cfTexto').textContent = texto; $('cfOk').textContent = botao || 'Confirmar';
+    document.querySelectorAll('#modalConfirma .cf-quem').forEach(n => n.remove());
+    if (quem) $('cfTitulo').insertAdjacentHTML('beforebegin', `<div class="cf-quem">${miniAv(quem)}<b translate="no">@${esc(quem)}</b></div>`);
     abrir('modalConfirma');
     const fim = v => { fechar('modalConfirma'); $('cfOk').onclick = $('cfNo').onclick = null; confirmar._fim = null; res(v); };
     confirmar._fim = fim; $('cfOk').onclick = () => fim(true); $('cfNo').onclick = () => fim(false);
@@ -864,31 +866,39 @@ function segNum(p, tipo){
   const v = +p[tipo] || 0, rot = tipo === 'seguidores' ? (v === 1 ? 'seguidor' : 'seguidores') : 'seguindo';
   return `<li><button type="button" class="ig-sg" data-seg-ver="${tipo}" data-h="${esc(p.handle)}"><b data-segn="${esc(p.handle)}:${tipo}">${fmtN(v)}</b> <span>${rot}</span></button></li>`;
 }
+const SEGUEME = new Set();   // quem me segue (para "Seguir de volta")
 async function carregarSeguindo(){
-  SEGUINDO.clear();
+  SEGUINDO.clear(); SEGUEME.clear();
   if (S.token){
     try{ const { data, error } = await _supabase.rpc('meus_seguindo', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUINDO.add(h)); }catch(_){}
+    try{ const { data, error } = await _supabase.rpc('meus_seguidores', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUEME.add(h)); }catch(_){}
   }
   document.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
 }
 function pintarSeguir(b){
-  const on = SEGUINDO.has(b.dataset.h);
+  const on = SEGUINDO.has(b.dataset.h), volta = !on && SEGUEME.has(b.dataset.h);
   b.classList.toggle('on', on); b.classList.toggle('pri', !on); b.setAttribute('aria-pressed', on);
-  b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : '<i class="fa-solid fa-user-plus"></i> <span>Seguir</span>';
+  b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : `<i class="fa-solid fa-user-plus"></i> <span>${volta ? 'Seguir de volta' : 'Seguir'}</span>`;
 }
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-seg-btn]'); if (!b || b.dataset.busy) return;
   const h = b.dataset.h;
   if (!S.perfil || !S.perfil.handle){ aviso('Reserve seu @ para seguir perfis'); return; }
   const on = !SEGUINDO.has(h);
-  b.dataset.busy = '1'; on ? SEGUINDO.add(h) : SEGUINDO.delete(h); pintarSeguir(b);
+  if (!on){
+    b.dataset.busy = '1';
+    const ok = await confirmar({ titulo:'Deixar de seguir?', texto:'Você pode voltar a seguir quando quiser.', botao:'Deixar de seguir', quem:h });
+    delete b.dataset.busy; if (!ok) return;
+    b.dataset.busy = '1';
+  } else b.dataset.busy = '1';
+  on ? SEGUINDO.add(h) : SEGUINDO.delete(h); document.querySelectorAll(`[data-seg-btn][data-h="${CSS.escape(h)}"]`).forEach(pintarSeguir);
   try{
     const { data, error } = await _supabase.rpc('seguir', { p_handle:h, p_token:S.token, p_on:on });
     if (error) throw error;
     if (data && data.seguidores != null) document.querySelectorAll('[data-segn]').forEach(n => { if (n.dataset.segn === h + ':seguidores'){ n.textContent = fmtN(data.seguidores); n.dataset.v = String(data.seguidores); } });
     if (S.perfil) S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + (on ? 1 : -1));
   }catch(err){
-    on ? SEGUINDO.delete(h) : SEGUINDO.add(h); pintarSeguir(b);
+    on ? SEGUINDO.delete(h) : SEGUINDO.add(h); document.querySelectorAll(`[data-seg-btn][data-h="${CSS.escape(h)}"]`).forEach(pintarSeguir);
     const m = String((err && err.message) || '');
     aviso(/Reserve|Limite|si mesmo|encontrado/.test(m) ? m : 'Não foi possível seguir agora.');
   }
@@ -901,8 +911,9 @@ async function abrirListaSeg(h, tipo){
   try{ const { data } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; }catch(_){}
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
   ul.innerHTML = lista.length
-    ? lista.map(x => `<li><button type="button" class="sg-r" data-sgp="${esc(x.handle)}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${esc(x.handle)}</span>${selosDe(x.handle)}</button></li>`).join('')
+    ? lista.map(x => `<li class="sg-li"><button type="button" class="sg-r" data-sgp="${esc(x.handle)}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${esc(x.handle)}</span>${selosDe(x.handle)}</button>${S.perfil && S.perfil.handle && S.perfil.handle !== x.handle ? `<button type="button" class="seg-btn sg-b" data-seg-btn data-h="${esc(x.handle)}"></button>` : ''}</li>`).join('')
     : `<li class="sg-vz">${tipo === 'seguindo' ? 'Não segue ninguém ainda.' : 'Nenhum seguidor ainda.'}</li>`;
+  ul.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
 }
 document.addEventListener('click', e => {
   const v = e.target.closest('[data-seg-ver]');
