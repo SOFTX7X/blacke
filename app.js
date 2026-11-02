@@ -953,11 +953,12 @@ const somLigado = () => lerLS('bl_nt_som') !== '0';
 function acordarAudio(){
   try{ AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); }catch(_){}
 }
-['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, acordarAudio, { once:true, passive:true }));
+['pointerdown', 'keydown', 'touchstart', 'click'].forEach(ev => addEventListener(ev, () => { if (!AC || AC.state !== 'running') acordarAudio(); }, { passive:true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && AC && AC.state === 'suspended') acordarAudio(); });
 function ntSom(forcar){
-  if (!forcar && !somLigado()) return;
+  if (!forcar && !somLigado()) return true;           // som desligado de propósito: não precisa de plano B
   try{
-    acordarAudio(); if (!AC || AC.state !== 'running') return;
+    acordarAudio(); if (!AC || AC.state !== 'running') return false;
     const t0 = AC.currentTime + 0.02, mestre = AC.createGain();
     mestre.gain.value = 0.16; mestre.connect(AC.destination);
     [[783.99, 0], [1174.66, 0.13], [1567.98, 0.28]].forEach(([f, d], i) => {
@@ -969,7 +970,8 @@ function ntSom(forcar){
         o.connect(g); g.connect(mestre); o.start(t); o.stop(t + 0.8);
       });
     });
-  }catch(_){}
+    return true;
+  }catch(_){ return false; }
 }
 function pintarSom(){
   const b = $('ntSom'); if (!b) return;
@@ -995,11 +997,11 @@ function ntPlano(x){
   if (x.tipo === 'meta_site') return T.meta(d.nome || '', fmtN(d.meta));
   return d.selo === 'blacke' ? T.blk : T.ver;
 }
-function ntSistema(novos){
+function ntSistema(novos, somDoSite){
   try{
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const x = novos[0], extra = novos.length > 1 ? ` (+${novos.length - 1})` : '';
-    const n = new Notification('BLACKE LAVEX', { body: ntPlano(x) + extra, icon:'/icon-192.png', tag:'bl-aviso', silent:true });
+    const n = new Notification('BLACKE LAVEX', { body: ntPlano(x) + extra, icon:'/icon-192.png', tag:'bl-aviso', renotify:true, silent:!!somDoSite && somLigado() });
     n.onclick = () => {
       try{ window.focus(); n.close(); }catch(_){}
       if (x.tipo === 'seguidor') irParaPerfil((x.dados || {}).handle); else trocarAba('meus');
@@ -1048,7 +1050,7 @@ async function carregarNotif(){
       const novos = NT.itens.filter(x => +x.id > visto && !x.lida);
       gravarLS('bl_nt_visto', String(max));
       if (novos.length){
-        if (document.hidden){ ntSom(); ntSistema(novos); }           // em outra aba: som + notificação do sistema
+        if (document.hidden){ const tocou = ntSom(); ntSistema(novos, tocou); }           // em outra aba: som + notificação do sistema
         else if ($('ntPanel').hidden) ntBolha(novos);
       }
     }
@@ -1104,7 +1106,10 @@ async function sincronizar(){
     }
   }finally{ sincOcupado = false; }
 }
-setInterval(sincronizar, 20000);
+try{
+  const w = new Worker(URL.createObjectURL(new Blob(['setInterval(()=>postMessage(1),20000)'], { type:'text/javascript' })));
+  w.onmessage = sincronizar;
+}catch(_){ setInterval(sincronizar, 20000); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizar(); });
 addEventListener('focus', sincronizar);
 
