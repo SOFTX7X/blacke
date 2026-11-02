@@ -1645,3 +1645,5 @@ details.sl{display:block;padding:0}
 .seg-lnk i{display:none}
 .seg-lnk.on{color:rgba(255,255,255,.5)!important}
 .seg-lnk:hover{text-decoration:underline}
+.seg-btn.seg-lnk,.seg-btn.seg-lnk.on,.seg-btn.seg-lnk.on:hover{background:none!important;border:0!important;border-radius:0;box-shadow:none}
+.seg-btn.seg-lnk.on i{display:none}
