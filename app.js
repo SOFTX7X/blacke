@@ -969,10 +969,9 @@ async function carregarNotif(){
     if (error || !data) return;
     NT.itens = Array.isArray(data.itens) ? data.itens : []; NT.n = +data.nao_lidas || 0;
     desenharNotif();
-    const max = NT.itens.reduce((m, x) => Math.max(m, +x.id || 0), 0), visto = lerLS('bl_nt_visto');
-    if (visto === null || visto === undefined || visto === ''){ gravarLS('bl_nt_visto', String(max)); }
-    else if (max > +visto){
-      const novos = NT.itens.filter(x => +x.id > +visto && !x.lida);
+    const max = NT.itens.reduce((m, x) => Math.max(m, +x.id || 0), 0), visto = +(lerLS('bl_nt_visto') || 0);
+    if (max > visto){
+      const novos = NT.itens.filter(x => +x.id > visto && !x.lida);
       gravarLS('bl_nt_visto', String(max));
       if (novos.length && $('ntPanel').hidden) ntBolha(novos);
     }
