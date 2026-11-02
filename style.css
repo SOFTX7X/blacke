@@ -1995,3 +1995,18 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
   body[data-aba="chat"] .bnav{background:#1f2240;border-color:rgba(255,255,255,.06);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 10px 30px -12px rgba(0,0,0,.55)}
   body[data-aba="chat"] .bnav.aberto,body[data-aba="chat"] html.tecla .bnav:has(:focus-visible){box-shadow:0 12px 34px -12px rgba(0,0,0,.6)}
 }
+/* chat: botões estáticos, só o ícone (sem giro, sem fundo, sem animação) */
+.chat-sec .icon-btn,.chat-sec .ch-ac button,.chat-sec .ch-rmb,.chat-sec .ch-ebtn{background:none!important;border:0!important;box-shadow:none;transition:none!important;transform:none!important}
+.chat-sec .icon-btn{color:#a3a8c8}
+.chat-sec .icon-btn:hover,.chat-sec .ch-rmb:hover,.chat-sec .ch-ac button:hover{color:#fff;background:none!important;transform:none!important}
+.chat-sec .ch-ac{transition:none}
+.chat-sec .ch-ac button{color:#aeb3d4}
+.chat-sec .ch-ac button[data-chat-del],.chat-sec .ch-ac button[data-chat-rm]{color:#ffb3bf}
+/* ⋮ da linha sempre no mesmo lugar: nada aparece nem some */
+.ch-rmb{opacity:1!important;pointer-events:auto!important;top:50%;right:6px;transform:translateY(-50%)!important;width:24px;height:30px;color:#7d82a3}
+.ch-li:hover .ch-hr{visibility:visible!important}
+.ch-r{padding-right:34px}
+.ch-lado.selm .ch-rmb{display:none}
+.ch-lado.selm .ch-r{padding-right:10px}
+.ch-menu button,.ch-menu{transition:none}
+.chp-x{transition:none!important;transform:none!important}
