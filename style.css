@@ -2026,3 +2026,6 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-m.achou{outline:1px solid rgba(255,214,102,.45)}
 .ch-m.atual{outline:2px solid #ffd666}
 .ch-conv.selm>.ch-bmsg{display:none}
+
+.ch-tk{font-size:11px;margin-right:2px;color:var(--muted)}
+.ch-tk.lido{color:#8fe8ff}
