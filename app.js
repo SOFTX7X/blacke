@@ -959,7 +959,7 @@ async function carregarSeguindo(){
   SEGUINDO.clear(); SEGUEME.clear();
   const antes = [...BLOQ].sort().join(',');
   if (S.token){
-    try{ const { data, error } = await _supabase.rpc('chat_bloqueados', { p_token:S.token }); if (!error && Array.isArray(data)){ BLOQ.clear(); data.forEach(x => BLOQ.add(x.handle)); } }catch(_){}
+    try{ const { data, error } = await _supabase.rpc('chat_ocultos', { p_token:S.token }); if (!error && Array.isArray(data)){ BLOQ.clear(); data.forEach(h => BLOQ.add(h)); } }catch(_){}
     try{ const { data, error } = await _supabase.rpc('meus_seguindo', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUINDO.add(h)); }catch(_){}
     try{ const { data, error } = await _supabase.rpc('meus_seguidores', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUEME.add(h)); }catch(_){}
   }
