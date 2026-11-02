@@ -896,7 +896,8 @@ document.addEventListener('click', async e => {
     const { data, error } = await _supabase.rpc('seguir', { p_handle:h, p_token:S.token, p_on:on });
     if (error) throw error;
     if (data && data.seguidores != null) document.querySelectorAll('[data-segn]').forEach(n => { if (n.dataset.segn === h + ':seguidores'){ n.textContent = fmtN(data.seguidores); n.dataset.v = String(data.seguidores); } });
-    if (S.perfil) S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + (on ? 1 : -1));
+    if (S.perfil){ S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + (on ? 1 : -1)); if (S.perfil.handle) pintarSegn(S.perfil.handle, { seguindo:S.perfil.seguindo }); }
+    atualizarContagens();
   }catch(err){
     on ? SEGUINDO.delete(h) : SEGUINDO.add(h); document.querySelectorAll(`[data-seg-btn][data-h="${CSS.escape(h)}"]`).forEach(pintarSeguir);
     const m = String((err && err.message) || '');
@@ -919,6 +920,7 @@ document.addEventListener('click', async e => {
     if (S.perfil && data) S.perfil.seguidores = data.seguidores;
     if (!document.querySelector('#sgLista .sg-li')) $('sgLista').innerHTML = '<li class="sg-vz">Nenhum seguidor ainda.</li>';
     aviso('Seguidor removido');
+    atualizarContagens();
   }catch(_){ aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
 });
 let SGATUAL = null;
@@ -1145,6 +1147,18 @@ function pintarSegn(h, d){
     n.textContent = fmtN(d[tp]); n.dataset.v = String(d[tp]);
   });
 }
+async function atualizarContagens(){
+  const hs = [...new Set([...document.querySelectorAll('[data-segn]')].map(n => n.dataset.segn.split(':')[0]))].slice(0, 6);
+  await Promise.all(hs.map(async h => {
+    try{ const { data } = await _supabase.rpc('perfil_publico', { p_handle:h }); if (data) pintarSegn(h, data); }catch(_){}
+  }));
+  if (S.perfil && S.perfil.handle && S.token){
+    try{
+      const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token });
+      if (data){ S.perfil.seguidores = data.seguidores; S.perfil.seguindo = data.seguindo; pintarSegn(S.perfil.handle, data); }
+    }catch(_){}
+  }
+}
 let sincOcupado = false;
 async function sincronizar(){
   if (sincOcupado || !S.token) return;
@@ -1154,16 +1168,7 @@ async function sincronizar(){
     carregarNotif();
     await carregarSeguindo();
     if (!$('modalSeg').hidden && SGATUAL && !document.querySelector('#modalConfirma:not([hidden])')) await abrirListaSeg(SGATUAL.h, SGATUAL.tipo, true);
-    const hs = [...new Set([...document.querySelectorAll('[data-segn]')].map(n => n.dataset.segn.split(':')[0]))].slice(0, 6);
-    await Promise.all(hs.map(async h => {
-      try{ const { data } = await _supabase.rpc('perfil_publico', { p_handle:h }); if (data) pintarSegn(h, data); }catch(_){}
-    }));
-    if (S.perfil && S.perfil.handle){
-      try{
-        const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token });
-        if (data){ S.perfil.seguidores = data.seguidores; S.perfil.seguindo = data.seguindo; pintarSegn(S.perfil.handle, data); }
-      }catch(_){}
-    }
+    await atualizarContagens();
   }finally{ sincOcupado = false; }
 }
 try{
