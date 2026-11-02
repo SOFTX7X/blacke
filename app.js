@@ -1861,7 +1861,7 @@ function chMsgsHtml(msgs){
     const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
     const q = m.r ? `<button type="button" class="ch-q" data-chat-ir="${m.r.id || ''}"><b translate="no">${m.r.m ? '<span>Você</span>' : '@' + esc(CH.h)}</b><span class="ch-qt" translate="no">${m.r.ap ? '' : esc(m.r.t)}</span>${m.r.ap ? '<span class="ch-qt"><i>Mensagem apagada</i></span>' : ''}</button>` : '';
     const ac = '';
-    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${ac}</div>`;
+    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}${m.m && !m.ap ? ` <i class="fa-solid ${m.l ? 'fa-check-double lido' : 'fa-check'}" aria-hidden="true"></i>` : ''}</span>${ac}</div>`;
     ant = { dia, m:m.m, t:new Date(m.at) };
   });
   return out;
@@ -1874,7 +1874,7 @@ function chLinha(x){
   return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}${CH.lsel.has(x.handle) ? ' ck' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-ckl" aria-hidden="true"><i class="fa-solid fa-check"></i></span><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span><span class="ch-fim">${ic}${x.nl ? `<span class="ch-nl${x.si ? ' mudo' : ''}">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></span></button></li>`;
 }
 async function chLista(){
-  CH.h = null; clearInterval(CH.t); chSelMsgs(false);
+  CH.h = null; clearInterval(CH.t); chSelMsgs(false); chBuscaFechar();
   $('chatSec').classList.remove('abriu'); document.body.classList.remove('ch-aberto'); chEmjAbrir(false); chPerfilFechar(); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
   await chPessoas(true);
 }
@@ -1998,7 +1998,7 @@ function chStatusTopo(){
   el.className = 'ch-st' + (x.on ? ' on' : ''); el.innerHTML = x.on ? '<span>Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
 }
 async function chConversa(h){
-  CH.h = h; CH.sig = ''; CH.dig = false; chSelMsgs(false); chRespLimpar(); clearInterval(CH.t); if (!$('chPerf').hidden) chPerfilAbrir(h);
+  CH.h = h; CH.sig = ''; CH.dig = false; chSelMsgs(false); chBuscaFechar(); chRespLimpar(); clearInterval(CH.t); if (!$('chPerf').hidden) chPerfilAbrir(h);
   $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
   $('chatSec').classList.add('abriu'); document.body.classList.add('ch-aberto'); chEmjAbrir(false); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
@@ -2017,7 +2017,7 @@ function chDigBolha(){
 async function chCarregar(rolar){
   const h = CH.h; let d = null;
   try{
-    const r = await _supabase.rpc('chat_mensagens', { p_handle:h, p_token:S.token, p_apos:0, p_limite:60 });
+    const r = await _supabase.rpc('chat_mensagens', { p_handle:h, p_token:S.token, p_apos:0, p_limite:CH.bmOn ? 100 : 60 });
     if (!r.error) d = r.data; else if (rolar){ aviso(chErro(r)); chLista(); return; }
   }catch(_){}
   if (!d || CH.h !== h) return;
@@ -2026,12 +2026,13 @@ async function chCarregar(rolar){
   $('chForm').hidden = !d.pode; $('chAviso').hidden = !!d.pode;
   $('chAviso').textContent = d.bloqueei ? 'Você bloqueou este usuário.' : 'Vocês precisam se seguir mutuamente para conversar.';
   const dig = !!d.dig; if (dig !== CH.dig){ CH.dig = dig; chStatusTopo(); chDigBolha(); }
-  const sig = msgs.map(m => m.id + (m.ap ? 'x' : '') + (m.r ? 'r' + (m.r.ap ? 'x' : '') : '')).join(',') + '|' + d.pode + d.bloqueei;
+  const sig = msgs.map(m => m.id + (m.ap ? 'x' : '') + (m.l ? 'v' : '') + (m.r ? 'r' + (m.r.ap ? 'x' : '') : '')).join(',') + '|' + d.pode + d.bloqueei;
   if (sig === CH.sig) return; CH.sig = sig;
   const box = $('chMsgs'), perto = rolar || box.scrollHeight - box.scrollTop - box.clientHeight < 90;
   box.innerHTML = msgs.length ? chMsgsHtml(msgs) : '<div class="sg-vz">Diga oi 👋</div>';
   if (perto) box.scrollTop = box.scrollHeight;
   chDigBolha();
+  if (CH.bmOn) chBuscaRodar(true);
   chNaoLidas();
 }
 
@@ -2271,6 +2272,39 @@ document.addEventListener('contextmenu', e => {
   document.addEventListener('touchmove', e => { const p = e.touches[0]; if (t && (Math.abs(p.clientX - x0) > 10 || Math.abs(p.clientY - y0) > 10)) limpa(); }, { passive:true });
   document.addEventListener('touchend', limpa, { passive:true }); document.addEventListener('touchcancel', limpa, { passive:true });
 })();
+
+/* ---------- Buscar dentro da conversa (nas últimas 100 mensagens) ---------- */
+CH.bmOn = false; CH.bmRes = []; CH.bmI = 0;
+function chBuscaAbrir(){
+  CH.bmOn = true; $('chBMsg').hidden = false; $('chBMsgI').value = ''; CH.bmRes = []; $('chBMsgN').textContent = '';
+  CH.sig = ''; chCarregar(false); $('chBMsgI').focus();
+}
+function chBuscaFechar(){
+  if (!CH.bmOn) return; CH.bmOn = false; CH.bmRes = []; $('chBMsg').hidden = true;
+  document.querySelectorAll('#chMsgs .ch-m.achou').forEach(x => x.classList.remove('achou', 'atual'));
+}
+function chBuscaRodar(manter){
+  const q = $('chBMsgI').value.trim().toLowerCase();
+  const atual = manter && CH.bmRes[CH.bmI];
+  CH.bmRes = q ? [...CH.msgs.values()].filter(m => !m.ap && String(m.t || '').toLowerCase().includes(q)).map(m => m.id) : [];
+  CH.bmI = manter && atual && CH.bmRes.includes(atual) ? CH.bmRes.indexOf(atual) : CH.bmRes.length - 1;
+  chBuscaMarcar(!manter);
+}
+function chBuscaMarcar(rolar){
+  document.querySelectorAll('#chMsgs .ch-m.achou').forEach(x => x.classList.remove('achou', 'atual'));
+  CH.bmRes.forEach((id, i) => { const el = document.getElementById('chm-' + id); if (el){ el.classList.add('achou'); if (i === CH.bmI) el.classList.add('atual'); } });
+  const q = $('chBMsgI').value.trim();
+  $('chBMsgN').textContent = !q ? '' : CH.bmRes.length ? `${CH.bmI + 1}/${CH.bmRes.length}` : '0';
+  const el = CH.bmRes.length && document.getElementById('chm-' + CH.bmRes[CH.bmI]);
+  if (rolar && el) el.scrollIntoView({ block:'center' });
+}
+function chBuscaIr(d){ const n = CH.bmRes.length; if (!n) return; CH.bmI = (CH.bmI + d + n) % n; chBuscaMarcar(true); }
+$('chBuscarMsg').addEventListener('click', () => { $('chMenu').hidden = true; chBuscaAbrir(); });
+$('chBMsgI').addEventListener('input', () => chBuscaRodar(false));
+$('chBMsgI').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); chBuscaIr(e.shiftKey ? 1 : -1); } else if (e.key === 'Escape'){ e.stopPropagation(); chBuscaFechar(); } });
+$('chBMsgUp').addEventListener('click', () => chBuscaIr(-1));
+$('chBMsgDn').addEventListener('click', () => chBuscaIr(1));
+$('chBMsgX').addEventListener('click', chBuscaFechar);
 
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };

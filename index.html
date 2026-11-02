@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="/style.css?v=1793640884">
+  <link rel="stylesheet" href="/style.css?v=1793641063">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -153,6 +153,7 @@
             <div class="ch-acoes">
               <button class="icon-btn" id="chMais" type="button" aria-label="Mais opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis-vertical"></i></button>
               <div class="ch-menu" id="chMenu" hidden role="menu">
+                <button type="button" role="menuitem" id="chBuscarMsg">Buscar na conversa</button>
                 <button type="button" role="menuitem" id="chSelMsg">Selecionar mensagens</button>
                 <button type="button" role="menuitem" id="chLimpar">Limpar conversa</button>
                 <button type="button" role="menuitem" id="chApagarConv" class="perigo">Apagar conversa</button>
@@ -161,6 +162,7 @@
               </div>
             </div>
           </div>
+          <div class="ch-bmsg" id="chBMsg" hidden><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="chBMsgI" type="search" placeholder="Buscar na conversa" aria-label="Buscar na conversa" autocomplete="off" spellcheck="false"><span class="ch-bmn" id="chBMsgN"></span><button type="button" class="icon-btn" id="chBMsgUp" aria-label="Anterior"><i class="fa-solid fa-chevron-up"></i></button><button type="button" class="icon-btn" id="chBMsgDn" aria-label="Próxima"><i class="fa-solid fa-chevron-down"></i></button><button type="button" class="icon-btn" id="chBMsgX" aria-label="Fechar busca"><i class="fa-solid fa-xmark"></i></button></div>
           <div class="ch-selb" id="chSelB"><button class="icon-btn" id="chSelX" type="button" aria-label="Cancelar"><i class="fa-solid fa-xmark"></i></button><span class="ch-selt"><b id="chSelN">0</b> <span>selecionadas</span></span><span class="ch-selacs"><button class="icon-btn perigo" id="chSelDel" type="button" aria-label="Apagar" title="Apagar"><i class="fa-regular fa-trash-can"></i></button></span></div>
           <div class="ch-msgs" id="chMsgs"></div>
           <div class="ch-aviso" id="chAviso" hidden></div>
@@ -480,7 +482,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="/i18n.js?v=1793640884"></script>
-  <script src="/app.js?v=1793640884"></script>
+  <script src="/i18n.js?v=1793641063"></script>
+  <script src="/app.js?v=1793641063"></script>
 </body>
 </html>

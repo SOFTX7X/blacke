@@ -2014,3 +2014,15 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-ac,.ch-rmb{display:none!important}
 .ch-r{padding-right:10px!important}
 .ch-m{-webkit-touch-callout:none;-webkit-user-select:text}
+
+/* lido (✓✓) e busca na conversa */
+.ch-h i{font-size:10px;margin-left:3px;opacity:.75}
+.ch-h i.lido{color:#8fe8ff;opacity:1}
+.ch-bmsg{flex:none;display:flex;align-items:center;gap:6px;height:50px;padding:0 10px 0 16px;border-bottom:1px solid var(--ch-linha);color:var(--muted)}
+.ch-bmsg[hidden]{display:none}
+.ch-bmsg input{flex:1;min-width:0;border:0;background:none;color:var(--text);font:400 15px system-ui,sans-serif;outline:0}
+.ch-bmsg input::-webkit-search-cancel-button{display:none}
+.ch-bmn{font:600 12px var(--mono);color:var(--muted);min-width:34px;text-align:right}
+.ch-m.achou{outline:1px solid rgba(255,214,102,.45)}
+.ch-m.atual{outline:2px solid #ffd666}
+.ch-conv.selm>.ch-bmsg{display:none}
