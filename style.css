@@ -1558,7 +1558,14 @@ details.sl{display:block;padding:0}
 .selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))}
 
 /* Ranking da semana */
-.rk{margin:10px 0 6px}
+.rk{margin:0 0 6px;padding:0;border-radius:0!important;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;animation:none;overflow:visible;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}
+.rk::before{display:none}
+.rk .nm-h{padding:11px 0}
+.rk .nm-h:hover{background:none}
+.rk .nm-h h3{font-size:15px}
+.rk .nm-b{padding:0 0 8px}
+.sw.com-rk{border-bottom:0;margin-bottom:0;padding-bottom:6px}
+.sw.com-rk + #ranking .rk{border-top:0}
 .rk[hidden],#ranking[hidden]{display:none}
 .rk-f{display:inline-flex}
 .rk-f img{width:28px;height:28px;border-radius:50%!important;object-fit:cover;border:2px solid #0c0e1b;margin-left:-8px;background:#11142a}

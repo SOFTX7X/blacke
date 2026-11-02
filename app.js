@@ -1460,7 +1460,7 @@ async function carregarRanking(){
 function desenharRanking(){
   const el = $('ranking'); if (!el) return;
   const mostrar = RANK && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
-  el.hidden = !mostrar; if (!mostrar) return;
+  el.hidden = !mostrar; const sw = $('semana'); if (sw) sw.classList.toggle('com-rk', !!mostrar); if (!mostrar) return;
   RANK.forEach(it => { if (!acharItem(it.id)) S.itens.push(it); });
   const topo = Math.max(1, +RANK[0].n7 || 1), tot = RANK.reduce((t, s) => t + (+s.n7 || 0), 0);
   const faces = RANK.slice(0, 3).map(s => `<img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}">`).join('');
