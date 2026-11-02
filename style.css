@@ -1593,3 +1593,6 @@ details.sl{display:block;padding:0}
   .rk-ac{grid-column:2 / -1}
   .rk-ac>*{flex:1}
 }
+
+/* sem contorno de foco nos blocos de ranking/números/selo */
+.nm-h,.nm-h:focus,.nm-h:focus-visible,.rk-av:focus,.rk-av:focus-visible,details.nm:focus,details.nm:focus-visible,details.sl>summary,details.sl>summary:focus,details.sl>summary:focus-visible{outline:none!important;-webkit-tap-highlight-color:transparent}
