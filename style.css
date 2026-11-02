@@ -1828,3 +1828,7 @@ body[data-aba="chat"] footer{display:none}
   body[data-aba="chat"] .bnav span:not(.bn-av),body[data-aba="chat"] .bnav.aberto span:not(.bn-av){opacity:0!important;pointer-events:none}
 }
 @media (max-width:760px){.chat-sec{height:calc(100dvh - 200px)}}
+.ch-quem h3{display:flex;align-items:center;gap:12px;overflow:visible;white-space:normal}
+.ch-quem h3 .ch-av .amini{width:42px;height:42px}
+.ch-nm{display:flex;flex-direction:column;min-width:0}
+.ch-n1{display:flex;align-items:center;gap:6px}

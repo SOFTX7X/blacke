@@ -1858,7 +1858,7 @@ function chStatusTopo(){
 }
 async function chConversa(h){
   CH.h = h; CH.sig = ''; clearInterval(CH.t);
-  $('chTitulo').innerHTML = `<span translate="no">@${esc(h)}</span>`; $('chMenu').hidden = true;
+  $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
   $('chatSec').classList.add('abriu'); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
   await chCarregar(true); chPessoas(false);
