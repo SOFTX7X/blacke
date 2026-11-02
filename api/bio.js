@@ -83,8 +83,9 @@ button{font:inherit;color:inherit}
 .selo{flex:none;width:22px;height:22px;color:var(--ice)}
 /* Selo BLACKE: rótulo roxo com ninja preto */ .selo-b{display:inline-block;flex:none;width:34px;height:34px;margin-left:.35em;vertical-align:-.26em;overflow:visible!important}.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))} .selo-b{width:34px;height:34px} 
 .bio{max-width:460px;margin-top:10px;color:#cdd1ea;font-size:15.5px;white-space:pre-line;overflow-wrap:anywhere}
-.num{display:flex;gap:18px;margin-top:14px;color:var(--dim);font-size:13.5px}
-.num b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;margin-right:4px}
+.num{display:flex;justify-content:center;gap:10px 26px;margin-top:14px;color:var(--dim);font-size:13px}
+.num span{display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.num b{color:var(--text);font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
 
 .ct{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
 .ct a{display:inline-flex;align-items:center;gap:9px;height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:rgba(20,22,42,.8);font:600 14.5px var(--display);transition:transform .2s,border-color .2s,background .2s}
@@ -199,7 +200,7 @@ function render(p, sites){
     <div class="av e" style="--i:0"><span>${p.foto ? `<img src="${esc(p.foto)}" alt="">` : ini}</span></div>
     <h1 class="nome e" style="--i:1"><span translate="no">@${esc(h)}</span>${p.verificado || (+p.acessos || 0) >= META_V ? SELO : ''}${p.selo || (+p.acessos || 0) >= META_SELO ? SELO_BLACKE : ''}</h1>
     ${p.bio ? `<p class="bio e" style="--i:2" translate="no">${esc(p.bio)}</p>` : ''}
-    <div class="num e" style="--i:3"><span><b>${fmt(p.sites)}</b>${+p.sites === 1 ? 'site' : 'sites'}</span><span><b>${fmt(p.acessos)}</b>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span></div>
+    <div class="num e" style="--i:3"><span><b>${fmt(p.sites)}</b>${+p.sites === 1 ? 'site' : 'sites'}</span><span><b>${fmt(p.acessos)}</b>${+p.acessos === 1 ? 'acesso' : 'acessos'}</span>${p.seguidores != null ? `<span><b>${fmt(p.seguidores)}</b>${+p.seguidores === 1 ? 'seguidor' : 'seguidores'}</span><span><b>${fmt(p.seguindo)}</b>seguindo</span>` : ''}</div>
     ${ct.length ? `<nav class="ct e" style="--i:4" aria-label="Contatos">${ct.map(c => `<a class="${esc(c.tipo)}" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${(CT[c.tipo] || {}).ic || 'fa-solid fa-link'}"></i>${nomeContato(c)}</a>`).join('')}</nav>` : ''}
   </section>
   ${links.length ? `<section class="lista" aria-label="Links">${links.map((s, k) => linha(s, k === 0 && links.length > 1)).join('')}</section>` : '<p class="vz e" style="--i:5">Ainda não há links por aqui.</p>'}`;
