@@ -1639,3 +1639,9 @@ details.sl{display:block;padding:0}
 .cf-quem{display:flex;align-items:center;gap:12px;margin:0 0 14px;font:700 16px var(--display)}
 .cf-quem .amini{flex:none;display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%!important;overflow:hidden;background:linear-gradient(135deg,#4a3fd6,#7b6cff);box-shadow:0 0 0 2px rgba(123,108,255,.55);color:#fff;font:700 17px var(--display);margin:0}
 .cf-quem .amini img{width:100%;height:100%;object-fit:cover}
+.sg-rm{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16);color:#fff}
+.sg-rm:hover{background:rgba(255,255,255,.15)}
+.seg-lnk{flex:none;border:0!important;background:none!important;padding:0 4px;color:var(--ice)!important;font:700 13px var(--display);cursor:pointer;outline:none!important;white-space:nowrap;display:inline-flex;align-items:center}
+.seg-lnk i{display:none}
+.seg-lnk.on{color:rgba(255,255,255,.5)!important}
+.seg-lnk:hover{text-decoration:underline}

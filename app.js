@@ -904,6 +904,23 @@ document.addEventListener('click', async e => {
   }
   delete b.dataset.busy;
 });
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-rm-seg]'); if (!b || b.dataset.busy) return;
+  const h = b.dataset.h; b.dataset.busy = '1';
+  const ok = await confirmar({ titulo:'Remover seguidor?', texto:'O perfil não será avisado de que foi removido. Ele poderá voltar a seguir você.', botao:'Remover', quem:h });
+  if (!ok){ delete b.dataset.busy; return; }
+  try{
+    const { data, error } = await _supabase.rpc('remover_seguidor', { p_handle:h, p_token:S.token });
+    if (error) throw error;
+    SEGUEME.delete(h);
+    const li = b.closest('li'); if (li) li.remove();
+    const eu = S.perfil && S.perfil.handle;
+    if (data && data.seguidores != null && eu) pintarSegn(eu, { seguidores:data.seguidores });
+    if (S.perfil && data) S.perfil.seguidores = data.seguidores;
+    if (!document.querySelector('#sgLista .sg-li')) $('sgLista').innerHTML = '<li class="sg-vz">Nenhum seguidor ainda.</li>';
+    aviso('Seguidor removido');
+  }catch(_){ aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
+});
 async function abrirListaSeg(h, tipo){
   $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span> <small translate="no">@${esc(h)}</small>`;
   const ul = $('sgLista'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg');
@@ -911,7 +928,13 @@ async function abrirListaSeg(h, tipo){
   try{ const { data } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; }catch(_){}
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
   ul.innerHTML = lista.length
-    ? lista.map(x => `<li class="sg-li"><button type="button" class="sg-r" data-sgp="${esc(x.handle)}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${esc(x.handle)}</span>${selosDe(x.handle)}</button>${S.perfil && S.perfil.handle && S.perfil.handle !== x.handle ? `<button type="button" class="seg-btn sg-b" data-seg-btn data-h="${esc(x.handle)}"></button>` : ''}</li>`).join('')
+    ? lista.map(x => {
+        const eu = S.perfil && S.perfil.handle, outro = eu && eu !== x.handle, H = esc(x.handle);
+        const meus = eu && eu === h && tipo === 'seguidores';       // minha própria lista de seguidores: Remover (como no Instagram)
+        const nome = `<button type="button" class="sg-r" data-sgp="${H}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</button>`;
+        if (meus) return `<li class="sg-li">${nome}<button type="button" class="seg-btn seg-lnk" data-seg-btn data-h="${H}"></button><button type="button" class="sg-b sg-rm" data-rm-seg data-h="${H}">Remover</button></li>`;
+        return `<li class="sg-li">${nome}${outro ? `<button type="button" class="seg-btn sg-b" data-seg-btn data-h="${H}"></button>` : ''}</li>`;
+      }).join('')
     : `<li class="sg-vz">${tipo === 'seguindo' ? 'Não segue ninguém ainda.' : 'Nenhum seguidor ainda.'}</li>`;
   ul.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
 }
