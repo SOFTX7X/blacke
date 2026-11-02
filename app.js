@@ -922,8 +922,8 @@ const ntTempo = d => {
     return new Date(d).toLocaleDateString(LOC(), { day:'2-digit', month:'short' });
   }catch(_){ return ''; }
 };
-function ntItem(x){
-  const d = x.dados || {}, tempo = `<time datetime="${esc(x.criado_em)}">${esc(ntTempo(x.criado_em))}</time>`;
+function ntConteudo(x){
+  const d = x.dados || {};
   let ic = '', txt = '', alvo = '';
   if (x.tipo === 'seguidor'){
     if (x.v) VERIF.add(d.handle); if (x.nj) NINJA.add(d.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(d.handle, x.f);
@@ -937,8 +937,24 @@ function ntItem(x){
     ic = `<i class="nt-ic ${nj ? 'vi' : 'ci'}">${nj ? SELO_BLACKE : SELO}</i>`;
     txt = nj ? '<span>Você conquistou o Selo BLACKE</span>' : '<span>Você conquistou o selo de Verificado</span>'; alvo = 'data-ntm="1"';
   }
+  return { ic, txt, alvo };
+}
+function ntItem(x){
+  const { ic, txt, alvo } = ntConteudo(x), tempo = `<time datetime="${esc(x.criado_em)}">${esc(ntTempo(x.criado_em))}</time>`;
   return `<li><button type="button" class="nt-i ${x.lida ? '' : 'nova'}" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><span class="nt-x">${txt}</span>${tempo}</span>${x.lida ? '' : '<i class="nt-d" aria-hidden="true"></i>'}</button></li>`;
 }
+/* bolha no topo (estilo notificação de celular) quando chega aviso novo */
+let ntTimer = 0;
+function ntBolha(novos){
+  const x = novos[0], { ic, txt, alvo } = ntConteudo(x);
+  let b = $('ntBolha');
+  if (!b){ b = document.createElement('div'); b.id = 'ntBolha'; b.className = 'nt-bolha'; b.setAttribute('role', 'status'); document.body.appendChild(b); }
+  const mais = novos.length > 1 ? `<em class="nt-mais">+${novos.length - 1}</em>` : '';
+  b.innerHTML = `<button type="button" class="nt-bn" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><b class="nt-tt">BLACKE LAVEX</b><span class="nt-x">${txt}</span></span>${mais}</button>`;
+  b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
+  clearTimeout(ntTimer); ntTimer = setTimeout(ntBolhaOff, 6500);
+}
+function ntBolhaOff(){ const b = $('ntBolha'); if (b) b.classList.remove('on'); }
 function desenharNotif(){
   const l = $('ntLista'); if (!l) return;
   l.innerHTML = NT.itens.length ? NT.itens.map(ntItem).join('') : `<li class="nt-vz"><i class="fa-regular fa-bell"></i><b>Tudo em dia</b><span>Avisos de novos seguidores e metas de acessos aparecem aqui.</span></li>`;
@@ -953,6 +969,13 @@ async function carregarNotif(){
     if (error || !data) return;
     NT.itens = Array.isArray(data.itens) ? data.itens : []; NT.n = +data.nao_lidas || 0;
     desenharNotif();
+    const max = NT.itens.reduce((m, x) => Math.max(m, +x.id || 0), 0), visto = lerLS('bl_nt_visto');
+    if (visto === null || visto === undefined || visto === ''){ gravarLS('bl_nt_visto', String(max)); }
+    else if (max > +visto){
+      const novos = NT.itens.filter(x => +x.id > +visto && !x.lida);
+      gravarLS('bl_nt_visto', String(max));
+      if (novos.length && $('ntPanel').hidden) ntBolha(novos);
+    }
   }catch(_){}
 }
 function ntAbrir(on){
@@ -971,14 +994,14 @@ document.addEventListener('click', e => {
   const i = e.target.closest('[data-nti]');
   if (i){
     const id = +i.dataset.nti; if (NT.itens.find(x => x.id === id && !x.lida)) ntLer(id);
-    ntAbrir(false);
+    ntAbrir(false); ntBolhaOff();
     if (i.dataset.ntp) irParaPerfil(i.dataset.ntp); else if (i.dataset.ntm) trocarAba('meus');
     return;
   }
   if (!$('ntPanel').hidden && !e.target.closest('#ntPanel')) ntAbrir(false);
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ntPanel').hidden) ntAbrir(false); });
-setInterval(() => { if (!document.hidden) carregarNotif(); }, 60000);
+setInterval(() => { if (!document.hidden) carregarNotif(); }, 40000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) carregarNotif(); });
 
 /* ---------- cartão de perfil ---------- */
