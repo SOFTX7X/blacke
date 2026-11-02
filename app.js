@@ -921,11 +921,15 @@ document.addEventListener('click', async e => {
     aviso('Seguidor removido');
   }catch(_){ aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
 });
-async function abrirListaSeg(h, tipo){
+let SGATUAL = null;
+async function abrirListaSeg(h, tipo, quieto){
+  SGATUAL = { h, tipo };
   $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span> <small translate="no">@${esc(h)}</small>`;
-  const ul = $('sgLista'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg');
-  let lista = [];
-  try{ const { data } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; }catch(_){}
+  const ul = $('sgLista'); if (!quieto){ ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg'); }
+  let lista = [], ok = false;
+  try{ const { data, error } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
+  if (quieto && !ok) return;
+  if (quieto && ($('modalSeg').hidden || !SGATUAL || SGATUAL.h !== h || SGATUAL.tipo !== tipo)) return;
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
   ul.innerHTML = lista.length
     ? lista.map(x => {
@@ -1149,6 +1153,7 @@ async function sincronizar(){
   try{
     carregarNotif();
     await carregarSeguindo();
+    if (!$('modalSeg').hidden && SGATUAL && !document.querySelector('#modalConfirma:not([hidden])')) await abrirListaSeg(SGATUAL.h, SGATUAL.tipo, true);
     const hs = [...new Set([...document.querySelectorAll('[data-segn]')].map(n => n.dataset.segn.split(':')[0]))].slice(0, 6);
     await Promise.all(hs.map(async h => {
       try{ const { data } = await _supabase.rpc('perfil_publico', { p_handle:h }); if (data) pintarSegn(h, data); }catch(_){}
