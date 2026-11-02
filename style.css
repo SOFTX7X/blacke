@@ -1930,3 +1930,50 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .bq-n{flex:1;min-width:0;display:flex;align-items:center;gap:6px;font:600 15px var(--display)}
 #chOpcBloq{display:flex;align-items:center;gap:10px;white-space:nowrap}
 .ch-menu .ch-vis{padding:10px 12px}
+
+/* ---- apagar / selecionar / fixar / silenciar / arquivar ---- */
+.ch-li{position:relative}
+.ch-fim{display:flex;align-items:center;gap:6px;flex:none}
+.ch-ic{font-size:11px;color:var(--muted)}
+.ch-nl.mudo{background:#4a4d63;color:#d6d8ea}
+.ch-rmb{position:absolute;top:8px;right:12px;width:26px;height:22px;border:0;border-radius:8px;background:#161a2c;color:var(--muted);font-size:13px;cursor:pointer;opacity:0;pointer-events:none}
+@media (hover:hover){.ch-li:hover .ch-rmb{opacity:1;pointer-events:auto}.ch-li:hover .ch-hr{visibility:hidden}}
+.ch-rmb:hover{color:#fff;background:#232844}
+.ch-lado.selm .ch-rmb{display:none}
+.ch-arq{list-style:none;margin:2px 4px 4px}
+.ch-arq button,.ch-arqv button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:var(--text);font:500 14px system-ui,sans-serif;padding:10px;border-radius:12px;cursor:pointer;text-align:left}
+.ch-arq button:hover{background:rgba(255,255,255,.05)}
+.ch-arq button i{width:20px;text-align:center;color:var(--muted)}
+.ch-arq button b{margin-left:auto;color:var(--muted);font-weight:600}
+.ch-arq .ch-nl{margin-left:0}
+.ch-arqv{margin:8px 4px 2px}
+.ch-arqv button{font:700 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ch-arqv b{margin-left:auto;color:var(--text)}
+.ch-rowm{position:fixed;z-index:60;min-width:210px;right:auto;top:auto}
+.ch-rowm button{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.ch-rowm button i{width:16px;text-align:center;color:var(--muted)}
+.ch-rowm .perigo i{color:#ff8a9b}
+/* barra de seleção */
+.ch-selb{display:none;flex:none;align-items:center;gap:10px;height:58px;padding:0 12px;border-bottom:1px solid var(--ch-linha);background:var(--ch-bg)}
+.ch-lado.selm>.ch-selb,.ch-conv.selm>.ch-selb{display:flex}
+.ch-lado.selm>.ch-lado-h,.ch-conv.selm>.ch-topo,.ch-conv.selm>.ch-form,.ch-conv.selm>.ch-resp,.ch-conv.selm>.ch-emj,.ch-conv.selm>.ch-aviso{display:none}
+.ch-selt{flex:1;font:600 15px system-ui,sans-serif;color:var(--text)}
+.ch-selt b{font-weight:700}
+.ch-selacs{display:flex;gap:6px}
+.ch-selb .icon-btn:disabled{opacity:.4;cursor:default}
+.ch-selb .perigo{color:#ff8a9b}
+/* caixinhas */
+.ch-ckl,.ch-ckm{display:none;flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #4a4f6d;place-items:center;color:transparent;font-size:11px}
+.ch-lado.selm .ch-ckl{display:grid}
+.ch-li.ck .ch-ckl,.ch-m.ck .ch-ckm{background:#7b6cff;border-color:#7b6cff;color:#fff}
+.ch-li.ck .ch-r{background:rgba(123,108,255,.18)}
+.ch-conv.selm .ch-m[id^="chm-"]{cursor:pointer;padding-left:38px}
+.ch-conv.selm .ch-m .ch-ckm{display:grid;position:absolute;left:8px;top:50%;transform:translateY(-50%)}
+.ch-conv.selm .ch-m.ck{outline:2px solid rgba(123,108,255,.7)}
+.ch-conv.selm .ch-ac{display:none}
+.ch-m.ck{filter:brightness(1.08)}
+.ca-btns{flex-wrap:wrap}
+.btn-primary.perigo{background:#d6385a;border-color:#d6385a}
+.ca-btns{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
+.ca-btns>*{flex:none!important;width:100%}
+#caTodos{order:1}#caMim{order:2}#caNo{order:3}

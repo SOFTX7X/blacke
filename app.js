@@ -1860,9 +1860,10 @@ function chMsgsHtml(msgs){
     if (!ant || ant.dia !== dia) out += `<div class="ch-dia"><b>${chDia(m.at)}</b></div>`;
     const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
     const q = m.r ? `<button type="button" class="ch-q" data-chat-ir="${m.r.id || ''}"><b translate="no">${m.r.m ? '<span>Você</span>' : '@' + esc(CH.h)}</b><span class="ch-qt" translate="no">${m.r.ap ? '' : esc(m.r.t)}</span>${m.r.ap ? '<span class="ch-qt"><i>Mensagem apagada</i></span>' : ''}</button>` : '';
-    const ac = m.ap ? `<span class="ch-ac"><button type="button" data-chat-rm="${m.id}" aria-label="Remover" title="Remover"><i class="fa-regular fa-trash-can"></i></button></span>`
-      : `<span class="ch-ac"><button type="button" data-chat-resp="${m.id}" aria-label="Responder" title="Responder"><i class="fa-solid fa-reply"></i></button>${m.m ? `<button type="button" data-chat-del="${m.id}" aria-label="Apagar mensagem" title="Apagar"><i class="fa-regular fa-trash-can"></i></button>` : ''}</span>`;
-    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}" id="chm-${m.id}">${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${ac}</div>`;
+    const bsel = `<button type="button" data-chat-sel="${m.id}" aria-label="Selecionar" title="Selecionar"><i class="fa-regular fa-square-check"></i></button>`;
+    const ac = m.ap ? `<span class="ch-ac">${bsel}<button type="button" data-chat-rm="${m.id}" aria-label="Remover" title="Remover"><i class="fa-regular fa-trash-can"></i></button></span>`
+      : `<span class="ch-ac"><button type="button" data-chat-resp="${m.id}" aria-label="Responder" title="Responder"><i class="fa-solid fa-reply"></i></button>${bsel}${m.m ? `<button type="button" data-chat-del="${m.id}" aria-label="Apagar mensagem" title="Apagar"><i class="fa-regular fa-trash-can"></i></button>` : ''}</span>`;
+    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${ac}</div>`;
     ant = { dia, m:m.m, t:new Date(m.at) };
   });
   return out;
@@ -1871,22 +1872,33 @@ const chCurto = d => { try{ const x = new Date(d); return x.toDateString() === n
 function chLinha(x){
   const H = esc(x.handle);
   const l2 = x.t != null ? (x.ap ? '<i>Mensagem apagada</i>' : (x.meu ? '<span class="ch-vc">Você</span>: ' : '') + `<span translate="no">${esc(x.t)}</span>`) : chStatus(x);
-  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span>${x.nl ? `<span class="ch-nl">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></button></li>`;
+  const ic = (x.fx ? '<i class="fa-solid fa-thumbtack ch-ic" aria-hidden="true"></i>' : '') + (x.si ? '<i class="fa-solid fa-bell-slash ch-ic" aria-hidden="true"></i>' : '');
+  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}${CH.lsel.has(x.handle) ? ' ck' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-ckl" aria-hidden="true"><i class="fa-solid fa-check"></i></span><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span><span class="ch-fim">${ic}${x.nl ? `<span class="ch-nl${x.si ? ' mudo' : ''}">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></span></button><button type="button" class="ch-rmb" data-chat-rmenu="${H}" aria-label="Opções da conversa" title="Opções"><i class="fa-solid fa-ellipsis-vertical"></i></button></li>`;
 }
 async function chLista(){
-  CH.h = null; clearInterval(CH.t);
+  CH.h = null; clearInterval(CH.t); chSelMsgs(false);
   $('chatSec').classList.remove('abriu'); document.body.classList.remove('ch-aberto'); chEmjAbrir(false); chPerfilFechar(); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
   await chPessoas(true);
 }
 function chDesenharLista(){
   const ul = $('chConv'), lista = CH.lista || [], q = ($('chBusca').value || '').trim().toLowerCase().replace(/^@/, '');
-  const f = q ? lista.filter(x => x.handle.includes(q)) : lista;
-  const on = f.filter(x => x.on), off = f.filter(x => !x.on);
+  const f = q ? lista.filter(x => x.handle.includes(q)) : lista.filter(x => !x.oc);
+  const arq = q ? [] : f.filter(x => x.ar), norm = q ? f : f.filter(x => !x.ar);
   const ordena = (a, b) => (b.nl - a.nl) || ((b.ord || 0) - (a.ord || 0)) || a.handle.localeCompare(b.handle);
+  if (CH.verArq && !q){
+    arq.sort(ordena);
+    ul.innerHTML = `<li class="ch-sub ch-arqv"><button type="button" data-ch-arq="0"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span>Arquivadas</span> <b>${arq.length}</b></button></li>` + (arq.length ? arq.map(chLinha).join('') : '<li class="sg-vz">Nenhuma conversa arquivada.</li>');
+    return;
+  }
+  const fx = norm.filter(x => x.fx).sort((a, b) => String(b.fxe || '').localeCompare(String(a.fxe || ''))), rest = norm.filter(x => !x.fx);
+  const on = rest.filter(x => x.on), off = rest.filter(x => !x.on);
   on.sort(ordena); off.sort(ordena);
-  ul.innerHTML = f.length
-    ? (on.length ? `<li class="ch-sub"><span>Online</span><b>${on.length}</b></li>` + on.map(chLinha).join('') : '') + (off.length ? `<li class="ch-sub"><span>Offline</span><b>${off.length}</b></li>` + off.map(chLinha).join('') : '')
-    : `<li class="sg-vz">${lista.length ? 'Ninguém encontrado.' : 'Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.'}</li>`;
+  const nlArq = arq.reduce((t, x) => t + (x.si ? 0 : (+x.nl || 0)), 0);
+  const secArq = arq.length ? `<li class="ch-arq"><button type="button" data-ch-arq="1"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> <span>Arquivadas</span> <b>${arq.length}</b>${nlArq ? `<span class="ch-nl">${nlArq > 99 ? '99+' : nlArq}</span>` : ''}</button></li>` : '';
+  ul.innerHTML = norm.length || arq.length
+    ? secArq + (fx.length ? `<li class="ch-sub"><span>Fixadas</span><b>${fx.length}</b></li>` + fx.map(chLinha).join('') : '')
+      + (on.length ? `<li class="ch-sub"><span>Online</span><b>${on.length}</b></li>` + on.map(chLinha).join('') : '') + (off.length ? `<li class="ch-sub"><span>Offline</span><b>${off.length}</b></li>` + off.map(chLinha).join('') : '')
+    : `<li class="sg-vz">${q ? 'Ninguém encontrado.' : (lista.length ? 'Nenhuma conversa. Procure o @ de alguém acima.' : 'Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.')}</li>`;
 }
 $('chBusca').addEventListener('input', chDesenharLista);
 $('chOpc').addEventListener('click', e => { e.stopPropagation(); $('chOpcM').hidden = !$('chOpcM').hidden; });
@@ -1988,7 +2000,7 @@ function chStatusTopo(){
   el.className = 'ch-st' + (x.on ? ' on' : ''); el.innerHTML = x.on ? '<span>Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
 }
 async function chConversa(h){
-  CH.h = h; CH.sig = ''; CH.dig = false; chRespLimpar(); clearInterval(CH.t); if (!$('chPerf').hidden) chPerfilAbrir(h);
+  CH.h = h; CH.sig = ''; CH.dig = false; chSelMsgs(false); chRespLimpar(); clearInterval(CH.t); if (!$('chPerf').hidden) chPerfilAbrir(h);
   $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
   $('chatSec').classList.add('abriu'); document.body.classList.add('ch-aberto'); chEmjAbrir(false); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
@@ -2115,12 +2127,130 @@ document.addEventListener('click', async e => {
     CH.sig = ''; chCarregar(false); return;
   }
   const bm = e.target.closest('#chMsgs .ch-m'); if (bm && !e.target.closest('button') && matchMedia('(hover:none)').matches){ const on = bm.classList.contains('ac'); document.querySelectorAll('#chMsgs .ch-m.ac').forEach(x => x.classList.remove('ac')); if (!on) bm.classList.add('ac'); }
-  const d = e.target.closest('[data-chat-del]'); if (d){
-    d.disabled = true;
-    try{ const r = await _supabase.rpc('chat_apagar', { p_id:+d.dataset.chatDel, p_token:S.token }); if (r.error) aviso(chErro(r)); }catch(_){ aviso('Não foi possível agora.'); }
-    CH.sig = ''; chCarregar(false);
+  const d = e.target.closest('[data-chat-del]'); if (d){ chApagarMsgs([+d.dataset.chatDel]); return; }
+  const sl = e.target.closest('[data-chat-sel]'); if (sl){ chSelMsgs(true, +sl.dataset.chatSel); return; }
+});
+
+/* ---------- Apagar, selecionar, limpar, fixar, silenciar, arquivar ---------- */
+CH.sel = new Set(); CH.selOn = false; CH.lsel = new Set(); CH.lselOn = false; CH.verArq = false;
+const chAcaoRpc = async (handles, acao) => {
+  try{ const r = await _supabase.rpc('chat_acao', { p_handles:handles, p_token:S.token, p_acao:acao }); if (r.error){ aviso(chErro(r)); return false; } return true; }
+  catch(_){ aviso('Não foi possível agora.'); return false; }
+};
+function chSelMsgs(on, id){
+  CH.selOn = !!on; if (!on) CH.sel.clear(); else if (id) CH.sel.add(id);
+  $('chConversa').classList.toggle('selm', !!on); chSelPintar();
+}
+function chSelPintar(){
+  document.querySelectorAll('#chMsgs .ch-m[id^="chm-"]').forEach(el => el.classList.toggle('ck', CH.sel.has(+el.id.slice(4))));
+  $('chSelN').textContent = CH.sel.size; $('chSelDel').disabled = !CH.sel.size;
+}
+function chPerguntaApagar(titulo, texto, podeTodos){
+  return new Promise(res => {
+    $('caTitulo').textContent = titulo; $('caTexto').textContent = texto; $('caTodos').hidden = !podeTodos;
+    abrir('modalChatApag');
+    const fim = v => { fechar('modalChatApag'); $('caMim').onclick = $('caTodos').onclick = $('caNo').onclick = null; res(v); };
+    $('caMim').onclick = () => fim('mim'); $('caTodos').onclick = () => fim('todos'); $('caNo').onclick = () => fim(null);
+  });
+}
+async function chApagarMsgs(ids){
+  const ms = ids.map(i => CH.msgs.get(i)).filter(Boolean); if (!ms.length) return;
+  const podeTodos = ms.every(m => m.m && !m.ap && Date.now() - new Date(m.at) < 864e5), n = ms.length;
+  const v = await chPerguntaApagar(n === 1 ? 'Apagar mensagem?' : `Apagar ${n} mensagens?`,
+    podeTodos ? 'Apagar para mim some só do seu lado. Apagar para todos remove das duas conversas (só até 24 horas depois de enviar).' : 'Vai sumir só do seu lado; a outra pessoa continua vendo.', podeTodos);
+  if (!v) return;
+  try{ const r = await _supabase.rpc('chat_apagar_msgs', { p_ids:ms.map(m => m.id), p_token:S.token, p_todos:v === 'todos' }); if (r.error){ aviso(chErro(r)); return; } }
+  catch(_){ aviso('Não foi possível agora.'); return; }
+  chSelMsgs(false); CH.sig = ''; await chCarregar(false); chPessoas(false);
+}
+async function chLimparApagar(handles, acao){
+  const um = handles.length === 1, limpar = acao === 'limpar';
+  const ok = await confirmar({
+    titulo: limpar ? (um ? 'Limpar conversa?' : `Limpar ${handles.length} conversas?`) : (um ? 'Apagar conversa?' : `Apagar ${handles.length} conversas?`),
+    texto: limpar ? 'Todas as mensagens somem só do seu lado. A conversa continua na lista e a outra pessoa não é afetada.'
+                  : 'A conversa sai da sua lista e o histórico some só do seu lado. A outra pessoa não é afetada. Ela volta se chegar mensagem nova.',
+    botao: limpar ? 'Limpar' : 'Apagar', quem: um ? handles[0] : null });
+  if (!ok || !await chAcaoRpc(handles, acao)) return false;
+  aviso(limpar ? 'Conversa limpa.' : 'Conversa apagada.');
+  if (CH.h && handles.includes(CH.h)){ if (limpar){ CH.sig = ''; chCarregar(false); } else { await chLista(); return true; } }
+  await chPessoas(false); return true;
+}
+/* menu de uma conversa na lista */
+function chRowMenu(h, x, y){
+  const c = CH.cont && CH.cont.get(h), m = $('chRowM'); if (!c) return;
+  const it = (a, ic, t, cls) => `<button type="button" role="menuitem" data-rm="${a}"${cls ? ` class="${cls}"` : ''}><i class="${ic}" aria-hidden="true"></i> ${t}</button>`;
+  m.dataset.h = h;
+  m.innerHTML = [
+    it(c.fx ? 'desfixar' : 'fixar', 'fa-solid fa-thumbtack', c.fx ? 'Desafixar' : 'Fixar'),
+    it(c.si ? 'dessilenciar' : 'silenciar', c.si ? 'fa-solid fa-bell' : 'fa-solid fa-bell-slash', c.si ? 'Reativar notificações' : 'Silenciar'),
+    it(c.ar ? 'desarquivar' : 'arquivar', 'fa-solid fa-box-archive', c.ar ? 'Desarquivar' : 'Arquivar'),
+    c.nl ? it('ler', 'fa-solid fa-check-double', 'Marcar como lida') : '',
+    it('selecionar', 'fa-regular fa-square-check', 'Selecionar'),
+    it('limpar', 'fa-solid fa-broom', 'Limpar conversa'),
+    it('apagar', 'fa-regular fa-trash-can', 'Apagar conversa', 'perigo')].join('');
+  m.hidden = false;
+  m.style.left = Math.max(8, Math.min(x, innerWidth - m.offsetWidth - 8)) + 'px';
+  m.style.top = Math.max(8, Math.min(y, innerHeight - m.offsetHeight - 8)) + 'px';
+}
+const chRowFechar = () => { const m = $('chRowM'); if (m) m.hidden = true; };
+$('chRowM').addEventListener('click', async e => {
+  const b = e.target.closest('[data-rm]'); if (!b) return;
+  const h = $('chRowM').dataset.h, a = b.dataset.rm; chRowFechar();
+  if (a === 'selecionar'){ chLSel(true, h); return; }
+  if (a === 'limpar' || a === 'apagar'){ await chLimparApagar([h], a); return; }
+  if (await chAcaoRpc([h], a)){
+    aviso({ fixar:'Conversa fixada.', desfixar:'Conversa desafixada.', silenciar:'Conversa silenciada.', dessilenciar:'Notificações reativadas.', arquivar:'Conversa arquivada.', desarquivar:'Conversa desarquivada.', ler:'Marcada como lida.' }[a] || 'Pronto.');
+    await chPessoas(false); chNaoLidas();
   }
 });
+/* seleção de várias conversas */
+function chLSel(on, h){
+  CH.lselOn = !!on; if (!on) CH.lsel.clear(); else if (h) CH.lsel.add(h);
+  $('chListaBox').classList.toggle('selm', !!on); chLSelPintar(); chDesenharLista();
+}
+function chLSelPintar(){ $('chSelLN').textContent = CH.lsel.size; document.querySelectorAll('#chSelL [data-lsel]').forEach(b => b.disabled = !CH.lsel.size); }
+async function chLSelAcao(tipo){
+  const hs = [...CH.lsel]; if (!hs.length) return;
+  if (tipo === 'apagar'){ if (await chLimparApagar(hs, 'apagar')) chLSel(false); return; }
+  const cs = hs.map(h => CH.cont.get(h)).filter(Boolean), todos = k => cs.every(c => c[k]);
+  const acao = tipo === 'fixar' ? (todos('fx') ? 'desfixar' : 'fixar') : tipo === 'silenciar' ? (todos('si') ? 'dessilenciar' : 'silenciar') : (todos('ar') ? 'desarquivar' : 'arquivar');
+  if (await chAcaoRpc(hs, acao)){ chLSel(false); await chPessoas(false); chNaoLidas(); }
+}
+$('chSelLX').addEventListener('click', () => chLSel(false));
+$('chSelL').addEventListener('click', e => { const b = e.target.closest('[data-lsel]'); if (b) chLSelAcao(b.dataset.lsel); });
+$('chOpcSel').addEventListener('click', () => { $('chOpcM').hidden = true; chLSel(true); });
+$('chSelX').addEventListener('click', () => chSelMsgs(false));
+$('chSelDel').addEventListener('click', () => chApagarMsgs([...CH.sel]));
+$('chSelMsg').addEventListener('click', () => { $('chMenu').hidden = true; chSelMsgs(true); });
+$('chLimpar').addEventListener('click', () => { $('chMenu').hidden = true; if (CH.h) chLimparApagar([CH.h], 'limpar'); });
+$('chApagarConv').addEventListener('click', () => { $('chMenu').hidden = true; if (CH.h) chLimparApagar([CH.h], 'apagar'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ chRowFechar(); if (CH.selOn) chSelMsgs(false); else if (CH.lselOn) chLSel(false); } });
+/* cliques em modo seleção (antes dos outros) */
+document.addEventListener('click', e => {
+  if (!e.target.closest('#chRowM,[data-chat-rmenu]')) chRowFechar();
+  if (CH.lp){ CH.lp = false; e.preventDefault(); e.stopImmediatePropagation(); return; }
+  const ar = e.target.closest('[data-ch-arq]'); if (ar){ CH.verArq = ar.dataset.chArq === '1'; chDesenharLista(); e.stopImmediatePropagation(); return; }
+  const rb = e.target.closest('[data-chat-rmenu]'); if (rb){ const r = rb.getBoundingClientRect(); chRowMenu(rb.dataset.chatRmenu, r.left - 150, r.bottom + 4); e.stopImmediatePropagation(); return; }
+  if (CH.lselOn){ const r = e.target.closest('#chConv [data-chat-abrir]'); if (r){ const h = r.dataset.chatAbrir; CH.lsel.has(h) ? CH.lsel.delete(h) : CH.lsel.add(h); chLSelPintar(); chDesenharLista(); e.stopImmediatePropagation(); return; } }
+  if (CH.selOn){ const m = e.target.closest('#chMsgs .ch-m[id^="chm-"]'); if (m && !e.target.closest('.ch-q')){ const id = +m.id.slice(4); CH.sel.has(id) ? CH.sel.delete(id) : CH.sel.add(id); chSelPintar(); e.stopImmediatePropagation(); return; } }
+}, true);
+document.addEventListener('contextmenu', e => {
+  const r = e.target.closest('#chConv .ch-li'); if (!r || CH.lselOn) return;
+  const h = r.querySelector('[data-chat-abrir]'); if (!h) return; e.preventDefault(); chRowMenu(h.dataset.chatAbrir, e.clientX, e.clientY);
+});
+/* toque longo: conversa → menu; mensagem → seleção */
+(() => {
+  let t = 0, x0 = 0, y0 = 0;
+  const limpa = () => { clearTimeout(t); t = 0; };
+  document.addEventListener('touchstart', e => {
+    const r = e.target.closest('#chConv [data-chat-abrir]'), m = e.target.closest('#chMsgs .ch-m[id^="chm-"]');
+    if (!r && !m) return; if (r && CH.lselOn) return; const p = e.touches[0]; x0 = p.clientX; y0 = p.clientY; limpa();
+    t = setTimeout(() => { CH.lp = true; setTimeout(() => { CH.lp = false; }, 700); if (navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
+      if (r) chRowMenu(r.dataset.chatAbrir, x0, y0); else if (!CH.selOn) chSelMsgs(true, +m.id.slice(4)); }, 450);
+  }, { passive:true });
+  document.addEventListener('touchmove', e => { const p = e.touches[0]; if (t && (Math.abs(p.clientX - x0) > 10 || Math.abs(p.clientY - y0) > 10)) limpa(); }, { passive:true });
+  document.addEventListener('touchend', limpa, { passive:true }); document.addEventListener('touchcancel', limpa, { passive:true });
+})();
 
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };
