@@ -1756,7 +1756,7 @@ body[data-aba="chat"] .topbar,body[data-aba="chat"] footer,body[data-aba="chat"]
 body[data-aba="chat"] main{padding:0;max-width:none}
 body[data-aba="chat"]{overflow:hidden}
 body[data-aba="chat"]::before{display:none}
-.chat-sec{--ch-bg:#0b0d17;--ch-linha:rgba(255,255,255,.07);position:fixed;inset:0 0 0 84px;z-index:20;background:var(--bg);overflow:hidden;display:grid;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(300px,390px) 1fr;margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Color Emoji',sans-serif}
+.chat-sec{--ch-bg:#181a2e;--ch-linha:rgba(255,255,255,.07);position:fixed;inset:0 0 0 84px;z-index:20;background:var(--bg);overflow:hidden;display:grid;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(300px,390px) 1fr;margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Color Emoji',sans-serif}
 .chat-sec[hidden]{display:none!important}
 .chat-sec .ch-emo,.chat-sec .ch-t,.chat-sec input,.chat-sec .ch-e,.chat-sec .ch-emj-t button{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Color Emoji',sans-serif}
 .ch-lado{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--ch-linha)}
@@ -1977,3 +1977,14 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ca-btns{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
 .ca-btns>*{flex:none!important;width:100%}
 #caTodos{order:1}#caMim{order:2}#caNo{order:3}
+
+/* fundo do chat = cor do cartão de perfil */
+.chat-sec{background:#181a2e}
+.ch-m.ele{background:#272b4a}
+.ch-busca,.ch-form input{background:rgba(255,255,255,.07)}
+.ch-rmb{background:#222643}
+.ch-arqv{margin:10px 6px 6px}
+.ch-arqv button{gap:12px;padding:6px 10px 6px 6px;font:600 15px system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--text)}
+.ch-arqv button i{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.08);color:#e4e6f7;font-size:14px}
+.ch-arqv button:hover i{background:rgba(123,108,255,.35)}
+.ch-arqv b{margin-left:auto;font:600 13px system-ui,sans-serif;color:var(--muted)}
