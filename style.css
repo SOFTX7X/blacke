@@ -1776,7 +1776,7 @@ details.sl{display:block;padding:0}
 @media (min-width:901px){.bnav .bn-n{top:6px;left:30px}}
 
 /* ===== Chat: seção própria (lista de pessoas + conversa) ===== */
-.chat-sec{display:grid;grid-template-columns:minmax(260px,340px) 1fr;height:calc(100dvh - 200px);min-height:420px;max-width:1040px;margin:8px auto 0;overflow:hidden}
+.chat-sec{display:grid;grid-template-columns:minmax(280px,380px) 1fr;height:calc(100dvh - 104px);min-height:420px;max-width:none;margin:6px 0 0;overflow:hidden}
 .chat-sec[hidden]{display:none!important}
 .ch-lado{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
 .ch-lado-h{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 10px}
@@ -1821,3 +1821,10 @@ details.sl{display:block;padding:0}
 body[data-aba="chat"] .hero{display:none}
 body[data-aba="chat"] .tb-busca,body[data-aba="chat"] .topbar .searchbar{display:none!important}
 .ch-sub{display:flex;gap:8px}.ch-sub b{font-weight:700;color:var(--text)}
+
+body[data-aba="chat"] footer{display:none}
+@media (min-width:900px){
+  body[data-aba="chat"] .bnav,body[data-aba="chat"] .bnav.aberto,html.tecla body[data-aba="chat"] .bnav:has(:focus-visible){width:62px!important}
+  body[data-aba="chat"] .bnav span:not(.bn-av),body[data-aba="chat"] .bnav.aberto span:not(.bn-av){opacity:0!important;pointer-events:none}
+}
+@media (max-width:760px){.chat-sec{height:calc(100dvh - 200px)}}
