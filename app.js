@@ -108,7 +108,7 @@ const LOC = () => ({ pt:'pt-BR', en:'en-US', es:'es-ES' })[window.blLang ? windo
 const COLS = 'id,brand_name,image_url,link_url,caption,categoria,cliques,owner_hash,handle,img_pos,created_at,verificado';
 const PAGE = 24, LIMITE = 10;
 const CATEGORIAS = ['Comunidade','Mídia','Ferramentas','Loja','Jogos','Outros'];
-const S = { aba:'mural', cat:'Todas', ordem:'recentes', busca:'', pagina:0, temMais:false, seq:0,
+const S = { aba:'mural', cat:'Todas', ordem:'alta', busca:'', pagina:0, temMais:false, seq:0,
             itens:[], meus:[], token:'', hash:'', total:0, perfil:null, dest:{ top:[], novos:[] }, destAba:'top' };
 let imagemBase64 = '', editId = null;
 let pos = { x:50, y:50 };   // posição da foto de capa (object-position, em %)
@@ -826,6 +826,7 @@ function desenharMeus(){
 }
 
 async function trocarAba(aba, semHistorico, manterPerfil){
+  if (aba === 'destaques') aba = 'mural';   // Destaques saiu do menu: o Mural já abre em "Em alta"
   if (!semHistorico) irUrl(rotaDe(aba), { aba });
   if (!manterPerfil && document.body.classList.contains('modo-perfil')){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
