@@ -1252,18 +1252,21 @@ function cartaoPerfil(p, dono){
 }
 /* ---------- Seus números (Conta) ---------- */
 function barrasHTML(dias){
-  const dt = d => new Date(d + 'T12:00:00');
+  const dt = d => new Date(d + 'T12:00:00'), longo = dias.length > 14;
   const max = Math.max(1, ...dias.map(d => +d.n || 0));
   return dias.map((d, i) => {
     const n = +d.n || 0, h = n ? Math.max(8, Math.round(n / max * 100)) : 3, ult_ = i === dias.length - 1;
-    const rot = dt(d.d).toLocaleDateString(LOC(), { weekday:'narrow' });
+    const rot = longo ? (((dias.length - 1 - i) % 5 === 0) ? String(dt(d.d).getDate()) : '') : dt(d.d).toLocaleDateString(LOC(), { weekday:'narrow' });
     return `<div class="nm-c${ult_ ? ' hj' : ''}${n === max && n ? ' pico' : ''}" style="--i:${i}" title="${esc(dt(d.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' }))} · ${n} ${n === 1 ? 'acesso' : 'acessos'}"><em>${n ? fmtN(n) : ''}</em><i style="--h:${h}%"></i><span>${esc(rot)}</span></div>`;
   }).join('');
 }
 function painelNumeros(){
   if (!SERIE || !S.meus.length) return '';
-  const dias = SERIE, soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
-  const tot = soma(dias), ult = soma(dias.slice(-7)), ant = soma(dias.slice(0, Math.max(0, dias.length - 7)).slice(-7));
+  const todos = SERIE, soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
+  const ops = [7, 14, 30].filter(n => n <= todos.length);
+  const per = ops.includes(S.nmPer) ? S.nmPer : (ops.includes(14) ? 14 : ops[ops.length - 1]);
+  const dias = todos.slice(-per);
+  const tot = soma(dias), ult = soma(todos.slice(-7)), ant = soma(todos.slice(0, Math.max(0, todos.length - 7)).slice(-7));
   const hoje = dias.length ? +dias[dias.length - 1].n || 0 : 0;
   const melhor = dias.reduce((m, d) => (+d.n > (m ? +m.n : 0) ? d : m), null);
   const dt = d => new Date(d + 'T12:00:00');
@@ -1272,11 +1275,12 @@ function painelNumeros(){
   else if (!ant) chip = '<span class="tend sobe">▲ novo</span>';
   else { const p = Math.round((ult - ant) / ant * 100); chip = p > 0 ? `<span class="tend sobe">▲ ${p}%</span>` : p < 0 ? `<span class="tend desce">▼ ${-p}%</span>` : '<span class="tend igual">= 0%</span>'; }
   const barras = barrasHTML(dias);
-  const sites = [...STATS.values()].filter(s => s.n14 > 0).sort((x, y) => y.n14 - x.n14 || y.total - x.total).slice(0, 5);
-  const topo = sites.length ? sites[0].n14 : 1;
+  const nP = s => +(s['n' + per] != null ? s['n' + per] : s.n14) || 0;
+  const sites = [...STATS.values()].filter(s => nP(s) > 0).sort((x, y) => nP(y) - nP(x) || y.total - x.total).slice(0, 5);
+  const topo = sites.length ? nP(sites[0]) : 1;
   const rank = sites.map((s, i) => {
     const it = S.meus.find(x => String(x.id) === String(s.id));
-    return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(s.n14 / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(s.n14)}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
+    return `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><span class="nm-im">${it ? `<img src="${esc(it.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(it.img_pos)}">` : ''}</span><div class="nm-nm"><b translate="no">${esc(s.nome)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round(nP(s) / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(nP(s))}</b>${s.hj ? `<small>+${fmtN(s.hj)} hoje</small>` : ''}</span></li>`;
   }).join('');
   const vida = (S.perfil && +S.perfil.acessos) || S.meus.reduce((t, s) => t + (s.cliques || 0), 0);
   const base = Object.assign({}, S.perfil || {}, { acessos:vida });
@@ -1292,7 +1296,8 @@ function painelNumeros(){
       <div><b>${fmtN(hoje)}</b><span>hoje</span></div>
       <div><b>${melhor && melhor.n > 0 ? esc(dt(melhor.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' })) : '—'}</b><span>melhor dia</span></div>
     </div>
-    ${tot ? `<div class="nm-g" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos nos últimos 14 dias. Compartilhe sua página de links para começar.</p>'}
+    ${ops.length > 1 ? `<div class="nm-per" role="group" aria-label="Período">${ops.map(n => `<button type="button" data-act="nmper" data-n="${n}" class="${n === per ? 'on' : ''}">${n} <span>dias</span></button>`).join('')}</div>` : ''}
+    ${tot ? `<div class="nm-g${per > 14 ? ' g30' : ''}" style="--col:${per}" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos neste período. Compartilhe sua página de links para começar.</p>'}
     ${rank ? `<h4 class="nm-t">Sites mais acessados</h4><ol class="nm-r">${rank}</ol>` : ''}
     </div>
   </details>`;
@@ -1527,6 +1532,7 @@ document.addEventListener('click', e => {
     case 'compartilhar': compartilhar(id); break;
     case 'linkmural': linkMural(id); break;
     case 'linkperfil': linkPerfil(el.dataset.h); break;
+    case 'nmper': S.nmPer = +el.dataset.n || 14; desenharMeuPerfil(); break;
     case 'temaselo': {
       const t = el.dataset.t === 'claro' ? 'claro' : 'escuro'; S.seloTema = t;
       const bl = el.closest('.sl'); if (!bl) break;
