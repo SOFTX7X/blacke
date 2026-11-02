@@ -8,7 +8,7 @@ const PC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI
 const RESERVA_URL = 'https://ldghexvlbkiqduzlpdss.supabase.co';
 const RESERVA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZ2hleHZsYmtpcWR1emxwZHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjgzNzAsImV4cCI6MjEwMjkwNDM3MH0.MJOsPqcyc5J5TRH_JxvpH0Eul_v9bwfSeab-bFLe6vM';
 let _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const MODO = { reserva:false };
+const MODO = { reserva:false, trocou:false };   // reserva: só leitura (projeto reserva) · trocou: o site saiu do principal
 async function responde(url, key, ms, pc){
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
   const h = pc ? { Authorization:'Bearer ' + key } : { apikey:key, Authorization:'Bearer ' + key };
@@ -28,18 +28,27 @@ async function escolherBanco(){
   if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }
   else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
   else return;                                                            // todos fora: segue no principal e mostra o erro normal
-  MODO.reserva = true;
+  MODO.trocou = true; MODO.reserva = (nome === 'reserva');
   const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta','meu_aviso'];
   const rpcOrig = cli.rpc.bind(cli);
-  cli.rpc = (nome, args) => {
-    if (LEITURA.includes(nome)) return rpcOrig(nome, args);
-    if (!['registrar_clique','salvar_site'].includes(nome)) aviso('Publicar e editar estão pausados por alguns instantes.');
-    return Promise.resolve({ data:null, error:{ message:'Publicar e editar estão pausados por alguns instantes.' } });
-  };
+  const ESCRITA = ['salvar_site','seguir','reservar_arroba','remover_seguidor','registrar_clique','reagir','publicar_site','ajustar_posicao_foto','marcar_notificacoes_lidas','marcar_corrigido','liberar_arroba','excluir_meus_sites','excluir_meu_site','editar_perfil','editar_meu_site','denunciar_site'];
+  if (nome === 'pc'){
+    // PC: tudo funciona. Cada ação vai para uma fila e é reenviada ao principal assim que ele voltar.
+    cli.rpc = async (n, args) => {
+      if (ESCRITA.includes(n)){ try{ await rpcOrig('pc_enfileirar', { p_nome:n, p_args:args || {} }); }catch(_){} }
+      return rpcOrig(n, args);
+    };
+  } else {
+    cli.rpc = (n, args) => {
+      if (LEITURA.includes(n)) return rpcOrig(n, args);
+      if (!['registrar_clique','salvar_site'].includes(n)) aviso('Publicar e editar estão pausados por alguns instantes.');
+      return Promise.resolve({ data:null, error:{ message:'Publicar e editar estão pausados por alguns instantes.' } });
+    };
+  }
   _supabase = cli;
   document.body.classList.add('modo-reserva');
   const b = document.createElement('div'); b.className = 'aviso-reserva'; b.setAttribute('role', 'status');
-  b.textContent = 'Modo de segurança: o mural está no ar, mas publicar e editar estão pausados por alguns instantes.';
+  b.textContent = nome === 'pc' ? 'Modo de segurança: o servidor principal está instável. Você pode usar o site normalmente; suas ações serão sincronizadas quando ele voltar.' : 'Modo de segurança: o mural está no ar, mas publicar e editar estão pausados por alguns instantes.';
   document.body.prepend(b);
   // capas guardadas no armazenamento do principal passam a vir do projeto reserva
   const DE = SUPABASE_URL + '/storage/', PARA = RESERVA_URL + '/storage/';
@@ -1654,7 +1663,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
-  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); carregarAviso(); } });
+  escolherBanco().then(() => { if (MODO.trocou){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); carregarAviso(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
   atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo(); carregarNotif(); carregarAviso();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){

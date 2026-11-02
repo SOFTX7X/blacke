@@ -148,6 +148,7 @@
     ['Escolher capa','Choose cover','Elegir portada'],['Toque ou arraste uma imagem','Tap or drag an image','Toca o arrastra una imagen'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],['no mural','on the wall','en el muro'],
     ['Modo de segurança: o mural está no ar, mas publicar e editar estão pausados por alguns instantes.','Safe mode: the wall is online, but publishing and editing are paused for a moment.','Modo seguro: el muro está en línea, pero publicar y editar están en pausa por unos instantes.'],
+    ['Modo de segurança: o servidor principal está instável. Você pode usar o site normalmente; suas ações serão sincronizadas quando ele voltar.','Safe mode: the main server is unstable. You can keep using the site normally; your actions will sync when it is back.','Modo seguro: el servidor principal está inestable. Puedes usar el sitio con normalidad; tus acciones se sincronizarán cuando vuelva.'],
     ['Publicar e editar estão pausados por alguns instantes.','Publishing and editing are paused for a moment.','Publicar y editar están en pausa por unos instantes.'],
     ['Publicar está pausado por alguns instantes. Tente de novo mais tarde.','Publishing is paused for a moment. Try again later.','Publicar está en pausa por unos instantes. Inténtalo más tarde.'],
     ['Editar está pausado por alguns instantes. Tente de novo mais tarde.','Editing is paused for a moment. Try again later.','Editar está en pausa por unos instantes. Inténtalo más tarde.'],
