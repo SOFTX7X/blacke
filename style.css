@@ -2051,3 +2051,12 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-hm{opacity:.62}
 .ch-m.eu .ch-h i:not(.lido){color:#dcd8ff;opacity:.85}
 .ch-m.ele .ch-h,.ch-m.ele .ch-hm{opacity:1}
+
+/* Usuários: sem cabeçalho, busca no topo e mais organizada */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.usr{padding-top:0}
+.usr-busca{height:46px;margin:10px 0 10px;padding:0 16px;gap:10px;border-radius:999px;background:var(--panel);box-shadow:none}
+.usr-busca i{font-size:15px;color:var(--muted);opacity:1}
+.usr-busca:focus-within i{color:var(--ice)}
+.usr-busca input{font-size:15px}
+.usr-sub{margin:14px 4px 2px}

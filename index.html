@@ -27,8 +27,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>try{var d=document.documentElement,L=localStorage;if(L.getItem('bl_tema')==='claro')d.classList.add('claro');var f=L.getItem('bl_fonte_n');if(f){d.style.setProperty('--display',"'"+f+"',system-ui,sans-serif");d.style.setProperty('--fonte-chat',"'"+f+"',system-ui,'Noto Color Emoji',sans-serif");if(L.getItem('bl_fonte_q')){var k=document.createElement('link');k.rel='stylesheet';k.href='https://fonts.googleapis.com/css2?family='+L.getItem('bl_fonte_q')+'&display=swap';document.head.appendChild(k)}}}catch(e){}</script>
-  <link rel="stylesheet" href="/style.css?v=1793642234">
-  <link rel="stylesheet" href="/tema-claro.css?v=1793642523">
+  <link rel="stylesheet" href="/style.css?v=1793643058">
+  <link rel="stylesheet" href="/tema-claro.css?v=1793643058">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -130,7 +130,7 @@
 
     <!-- Usuários: procurar pessoas pelo @ -->
     <section class="usr" id="usuarios" hidden aria-label="Usuários">
-      <div class="dest-head"><div class="dest-tit"><h1>Usuários</h1><p>Procure pessoas pelo @ e siga quem você curte.</p></div></div>
+      <h1 class="sr-only">Usuários</h1>
       <label class="usr-busca"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         <input id="usrBusca" type="search" inputmode="search" placeholder="Procurar usuário (@nome)" aria-label="Procurar usuário" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="31"></label>
       <div class="usr-sub" id="usrSub">Em destaque</div>
