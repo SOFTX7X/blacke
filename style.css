@@ -1988,3 +1988,5 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-arqv button i{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.08);color:#e4e6f7;font-size:14px}
 .ch-arqv button:hover i{background:rgba(123,108,255,.35)}
 .ch-arqv b{margin-left:auto;font:600 13px system-ui,sans-serif;color:var(--muted)}
+/* o fundo do chat passa por baixo do menu lateral */
+@media (min-width:900px){.chat-sec{inset:0;padding-left:84px;box-sizing:border-box}}
