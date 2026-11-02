@@ -571,7 +571,9 @@ function atualizarTitulo(){
   document.title = ({ destaques:'Destaques — ' + B, meus:'Conta — ' + B, publicar:'Publicar — ' + B })[S.aba] || B + ' — Mural anônimo';
 }
 const ROTA = { mural:'/', destaques:'/destaques', meus:'/conta', publicar:'/publicar' };
-function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : (ROTA[S.aba] || '/'); }
+// a Conta usa o endereço do próprio @ (/@nome); sem @ reservado, /conta
+const rotaDe = aba => aba === 'meus' && S.perfil && S.perfil.handle ? '/@' + S.perfil.handle : (ROTA[aba] || '/');
+function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : rotaDe(S.aba); }
 function irUrl(url, state, trocar){
   try{
     if (location.pathname === url && !location.search) trocar = true;
@@ -731,7 +733,7 @@ function desenharMeus(){
 }
 
 async function trocarAba(aba, semHistorico, manterPerfil){
-  if (!semHistorico) irUrl(ROTA[aba] || '/', { aba });
+  if (!semHistorico) irUrl(rotaDe(aba), { aba });
   if (!manterPerfil && document.body.classList.contains('modo-perfil')){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
@@ -812,6 +814,7 @@ async function carregarPerfil(){
   try{ const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token }); S.perfil = data || null; }
   catch(_){ S.perfil = null; }
   atualizarPerfilUI();
+  if (S.aba === 'meus' && !document.body.classList.contains('modo-perfil')) irUrl(rotaDe('meus'), { aba:'meus' }, true);   // endereço da Conta = @ atual
   // abriu o link do próprio @ antes de o perfil carregar: mostra a Conta
   const h = S.perfil && S.perfil.handle;
   if (h && document.body.classList.contains('modo-perfil') && S.busca === '@' + h) irParaPerfil(h, true);
@@ -1128,7 +1131,7 @@ function modoPerfil(on){ document.body.classList.toggle('modo-perfil', !!on); }
 function irParaPerfil(h, semHistorico){
   // o meu próprio @ abre a minha Conta (com Editar perfil, Trocar @ etc.)
   if (S.perfil && S.perfil.handle && S.perfil.handle === String(h).toLowerCase()){
-    if (semHistorico) irUrl('/conta', { aba:'meus' }, true);
+    if (semHistorico) irUrl(rotaDe('meus'), { aba:'meus' }, true);
     trocarAba('meus', !!semHistorico); return;
   }
   if (!document.body.classList.contains('modo-perfil')) S.voltar = { scroll:scrollY };
