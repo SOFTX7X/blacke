@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','lista_seguir'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','lista_seguir','ids_em_alta'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -668,6 +668,11 @@ function fecharSplash(){
 setTimeout(fecharSplash, 7000);
 
 /* ---------- Mural ---------- */
+let ALTA = [], ALTA_T = 0;
+async function carregarAlta(){
+  if (Date.now() - ALTA_T < 300000) return;
+  try{ const { data, error } = await _supabase.rpc('ids_em_alta', { p_limite:200 }); if (!error && Array.isArray(data)){ ALTA = data; ALTA_T = Date.now(); } }catch(_){}
+}
 async function buscarMural(reset){
   if (typeof desenharSemana === 'function') setTimeout(desenharSemana, 0);
   if (typeof desenharRanking === 'function') setTimeout(desenharRanking, 0);
@@ -688,15 +693,19 @@ async function buscarMural(reset){
       if (t) q = q.or(`brand_name.ilike.%${t}%,caption.ilike.%${t}%,handle.ilike.%${t}%`);
       if (reset) $('perfilBox').hidden = true;
     }
-    q = S.ordem === 'acessos'
+    // "Em alta": mais acessados nos últimos 7 dias (ordem vem do banco; sem dados, cai em "mais acessados")
+    let alta = false;
+    if (S.ordem === 'alta'){ await carregarAlta(); if (meu !== S.seq) return; if (ALTA.length){ alta = true; q = q.in('id', ALTA); } }
+    if (!alta) q = (S.ordem === 'acessos' || S.ordem === 'alta')
       ? q.order('cliques', { ascending:false }).order('id', { ascending:false })
       : q.order('created_at', { ascending:false }).order('id', { ascending:false });
     const de = S.pagina * PAGE;
-    const { data, error, count } = await q.range(de, de + PAGE);
+    const { data, error, count } = await (alta ? q.limit(200) : q.range(de, de + PAGE));
     if (meu !== S.seq) return;            // chegou uma busca mais nova
     if (error) throw error;
-    const lote = (data || []).slice(0, PAGE);
-    S.temMais = (data || []).length > PAGE; S.total = count ?? lote.length;
+    let lote = (data || []).slice(0, alta ? 200 : PAGE);
+    if (alta){ const pos = new Map(ALTA.map((id, i) => [String(id), i])); lote.sort((x, y) => pos.get(String(x.id)) - pos.get(String(y.id))); lote = lote.slice(de, de + PAGE); }
+    S.temMais = alta ? (data || []).length > de + PAGE : (data || []).length > PAGE; S.total = count ?? lote.length;
     S.itens = S.itens.concat(lote);
     anexar(lote, reset);
     $('contador').textContent = `${S.total} ${S.total === 1 ? 'site' : 'sites'}`;

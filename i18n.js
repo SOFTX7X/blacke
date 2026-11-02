@@ -50,6 +50,7 @@
     ['Ordenar','Sort','Ordenar'],
     ['Mais recentes','Newest','Más recientes'],
     ['Mais acessados','Most visited','Más visitados'],
+    ['Em alta (7 dias)','Trending (7 days)','En alza (7 días)'],
     ['Compartilhar perfil','Share profile','Compartir perfil'],
     ['Compartilhar','Share','Compartir'],
     ['Limpar','Clear','Limpiar'],
