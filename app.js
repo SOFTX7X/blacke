@@ -830,7 +830,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  if (aba !== 'chat'){ clearInterval(CH.t); }
+  if (aba !== 'chat'){ clearInterval(CH.t); document.body.classList.remove('ch-aberto'); }
   S.aba = aba; document.body.dataset.aba = aba; setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques'); $('tabUsr').classList.toggle('on', aba === 'usuarios');
@@ -846,7 +846,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
     ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
     scrollTo({ top:0 }); if (!chAtivo()){ aviso('Reserve seu @ para usar o chat'); trocarAba('mural'); return; }
-    chPing(); if (!CH.h) chLista(); else { chPessoas(false); if (CH.t) clearInterval(CH.t); const h = CH.h; CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000); chCarregar(false); } return;
+    chPing(); if (!CH.h) chLista(); else { chPessoas(false); if (CH.t) clearInterval(CH.t); const h = CH.h; CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 3000); chCarregar(false); } return;
   }
   if (aba === 'usuarios'){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
@@ -1825,16 +1825,77 @@ $('chVis').addEventListener('change', async e => {
 const chVisto = d => { try{ const s = Math.max(1, Math.round((Date.now() - new Date(d)) / 60000)); const rtf = new Intl.RelativeTimeFormat(LOC(), { numeric:'auto' });
   return s < 60 ? rtf.format(-s, 'minute') : s < 1440 ? rtf.format(-Math.round(s / 60), 'hour') : rtf.format(-Math.round(s / 1440), 'day'); }catch(_){ return ''; } };
 const chStatus = x => x.on ? '<span class="ch-on">Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
+
+const chDia = d => { const x = new Date(d), h = new Date(), o = new Date(Date.now() - 864e5), mesmo = (a, b) => a.toDateString() === b.toDateString();
+  return mesmo(x, h) ? '<span>Hoje</span>' : mesmo(x, o) ? '<span>Ontem</span>' : esc(x.toLocaleDateString(LOC(), { day:'numeric', month:'long', ...(x.getFullYear() !== h.getFullYear() ? { year:'numeric' } : {}) })); };
+function chMsgsHtml(msgs){
+  let ant = null, out = '';
+  msgs.forEach(m => {
+    const dia = new Date(m.at).toDateString();
+    if (!ant || ant.dia !== dia) out += `<div class="ch-dia"><b>${chDia(m.at)}</b></div>`;
+    const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
+    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}">${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${m.m && !m.ap ? `<button type="button" class="ch-del" data-chat-del="${m.id}" aria-label="Apagar mensagem"><i class="fa-regular fa-trash-can"></i></button>` : ''}</div>`;
+    ant = { dia, m:m.m, t:new Date(m.at) };
+  });
+  return out;
+}
+const chCurto = d => { try{ const x = new Date(d); return x.toDateString() === new Date().toDateString() ? chHora(d) : x.toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' }); }catch(_){ return ''; } };
 function chLinha(x){
   const H = esc(x.handle);
-  const l2 = x.t != null ? (x.ap ? 'Mensagem apagada' : (x.meu ? 'Você: ' : '') + esc(x.t)) : chStatus(x);
-  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="usr-info"><span class="usr-l1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span><span class="usr-l2">${l2}</span></span>${x.nl ? `<span class="ch-nl">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</button></li>`;
+  const l2 = x.t != null ? (x.ap ? '<i>Mensagem apagada</i>' : (x.meu ? '<span class="ch-vc">Você</span>: ' : '') + `<span translate="no">${esc(x.t)}</span>`) : chStatus(x);
+  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="ch-info"><span class="ch-l1"><span class="ch-n1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span>${x.at ? `<span class="ch-hr" translate="no">${chCurto(x.at)}</span>` : ''}</span><span class="ch-l2"><span class="ch-pv ch-emo">${l2}</span>${x.nl ? `<span class="ch-nl">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</span></span></button></li>`;
 }
 async function chLista(){
   CH.h = null; clearInterval(CH.t);
-  $('chatSec').classList.remove('abriu'); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
+  $('chatSec').classList.remove('abriu'); document.body.classList.remove('ch-aberto'); chEmjAbrir(false); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
   await chPessoas(true);
 }
+function chDesenharLista(){
+  const ul = $('chConv'), lista = CH.lista || [], q = ($('chBusca').value || '').trim().toLowerCase().replace(/^@/, '');
+  const f = q ? lista.filter(x => x.handle.includes(q)) : lista;
+  const on = f.filter(x => x.on), off = f.filter(x => !x.on);
+  const ordena = (a, b) => (b.nl - a.nl) || ((b.ord || 0) - (a.ord || 0)) || a.handle.localeCompare(b.handle);
+  on.sort(ordena); off.sort(ordena);
+  ul.innerHTML = f.length
+    ? (on.length ? `<li class="ch-sub"><span>Online</span><b>${on.length}</b></li>` + on.map(chLinha).join('') : '') + (off.length ? `<li class="ch-sub"><span>Offline</span><b>${off.length}</b></li>` + off.map(chLinha).join('') : '')
+    : `<li class="sg-vz">${lista.length ? 'Ninguém encontrado.' : 'Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.'}</li>`;
+}
+$('chBusca').addEventListener('input', chDesenharLista);
+/* ---------- Emojis (fonte Noto Color Emoji, via Google Fonts) ---------- */
+const EMOJIS = [
+ ['😀','Carinhas','😀 😃 😄 😁 😆 😅 😂 🤣 🥲 ☺️ 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🫣 🤭 🫢 🫡 🤫 🫠 🤥 😶 😐 😑 😬 🫨 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃'],
+ ['👍','Gestos','👍 👎 👊 ✊ 🤛 🤜 👏 🙌 🫶 👐 🤲 🤝 🙏 ✌️ 🤞 🫰 🤟 🤘 👌 🤌 🤏 👈 👉 👆 👇 ☝️ ✋ 🤚 🖐️ 🖖 👋 🤙 💪 🦾 🖕 ✍️ 🤳 💅 🫵 👀 👁️ 👅 👄 🫦 🧠 🫀'],
+ ['❤️','Corações','❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❤️‍🔥 ❤️‍🩹 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 💌 💋 💯 💢 💥 💫 💦 💨 🕳️ 💬 🗯️ 💭 💤'],
+ ['🐶','Animais','🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐻‍❄️ 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🙈 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🪱 🐛 🦋 🐌 🐞 🐜 🪰 🐢 🐍 🦎 🐙 🦑 🦐 🦀 🐡 🐠 🐟 🐬 🐳 🐋 🦈 🐊 🐅 🐆 🦓 🦍 🐘 🦛 🐪 🐫 🦒 🦘 🐃 🐂 🐄 🐎 🐖 🐏 🐑 🦙 🐐 🦌 🐕 🐩 🐈 🐓 🦃 🦚 🦜 🦢 🕊️ 🐇 🦝 🦨 🦡 🐁 🐀 🐿️ 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🍁 🍂 🍃 🌺 🌻 🌹 🌷 🌼 🌸 💐 🍄'],
+ ['🍕','Comida','🍏 🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🌽 🥕 🧄 🧅 🥔 🍠 🥐 🍞 🥖 🧀 🥚 🍳 🥞 🧇 🥓 🥩 🍗 🍖 🌭 🍔 🍟 🍕 🫓 🥪 🌮 🌯 🥗 🍝 🍜 🍲 🍛 🍣 🍱 🥟 🍤 🍙 🍚 🍘 🍥 🍦 🍧 🍨 🍩 🍪 🎂 🍰 🧁 🍫 🍬 🍭 🍮 🍯 ☕ 🍵 🧃 🥤 🧋 🍺 🍻 🥂 🍷 🥃 🍸 🍹'],
+ ['⚽','Atividades','⚽ 🏀 🏈 ⚾ 🎾 🏐 🏉 🎱 🏓 🏸 🥊 🥋 ⛳ 🎣 🎽 🛹 🎿 🏂 🏋️ 🤸 🏆 🥇 🥈 🥉 🏅 🎖️ 🎮 🕹️ 🎲 🎯 🎳 🎰 🧩 🎨 🎬 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🎻 🎉 🎊 🎈 🎁'],
+ ['🚗','Viagem','🚗 🚕 🚙 🚌 🏎️ 🚓 🚑 🚒 🚚 🛵 🏍️ 🚲 ✈️ 🚀 🛸 🚁 ⛵ 🚤 🚢 🏠 🏢 🏰 🗼 🗽 ⛰️ 🌋 🏖️ 🏝️ 🌅 🌄 🌃 🌉 🌈 ☀️ 🌤️ ⛅ ☁️ 🌧️ ⛈️ ❄️ ⛄ 🔥 💧 🌊 🌙 ⭐ 🌟 ✨ ⚡ ☄️'],
+ ['💡','Objetos','⌚ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💾 📷 📹 🎥 📺 📻 ⏰ 🔋 🔌 💡 🔦 💰 💵 💳 💎 ⚖️ 🔧 🔨 ⚙️ 🔒 🔓 🔑 🛡️ 💊 🧬 🔬 🔭 📡 🚪 🛏️ 🛋️ 🚿 🧹 🛒 📦 ✉️ 📧 📝 📁 📅 📌 📎 ✂️ 📖 📚 🔔 🔕 🎓 👑 👒 🎩 👓 🕶️ 👕 👖 👟 👜 🎒'],
+ ['✅','Símbolos','✅ ❌ ❎ ⭕ ❗ ❓ ‼️ ⁉️ ⚠️ 🚫 ⛔ 🔞 ♻️ ➕ ➖ ✖️ ➡️ ⬅️ ⬆️ ⬇️ ↩️ 🔄 ▶️ ⏸️ ⏹️ 🔊 🔇 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜ 🔶 🔷 ♾️ 💲 ™️ ©️ ®️ 🆗 🆒 🆕 🔝 🏁 🚩 🏳️ 🏴 🇧🇷 🇺🇸 🇵🇹 🇪🇸']
+];
+let chEmjCat = 0;
+function chEmjDesenhar(){
+  const g = $('chEmjG'), t = $('chEmjT');
+  g.innerHTML = EMOJIS[chEmjCat][2].split(' ').map(e => `<button type="button" class="ch-e" data-emo="${e}">${e}</button>`).join('');
+  g.scrollTop = 0;
+  t.innerHTML = EMOJIS.map((c, i) => `<button type="button" class="${i === chEmjCat ? 'on' : ''}" data-emocat="${i}" title="${c[1]}">${c[0]}</button>`).join('');
+}
+function chEmjAbrir(abrir_){
+  const p = $('chEmj'); p.hidden = !abrir_; $('chEBtn').setAttribute('aria-expanded', String(abrir_));
+  if (abrir_) chEmjDesenhar();
+}
+$('chEBtn').addEventListener('click', e => { e.stopPropagation(); chEmjAbrir($('chEmj').hidden); });
+$('chEmj').addEventListener('click', e => {
+  e.stopPropagation();
+  const c = e.target.closest('[data-emocat]'); if (c){ chEmjCat = +c.dataset.emocat; chEmjDesenhar(); return; }
+  const b = e.target.closest('[data-emo]'); if (!b) return;
+  const inp = $('chTexto'), i = inp.selectionStart ?? inp.value.length, f = inp.selectionEnd ?? i, v = inp.value;
+  if ((v.slice(0, i) + b.dataset.emo + v.slice(f)).length > 500) return;
+  inp.value = v.slice(0, i) + b.dataset.emo + v.slice(f); const p = i + b.dataset.emo.length; inp.setSelectionRange(p, p);
+  if (matchMedia('(hover:hover)').matches) inp.focus();
+});
+document.addEventListener('click', e => { if (!e.target.closest('#chEmj,#chEBtn')) chEmjAbrir(false); });
+
 async function chPessoas(primeira){
   const ul = $('chConv');
   if (primeira && !CH.lista) ul.innerHTML = '<li class="sg-vz">Carregando…</li>';
@@ -1844,12 +1905,7 @@ async function chPessoas(primeira){
   if (!ok){ if (!CH.lista) ul.innerHTML = '<li class="sg-vz">Não foi possível carregar agora.</li>'; return; }
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
   CH.lista = lista; CH.cont = new Map(lista.map(x => [x.handle, x]));
-  const on = lista.filter(x => x.on), off = lista.filter(x => !x.on);
-  const ordena = (a, b) => (b.nl - a.nl) || ((b.ord || 0) - (a.ord || 0)) || a.handle.localeCompare(b.handle);
-  on.sort(ordena); off.sort(ordena);
-  ul.innerHTML = lista.length
-    ? (on.length ? `<li class="ch-sub"><span>Online</span><b>${on.length}</b></li>` + on.map(chLinha).join('') : '') + (off.length ? `<li class="ch-sub"><span>Offline</span><b>${off.length}</b></li>` + off.map(chLinha).join('') : '')
-    : '<li class="sg-vz">Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.</li>';
+  chDesenharLista();
   chNaoLidas(); if (CH.h) chStatusTopo();
 }
 function chStatusTopo(){
@@ -1859,10 +1915,10 @@ function chStatusTopo(){
 async function chConversa(h){
   CH.h = h; CH.sig = ''; clearInterval(CH.t);
   $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
-  $('chatSec').classList.add('abriu'); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
+  $('chatSec').classList.add('abriu'); document.body.classList.add('ch-aberto'); chEmjAbrir(false); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
   await chCarregar(true); chPessoas(false);
-  CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000);
+  CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 3000);
   if (matchMedia('(hover:hover)').matches && !$('chForm').hidden) $('chTexto').focus();
 }
 async function chCarregar(rolar){
@@ -1879,7 +1935,7 @@ async function chCarregar(rolar){
   const sig = msgs.map(m => m.id + (m.ap ? 'x' : '')).join(',') + '|' + d.pode + d.bloqueei;
   if (sig === CH.sig) return; CH.sig = sig;
   const box = $('chMsgs'), perto = rolar || box.scrollHeight - box.scrollTop - box.clientHeight < 90;
-  box.innerHTML = msgs.length ? msgs.map(m => `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}">${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${m.m && !m.ap ? `<button type="button" class="ch-del" data-chat-del="${m.id}" aria-label="Apagar mensagem"><i class="fa-regular fa-trash-can"></i></button>` : ''}</div>`).join('') : '<div class="sg-vz">Diga oi 👋</div>';
+  box.innerHTML = msgs.length ? chMsgsHtml(msgs) : '<div class="sg-vz">Diga oi 👋</div>';
   if (perto) box.scrollTop = box.scrollHeight;
   chNaoLidas();
 }
