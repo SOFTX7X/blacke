@@ -1645,5 +1645,10 @@ details.sl{display:block;padding:0}
 .seg-lnk i{display:none}
 .seg-lnk.on{color:rgba(255,255,255,.5)!important}
 .seg-lnk:hover{text-decoration:underline}
+.sg-li .sg-r:has(+.seg-lnk){flex:0 1 auto}
+.sg-li .seg-lnk{margin-right:auto;padding:0;font-weight:600;color:#6e8bff!important}
+.sg-li .seg-lnk::before{content:"·";margin:0 6px 0 2px;color:rgba(255,255,255,.55)}
+.sg-li .seg-lnk.on{display:none!important}
+.sg-li .sg-rm{margin-left:auto}
 .seg-btn.seg-lnk,.seg-btn.seg-lnk.on,.seg-btn.seg-lnk.on:hover{background:none!important;border:0!important;border-radius:0;box-shadow:none}
 .seg-btn.seg-lnk.on i{display:none}

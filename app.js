@@ -878,7 +878,7 @@ async function carregarSeguindo(){
 function pintarSeguir(b){
   const on = SEGUINDO.has(b.dataset.h), volta = !on && SEGUEME.has(b.dataset.h);
   b.classList.toggle('on', on); b.classList.toggle('pri', !on); b.setAttribute('aria-pressed', on);
-  b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : `<i class="fa-solid fa-user-plus"></i> <span>${volta ? 'Seguir de volta' : 'Seguir'}</span>`;
+  b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : `<i class="fa-solid fa-user-plus"></i> <span>${volta && !b.classList.contains('seg-lnk') ? 'Seguir de volta' : 'Seguir'}</span>`;
 }
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-seg-btn]'); if (!b || b.dataset.busy) return;
@@ -932,7 +932,7 @@ async function abrirListaSeg(h, tipo){
         const eu = S.perfil && S.perfil.handle, outro = eu && eu !== x.handle, H = esc(x.handle);
         const meus = eu && eu === h && tipo === 'seguidores';       // minha própria lista de seguidores: Remover (como no Instagram)
         const nome = `<button type="button" class="sg-r" data-sgp="${H}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</button>`;
-        if (meus) return `<li class="sg-li">${nome}<button type="button" class="sg-b sg-rm" data-rm-seg data-h="${H}">Remover</button></li>`;
+        if (meus) return `<li class="sg-li">${nome}<button type="button" class="seg-btn seg-lnk" data-seg-btn data-h="${H}"></button><button type="button" class="sg-b sg-rm" data-rm-seg data-h="${H}">Remover</button></li>`;
         return `<li class="sg-li">${nome}${outro ? `<button type="button" class="seg-btn sg-b" data-seg-btn data-h="${H}"></button>` : ''}</li>`;
       }).join('')
     : `<li class="sg-vz">${tipo === 'seguindo' ? 'Não segue ninguém ainda.' : 'Nenhum seguidor ainda.'}</li>`;
