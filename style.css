@@ -2068,10 +2068,11 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
   .chat-sec .ch-topo{gap:10px}
 }
 
-/* Menu inferior (mobile): só o ícone; o nome aparece apenas na aba ativa */
+/* Menu inferior (mobile): com 5 itens os nomes cabem */
 @media (max-width:899px){
-  .bnav button,.bnav a{font-size:0!important;gap:0}
+  .bnav button,.bnav a{font-size:10px!important;gap:3px;min-width:0}
 }
+
 
 /* Tela de banimento */
 #telaBan{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;background:#06070d;color:#eceefb;text-align:center;overflow:auto}
