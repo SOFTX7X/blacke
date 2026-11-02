@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','lista_seguir'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -674,6 +674,7 @@ async function buscarMural(reset){
   try{
     let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
     if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
+    else if (S.cat === 'Seguindo') q = q.in('handle', SEGUINDO.size ? [...SEGUINDO].slice(0, 200) : ['-']);
     else if (S.cat !== 'Todas') q = q.eq('categoria', S.cat);
     const porArroba = S.busca.startsWith('@');
     if (porArroba){
@@ -701,7 +702,8 @@ async function buscarMural(reset){
     vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
-      setEstado(S.cat === 'Salvos' && !S.busca ? vazio('coracao', 'Nenhum site salvo', 'Toque no ♥ de um card para guardar aqui.', ['mural'])
+      setEstado(S.cat === 'Seguindo' && !S.busca ? vazio('coracao', 'Você ainda não segue ninguém', S.perfil && S.perfil.handle ? 'Abra um perfil e toque em Seguir para ver os sites dele aqui.' : 'Reserve seu @ e siga perfis para ver os sites deles aqui.', ['mural'])
+        : S.cat === 'Salvos' && !S.busca ? vazio('coracao', 'Nenhum site salvo', 'Toque no ♥ de um card para guardar aqui.', ['mural'])
         : filtrando ? vazio('busca', 'Nada encontrado', 'Tente outra busca ou categoria.', ['limpar'])
         : vazio('grade', 'O mural está vazio', 'Seja o primeiro a publicar um site.', ['publicar']));
     } else setEstado('');
@@ -831,8 +833,62 @@ async function mostrarPerfil(h){
   if (temVerif(data)) VERIF.add(data.handle);
   if (temSeloB(data)) NINJA.add(data.handle);
   $('pfCard').innerHTML = cartaoPerfil(data, false);
+  $('pfCard').querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
   box.hidden = false;
 }
+
+/* ---------- Seguir perfis ---------- */
+const SEGUINDO = new Set();
+function segNum(p, tipo){
+  const v = +p[tipo] || 0, rot = tipo === 'seguidores' ? (v === 1 ? 'seguidor' : 'seguidores') : 'seguindo';
+  return `<li><button type="button" class="ig-sg" data-seg-ver="${tipo}" data-h="${esc(p.handle)}"><b data-segn="${esc(p.handle)}:${tipo}">${fmtN(v)}</b> <span>${rot}</span></button></li>`;
+}
+async function carregarSeguindo(){
+  SEGUINDO.clear();
+  if (S.token){
+    try{ const { data, error } = await _supabase.rpc('meus_seguindo', { p_token:S.token }); if (!error && Array.isArray(data)) data.forEach(h => SEGUINDO.add(h)); }catch(_){}
+  }
+  document.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
+}
+function pintarSeguir(b){
+  const on = SEGUINDO.has(b.dataset.h);
+  b.classList.toggle('on', on); b.classList.toggle('pri', !on); b.setAttribute('aria-pressed', on);
+  b.innerHTML = on ? '<i class="fa-solid fa-check"></i> <span>Seguindo</span>' : '<i class="fa-solid fa-user-plus"></i> <span>Seguir</span>';
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-seg-btn]'); if (!b || b.dataset.busy) return;
+  const h = b.dataset.h;
+  if (!S.perfil || !S.perfil.handle){ aviso('Reserve seu @ para seguir perfis'); return; }
+  const on = !SEGUINDO.has(h);
+  b.dataset.busy = '1'; on ? SEGUINDO.add(h) : SEGUINDO.delete(h); pintarSeguir(b);
+  try{
+    const { data, error } = await _supabase.rpc('seguir', { p_handle:h, p_token:S.token, p_on:on });
+    if (error) throw error;
+    if (data && data.seguidores != null) document.querySelectorAll('[data-segn]').forEach(n => { if (n.dataset.segn === h + ':seguidores'){ n.textContent = fmtN(data.seguidores); n.dataset.v = String(data.seguidores); } });
+    if (S.perfil) S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + (on ? 1 : -1));
+  }catch(err){
+    on ? SEGUINDO.delete(h) : SEGUINDO.add(h); pintarSeguir(b);
+    const m = String((err && err.message) || '');
+    aviso(/Reserve|Limite|si mesmo|encontrado/.test(m) ? m : 'Não foi possível seguir agora.');
+  }
+  delete b.dataset.busy;
+});
+async function abrirListaSeg(h, tipo){
+  $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span> <small translate="no">@${esc(h)}</small>`;
+  const ul = $('sgLista'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg');
+  let lista = [];
+  try{ const { data } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; }catch(_){}
+  lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
+  ul.innerHTML = lista.length
+    ? lista.map(x => `<li><button type="button" class="sg-r" data-sgp="${esc(x.handle)}">${miniAv(x.handle)}<span class="sg-n" translate="no">@${esc(x.handle)}</span>${selosDe(x.handle)}</button></li>`).join('')
+    : `<li class="sg-vz">${tipo === 'seguindo' ? 'Não segue ninguém ainda.' : 'Nenhum seguidor ainda.'}</li>`;
+}
+document.addEventListener('click', e => {
+  const v = e.target.closest('[data-seg-ver]');
+  if (v){ abrirListaSeg(v.dataset.h, v.dataset.segVer); return; }
+  const r = e.target.closest('[data-sgp]');
+  if (r){ fechar('modalSeg'); irParaPerfil(r.dataset.sgp); }
+});
 
 /* ---------- cartão de perfil ---------- */
 const fmtN = n => { try{ return new Intl.NumberFormat(LOC(), { notation:'compact', maximumFractionDigits:1 }).format(n || 0); }catch(_){ return String(n || 0); } };
@@ -868,7 +924,8 @@ function cartaoPerfil(p, dono){
     <ul class="ig-nums">
       ${num(p.sites, 'site', 'sites')}
       ${num(p.acessos, 'acesso', 'acessos', dono && TREND ? ' ' + chipTendencia(TREND.hj, TREND.ontem) : '')}
-      ${num(p.salvos, 'salvo', 'salvos')}
+      ${segNum(p, 'seguidores')}
+      ${segNum(p, 'seguindo')}
     </ul>
     <div class="ig-bio">
       ${p.bio ? `<p translate="no">${esc(p.bio)}</p>` : (dono ? '<p class="dim">Adicione uma bio em "Editar perfil".</p>' : '')}
@@ -879,6 +936,8 @@ function cartaoPerfil(p, dono){
     <div class="ig-btns">
       ${dono ? `<button class="pc-btn" type="button" data-pc="editar">Editar perfil</button>
       <button class="pc-btn" type="button" data-pc="arroba">Trocar @</button><span class="so-m">${TOOLS(p.handle)}</span>${ct.length ? '<i class="ig-quebra"></i>' : ''}` : ''}
+      ${dono ? '' : `<button class="pc-btn seg-btn" type="button" data-seg-btn data-h="${esc(p.handle)}"></button>`}
+      ${dono ? '' : '<i class="ig-quebra seg-q"></i>'}
       ${ct.map(c => `<a class="pc-btn ct" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[c.tipo] || 'fa-solid fa-link'}"></i> <span>${nomeContato(c)}</span></a>`).join('')}
       ${dono ? '' : `<a class="pc-btn" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i> <span>Página de links</span></a><button class="pc-btn" type="button" data-act="linkperfil" data-h="${esc(p.handle)}"><i class="fa-solid fa-share-nodes"></i> <span>Compartilhar</span></button>`}
     </div>
@@ -1144,7 +1203,7 @@ $('btnUsarChave').addEventListener('click', async () => {
   if (S.meus.length && !await confirmar({ titulo:'Trocar de chave?', texto:'Os sites desta chave atual só serão gerenciáveis de novo se você tiver guardado ela. Copie antes se precisar.', botao:'Trocar' })) return;
   gravarLS('bl_chave', nova); await iniciarChave();
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  await carregarPerfil(); fechar('modalChave'); atualizarMeusUI(); aviso(`Chave restaurada: ${S.meus.length} ${S.meus.length === 1 ? 'site encontrado' : 'sites encontrados'}`);
+  await carregarPerfil(); carregarSeguindo(); fechar('modalChave'); atualizarMeusUI(); aviso(`Chave restaurada: ${S.meus.length} ${S.meus.length === 1 ? 'site encontrado' : 'sites encontrados'}`);
   if (S.aba === 'meus') desenharMeus(); else buscarMural(true);
 });
 $('btnExcluirTodos').addEventListener('click', excluirTodos);
@@ -1203,7 +1262,7 @@ document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('c
   if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil')) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
-$('chips').innerHTML = ['Todas', 'Salvos', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c}</button>`).join('');
+$('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c}</button>`).join('');
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
@@ -1222,9 +1281,9 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
-  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); } });
+  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }

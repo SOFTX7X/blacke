@@ -1596,3 +1596,23 @@ details.sl{display:block;padding:0}
 
 /* sem contorno de foco nos blocos de ranking/números/selo */
 .nm-h,.nm-h:focus,.nm-h:focus-visible,.rk-av:focus,.rk-av:focus-visible,details.nm:focus,details.nm:focus-visible,details.sl>summary,details.sl>summary:focus,details.sl>summary:focus-visible{outline:none!important;-webkit-tap-highlight-color:transparent}
+
+/* Seguidores / Seguindo */
+.ig-sg{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;outline:none!important;-webkit-tap-highlight-color:transparent}
+.ig-sg:hover span{color:#fff}
+@media (max-width:640px){.ig-sg{flex-direction:column;align-items:flex-start;gap:0}}
+.seg-btn.on{background:rgba(255,255,255,.04);border-color:#3a3f87;color:#c9c1ff}
+.seg-btn.on i{color:#3ddc97}
+.sg-l{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;max-height:56vh;overflow:auto}
+.sg-l li{border-top:1px solid rgba(255,255,255,.06)}
+.sg-l li:first-child{border-top:0}
+.sg-r{display:flex;align-items:center;gap:12px;width:100%;padding:11px 4px;border:0;background:none;color:#fff;cursor:pointer;text-align:left;font:600 15px var(--display);outline:none!important}
+.sg-r:hover{background:rgba(255,255,255,.03)}
+.sg-r .amini{flex:none;display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%!important;overflow:hidden;background:linear-gradient(135deg,#4a3fd6,#7b6cff);box-shadow:0 0 0 1.5px rgba(123,108,255,.55);color:#fff;font:700 16px var(--display);margin:0}
+.sg-r .amini img{width:100%;height:100%;object-fit:cover;display:block}
+.sg-r .selo,.sg-r .selo-b{margin-left:2px}
+.sg-r .selo{width:15px;height:15px}
+.sg-r .selo-b{width:22px;height:22px}
+.sg-vz{padding:22px 4px;color:var(--muted);font-size:14px;text-align:center}
+#sgTitulo small{font:500 13px var(--mono);color:var(--muted);margin-left:6px}
+@media (max-width:640px){.ig-btns .pc-btn.seg-btn{flex:1 0 100%}.ig-btns .seg-q{display:none}}
