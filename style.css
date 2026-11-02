@@ -1600,7 +1600,6 @@ details.sl{display:block;padding:0}
 /* Seguidores / Seguindo */
 .ig-sg{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;outline:none!important;-webkit-tap-highlight-color:transparent}
 .ig-sg:hover span{color:#fff}
-@media (max-width:640px){.ig-sg{flex-direction:column;align-items:flex-start;gap:0}}
 .seg-btn.on{background:rgba(255,255,255,.04);border-color:#3a3f87;color:#c9c1ff}
 .seg-btn.on i{color:#3ddc97}
 .sg-l{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;max-height:56vh;overflow:auto}
@@ -1616,3 +1615,10 @@ details.sl{display:block;padding:0}
 .sg-vz{padding:22px 4px;color:var(--muted);font-size:14px;text-align:center}
 #sgTitulo small{font:500 13px var(--mono);color:var(--muted);margin-left:6px}
 @media (max-width:640px){.ig-btns .pc-btn.seg-btn{flex:1 0 100%}.ig-btns .seg-q{display:none}}
+
+/* números do perfil: valor em cima, nome embaixo */
+.ig-nums{align-items:flex-start;gap:6px 28px}
+.ig-nums li,.ig-nums .ig-sg{flex-direction:column;align-items:center;gap:1px;text-align:center;line-height:1.25}
+.ig-nums li>span,.ig-nums .ig-sg span{font-size:13px;color:var(--muted)}
+.ig-nums b{font-size:17px}
+@media (max-width:640px){.ig-nums{width:100%;justify-content:space-between;gap:6px 8px;padding-right:4px}.ig-nums b{font-size:16px}.ig-nums li>span,.ig-nums .ig-sg span{font-size:12px}}

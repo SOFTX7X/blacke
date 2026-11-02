@@ -163,7 +163,7 @@
     ['Os sites mais novos aparecem aqui.','The newest sites appear here.','Los sitios más nuevos aparecen aquí.'],
     ['Reagir','React','Reaccionar'],['Não foi possível reagir.','Could not react.','No se pudo reaccionar.'],
     ['muitas reações em pouco tempo. Tente mais tarde.','too many reactions in a short time. Try again later.','demasiadas reacciones en poco tiempo. Inténtalo más tarde.'],
-    ['Seguir','Follow','Seguir'],['Seguindo','Following','Siguiendo'],['Seguidores','Followers','Seguidores'],['seguidores','followers','seguidores'],['seguidor','follower','seguidor'],
+    ['Seguir','Follow','Seguir'],['Seguindo','Following','Siguiendo'],['Seguidores','Followers','Seguidores'],['seguidores','followers','seguidores'],['seguidor','follower','seguidor'],['seguindo','following','siguiendo'],
     ['Nenhum seguidor ainda.','No followers yet.','Aún no hay seguidores.'],['Não segue ninguém ainda.','Not following anyone yet.','Aún no sigue a nadie.'],
     ['Reserve seu @ para seguir perfis','Reserve your @ to follow profiles','Reserva tu @ para seguir perfiles'],['Não foi possível seguir agora.','Could not follow right now.','No se pudo seguir ahora.'],
     ['Você ainda não segue ninguém','You are not following anyone yet','Aún no sigues a nadie'],
