@@ -1776,7 +1776,7 @@ details.sl{display:block;padding:0}
 @media (min-width:901px){.bnav .bn-n{top:6px;left:30px}}
 
 /* ===== Chat: seção própria (lista de pessoas + conversa) ===== */
-.chat-sec{display:grid;grid-template-columns:minmax(260px,340px) 1fr;height:calc(100dvh - 200px);min-height:420px;max-width:1040px;margin:8px auto 0;border:1px solid var(--line);border-radius:20px;background:rgba(12,14,27,.7);overflow:hidden}
+.chat-sec{display:grid;grid-template-columns:minmax(260px,340px) 1fr;height:calc(100dvh - 200px);min-height:420px;max-width:1040px;margin:8px auto 0;overflow:hidden}
 .chat-sec[hidden]{display:none!important}
 .ch-lado{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
 .ch-lado-h{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 10px}
@@ -1787,10 +1787,11 @@ details.sl{display:block;padding:0}
 .ch-sub{list-style:none;margin:12px 8px 4px;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ch-li{list-style:none}
 .ch-r{display:flex;align-items:center;gap:12px;width:100%;padding:9px 8px;border:0;border-radius:14px;background:none;color:inherit;text-align:left;cursor:pointer}
-.ch-r:hover,.ch-li.sel .ch-r{background:rgba(123,108,255,.16)}
+.ch-r:hover,.ch-li.sel .ch-r{background:rgba(255,255,255,.05)}
 .ch-av{position:relative;flex:none}
-.ch-av .amini{width:44px!important;height:44px!important}
-.ch-dot{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:#5b5f78;border:2px solid #0c0e1b}
+.ch-av .amini{display:grid;place-items:center;width:44px;height:44px;border-radius:50%!important;overflow:hidden;background:#1b1d33;color:#cfd2ee;font:700 16px var(--display)}
+.ch-av .amini img{width:100%;height:100%;object-fit:cover;display:block}
+.ch-dot{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#5b5f78;border:2px solid var(--bg,#05060b)}
 .ch-av.on .ch-dot{background:#3ddc84}
 .ch-r .usr-info{flex:1;min-width:0}
 .ch-r .usr-l2{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1809,7 +1810,7 @@ details.sl{display:block;padding:0}
 .ch-st.on{color:#3ddc84}
 #chVoltar{display:none}
 @media (max-width:760px){
-  .chat-sec{grid-template-columns:1fr;height:calc(100dvh - 215px);margin:4px 10px 0;max-width:none}
+  .chat-sec{grid-template-columns:1fr;height:calc(100dvh - 215px);margin:4px 14px 0;max-width:none}
   .chat-sec .ch-main{display:none}
   .chat-sec.abriu .ch-main{display:flex}
   .chat-sec.abriu .ch-lado{display:none}
