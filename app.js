@@ -2318,7 +2318,11 @@ const FONTES = [
   { id:'sora', nome:'Sora', q:'Sora:wght@400;500;600;700' },
   { id:'lexend', nome:'Lexend', q:'Lexend:wght@400;500;600;700' },
   { id:'playfair', nome:'Playfair Display', q:'Playfair+Display:wght@400;500;600;700' },
-  { id:'jetbrains', nome:'JetBrains Mono', q:'JetBrains+Mono:wght@400;500;600;700' }
+  { id:'jetbrains', nome:'JetBrains Mono', q:'JetBrains+Mono:wght@400;500;600;700' },
+  { id:'sistema', nome:'Fonte do sistema', fam:'system-ui', q:'' },
+  { id:'arimo', nome:'Arimo', q:'Arimo:wght@400;500;600;700' },
+  { id:'cousine', nome:'Cousine', q:'Cousine:wght@400;700' },
+  { id:'cascadia', nome:'Cascadia Code', q:'Cascadia+Code:wght@400;500;600;700' }
 ];
 const apLS = { get:k => { try{ return localStorage.getItem(k); }catch(_){ return null; } }, set:(k, v) => { try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); }catch(_){} } };
 function aplicarTema(t){
@@ -2328,11 +2332,12 @@ function aplicarTema(t){
 }
 function aplicarFonte(id){
   const f = FONTES.find(x => x.id === id) || FONTES[0], d = document.documentElement.style;
-  if (!f.q){ d.removeProperty('--display'); d.removeProperty('--fonte-chat'); ['bl_fonte_n', 'bl_fonte_q'].forEach(k => apLS.set(k, null)); }
+  if (f.q == null){ d.removeProperty('--display'); d.removeProperty('--fonte-chat'); ['bl_fonte_n', 'bl_fonte_q'].forEach(k => apLS.set(k, null)); }
   else{
-    apFonteLink(f.q);
-    d.setProperty('--display', `'${f.nome}',system-ui,sans-serif`); d.setProperty('--fonte-chat', `'${f.nome}',system-ui,'Noto Color Emoji',sans-serif`);
-    apLS.set('bl_fonte_n', f.nome); apLS.set('bl_fonte_q', f.q);
+    const fam = f.fam || f.nome;
+    if (f.q) apFonteLink(f.q);
+    d.setProperty('--display', `'${fam}',system-ui,sans-serif`); d.setProperty('--fonte-chat', `'${fam}',system-ui,'Noto Color Emoji',sans-serif`);
+    apLS.set('bl_fonte_n', fam); apLS.set('bl_fonte_q', f.q || null);
   }
   document.querySelectorAll('#apFontes [data-fonte]').forEach(b => b.classList.toggle('on', b.dataset.fonte === f.id));
 }
@@ -2340,9 +2345,9 @@ function apFonteLink(q){ const href = 'https://fonts.googleapis.com/css2?family=
 function abrirAparencia(){
   if (!$('apFontes').children.length){
     apFonteLink(FONTES.filter(f => f.q).map(f => f.q).join('&family='));
-    $('apFontes').innerHTML = FONTES.map(f => `<button type="button" data-fonte="${f.id}" style="font-family:${f.q ? `'${f.nome}',` : ''}'Space Grotesk',system-ui,sans-serif"><span class="ap-n">${f.nome}</span><span class="ap-a">Aa Bb Cc 123</span></button>`).join('');
+    $('apFontes').innerHTML = FONTES.map(f => `<button type="button" data-fonte="${f.id}" style="font-family:${f.q != null ? `'${f.fam || f.nome}',` : ''}'Space Grotesk',system-ui,sans-serif"><span class="ap-n">${f.nome}</span><span class="ap-a">Aa Bb Cc 123</span></button>`).join('');
   }
-  const atual = FONTES.find(f => f.nome === apLS.get('bl_fonte_n')) || FONTES[0];
+  const atual = FONTES.find(f => (f.fam || f.nome) === apLS.get('bl_fonte_n')) || FONTES[0];
   document.querySelectorAll('#apFontes [data-fonte]').forEach(b => b.classList.toggle('on', b.dataset.fonte === atual.id));
   aplicarTema(document.documentElement.classList.contains('claro') ? 'claro' : 'escuro');
   abrir('modalAparencia');
