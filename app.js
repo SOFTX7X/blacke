@@ -16,7 +16,7 @@ async function escolherBanco(){
   if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
   const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta','meu_aviso'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
     if (LEITURA.includes(nome)) return rpcOrig(nome, args);
@@ -758,7 +758,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
+  S.aba = aba; document.body.dataset.aba = aba; setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
@@ -929,6 +929,45 @@ document.addEventListener('click', async e => {
     atualizarContagens();
   }catch(_){ if (eu0) ajustarN(eu0, 'seguidores', 1); if (li0) li0.style.display = ''; aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
 });
+/* ---------- aviso da moderação (aba Conta) ---------- */
+function avisoPrazo(prazo){
+  const ms = new Date(prazo) - Date.now();
+  if (!(ms > 0)) return '<b class="av-venc">Prazo encerrado</b>';
+  const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60), mi = m % 60;
+  return d ? `<b>${d}</b> <span>d</span> <b>${h}</b> <span>h</span>` : h ? `<b>${h}</b> <span>h</span> <b>${mi}</b> <span>min</span>` : `<b>${mi}</b> <span>min</span>`;
+}
+function desenharAviso(){
+  const el = $('avisoConta'); if (!el) return;
+  const a = S.aviso;
+  if (!a || S.aba !== 'meus'){ el.hidden = true; el._html = ''; return; }
+  const corr = a.status === 'corrigido';
+  const html = `<div class="av-ban ${corr ? 'ok' : ''}" role="alert"><span class="av-ic"><i class="fa-solid ${corr ? 'fa-clock' : 'fa-triangle-exclamation'}"></i></span>
+    <div class="av-b"><b class="av-t">Aviso da moderação</b><p class="av-m" translate="no">${esc(a.mensagem)}</p>
+    ${corr ? '<p class="av-s">Você avisou que corrigiu. Aguarde a análise da moderação.</p>'
+           : `<p class="av-s"><span>Prazo para corrigir:</span> ${avisoPrazo(a.prazo_em)}</p>`}</div>
+    ${corr ? '' : '<button type="button" class="pc-btn pri av-ok" data-aviso-ok>Já corrigi</button>'}</div>`;
+  if (el._html !== html){ el._html = html; el.innerHTML = html; }
+  el.hidden = false;
+}
+async function carregarAviso(){
+  if (!S.token) return;
+  try{
+    const { data, error } = await _supabase.rpc('meu_aviso', { p_token:S.token });
+    if (error) return;
+    S.aviso = data || null; desenharAviso();
+  }catch(_){}
+}
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-aviso-ok]'); if (!b || b.dataset.busy) return;
+  b.dataset.busy = '1';
+  const ok = await confirmar({ titulo:'Você já corrigiu tudo?', texto:'A moderação vai conferir. Se faltar algo, você recebe um novo prazo.', botao:'Sim, já corrigi' });
+  if (!ok){ delete b.dataset.busy; return; }
+  try{
+    const { error } = await _supabase.rpc('marcar_corrigido', { p_token:S.token });
+    if (error) throw error;
+    aviso('Aviso enviado à moderação'); await carregarAviso();
+  }catch(_){ aviso('Não foi possível enviar agora.'); delete b.dataset.busy; }
+});
 let SGATUAL = null;
 function filtrarSeg(){
   const q = ($('sgBusca').value || '').trim().toLowerCase().replace(/^@/, '');
@@ -988,6 +1027,9 @@ function ntConteudo(x){
     if (x.v) VERIF.add(d.handle); if (x.nj) NINJA.add(d.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(d.handle, x.f);
     ic = miniAv(d.handle);
     txt = `<b translate="no">@${esc(d.handle)}</b> <span>começou a seguir você</span>`; alvo = `data-ntp="${esc(d.handle)}"`;
+  } else if (x.tipo === 'aviso'){
+    ic = '<i class="nt-ic am"><i class="fa-solid fa-triangle-exclamation"></i></i>';
+    txt = `<span>Aviso da moderação:</span> <b translate="no">${esc(d.mensagem || '')}</b>`; alvo = 'data-ntm="1"';
   } else if (x.tipo === 'meta_site'){
     ic = '<i class="nt-ic am"><i class="fa-solid fa-trophy"></i></i>';
     txt = `<span>Seu site</span> <b translate="no">${esc(d.nome || '')}</b> <span>chegou a</span> <b>${fmtN(d.meta)}</b> <span>acessos</span>`; alvo = 'data-ntm="1"';
@@ -1043,14 +1085,15 @@ pintarSom();
 
 /* notificação do sistema (quando a aba está em segundo plano) */
 const NT_TXT = {
-  pt:{ seg:h => `@${h} começou a seguir você`, meta:(n, m) => `Seu site ${n} chegou a ${m} acessos`, ver:'Você conquistou o selo de Verificado', blk:'Você conquistou o Selo BLACKE' },
-  en:{ seg:h => `@${h} started following you`, meta:(n, m) => `Your site ${n} reached ${m} visits`, ver:'You earned the Verified badge', blk:'You earned the BLACKE Badge' },
-  es:{ seg:h => `@${h} empezó a seguirte`, meta:(n, m) => `Tu sitio ${n} llegó a ${m} visitas`, ver:'Conseguiste el sello de Verificado', blk:'Conseguiste el Sello BLACKE' }
+  pt:{ seg:h => `@${h} começou a seguir você`, meta:(n, m) => `Seu site ${n} chegou a ${m} acessos`, ver:'Você conquistou o selo de Verificado', blk:'Você conquistou o Selo BLACKE', avs:'Aviso da moderação: você tem um prazo para corrigir' },
+  en:{ seg:h => `@${h} started following you`, meta:(n, m) => `Your site ${n} reached ${m} visits`, ver:'You earned the Verified badge', blk:'You earned the BLACKE Badge', avs:'Moderation notice: you have a deadline to fix' },
+  es:{ seg:h => `@${h} empezó a seguirte`, meta:(n, m) => `Tu sitio ${n} llegó a ${m} visitas`, ver:'Conseguiste el sello de Verificado', blk:'Conseguiste el Sello BLACKE', avs:'Aviso de moderación: tienes un plazo para corregir' }
 };
 function ntPlano(x){
   const T = NT_TXT[window.blLang ? window.blLang() : 'pt'] || NT_TXT.pt, d = x.dados || {};
   if (x.tipo === 'seguidor') return T.seg(d.handle);
   if (x.tipo === 'meta_site') return T.meta(d.nome || '', fmtN(d.meta));
+  if (x.tipo === 'aviso') return T.avs;
   return d.selo === 'blacke' ? T.blk : T.ver;
 }
 function ntSistema(novos, somDoSite){
@@ -1188,7 +1231,7 @@ async function sincronizar(){
   if (document.hidden){ carregarNotif(); return; }       // em outra aba: só confere os avisos
   sincOcupado = true;
   try{
-    carregarNotif();
+    carregarNotif(); carregarAviso();
     await carregarSeguindo();
     if (!$('modalSeg').hidden && SGATUAL && !document.querySelector('#modalConfirma:not([hidden])')) await abrirListaSeg(SGATUAL.h, SGATUAL.tipo, true);
     await atualizarContagens();
@@ -1598,9 +1641,9 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 (async function iniciar(){
   await iniciarChave();
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
-  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); } });
+  escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); carregarAviso(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo(); carregarNotif();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking(); carregarSeguindo(); carregarNotif(); carregarAviso();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }
