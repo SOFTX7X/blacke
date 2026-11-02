@@ -1418,9 +1418,10 @@ function barrasHTML(dias){
   }).join('');
 }
 function painelNumeros(){
-  if (!SERIE || !S.meus.length) return '';
-  const todos = SERIE, soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
-  const ops = [7, 14, 30].filter(n => n <= todos.length);
+  const temSites = !!S.meus.length;
+  const zero = () => Array.from({ length:30 }, (_, i) => { const d = new Date(Date.now() - (29 - i) * 864e5); return { d:`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, n:0 }; });
+  const todos = (SERIE && temSites) ? SERIE : zero(), soma = l => l.reduce((t, d) => t + (+d.n || 0), 0);
+  const ops = [3, 7, 14, 30].filter(n => n <= todos.length);
   const per = ops.includes(S.nmPer) ? S.nmPer : (ops.includes(14) ? 14 : ops[ops.length - 1]);
   const dias = todos.slice(-per);
   const tot = soma(dias), ult = soma(todos.slice(-7)), ant = soma(todos.slice(0, Math.max(0, todos.length - 7)).slice(-7));
@@ -1454,7 +1455,7 @@ function painelNumeros(){
       <div><b>${melhor && melhor.n > 0 ? esc(dt(melhor.d).toLocaleDateString(LOC(), { day:'2-digit', month:'2-digit' })) : '—'}</b><span>melhor dia</span></div>
     </div>
     ${ops.length > 1 ? `<div class="nm-per" role="group" aria-label="Período">${ops.map(n => `<button type="button" data-act="nmper" data-n="${n}" class="${n === per ? 'on' : ''}">${n} <span>dias</span></button>`).join('')}</div>` : ''}
-    ${tot ? `<div class="nm-g${per > 14 ? ' g30' : ''}" style="--col:${per}" role="img" aria-label="Acessos por dia">${barras}</div>` : '<p class="nm-vz">Ainda sem acessos neste período. Compartilhe sua página de links para começar.</p>'}
+    ${tot ? `<div class="nm-g${per > 14 ? ' g30' : ''}" style="--col:${per}" role="img" aria-label="Acessos por dia">${barras}</div>` : `<p class="nm-vz">${temSites ? 'Ainda sem acessos neste período. Compartilhe sua página de links para começar.' : 'Publique um site para acompanhar seus acessos por aqui.'}</p>`}
     ${rank ? `<h4 class="nm-t">Sites mais acessados</h4><ol class="nm-r">${rank}</ol>` : ''}
     </div>
   </details>`;
