@@ -231,6 +231,11 @@ html.claro .chat-sec .ch-ac button{color:#2b3051!important}
 html.claro .chat-sec .ch-ac button[data-chat-del],html.claro .chat-sec .ch-ac button[data-chat-rm]{color:#990018!important}
 html.claro .ch-rmb{color:#5c6182!important}
 html.claro .ch-m.eu .ch-h i:not(.lido){color:#0c0073!important}
+html.claro *,html.claro *::before,html.claro *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.claro .ig-fundo,html.claro .pn-aurora{display:none!important}
+html.claro .nt-pn,html.claro .nt-bn,html.claro .nm,html.claro .sug{box-shadow:0 8px 24px -12px rgba(20,22,43,.25)!important}
+html.claro .nt-pn,html.claro .nt-bn{background:#ffffff!important}
+html.claro .bnav{box-shadow:0 4px 14px -8px rgba(20,22,43,.3)!important}
 html.claro .ch-tk.lido{color:#1a73e8!important}
 html.claro .ch-tk{color:#7a80a3!important}
 html.claro .perigo,html.claro .ch-menu .perigo,html.claro .ch-menu .perigo i{color:#d6385a!important}
