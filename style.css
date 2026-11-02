@@ -1623,3 +1623,5 @@ details.sl{display:block;padding:0}
 .nt-pt b{color:#fff;font:700 13px var(--display)}
 .nt-pb{border:0;border-radius:999px;padding:7px 14px;background:var(--grad);color:#fff;font:700 12.5px var(--display);cursor:pointer;flex:none;outline:none!important}
 .nt-pb:hover{filter:brightness(1.12)}
+.nt-perm>i.fa-circle-check{color:#5ee0a0}
+.nt-perm>i.fa-bell-slash{color:#ff6b7f}

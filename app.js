@@ -1009,8 +1009,29 @@ function ntSistema(novos, somDoSite){
   }catch(_){}
 }
 function ntPerm(){
-  const b = $('ntPerm'); if (b) b.hidden = !('Notification' in window) || Notification.permission !== 'default';
+  const b = $('ntPerm'); if (!b) return;
+  if (!('Notification' in window)){ b.hidden = true; return; }
+  const p = Notification.permission; b.hidden = false;
+  if (b.dataset.st === p) return; b.dataset.st = p;
+  if (p === 'default') b.innerHTML = '<i class="fa-regular fa-bell"></i><span class="nt-pt"><b>Receber avisos fora da aba</b><span>Notificação do sistema quando você estiver em outra aba.</span></span><button type="button" id="ntPermBtn" class="nt-pb">Ativar</button>';
+  else if (p === 'denied') b.innerHTML = '<i class="fa-solid fa-bell-slash"></i><span class="nt-pt"><b>Avisos fora da aba bloqueados</b><span>Libere as notificações deste site no cadeado ao lado do endereço.</span></span>';
+  else b.innerHTML = '<i class="fa-solid fa-circle-check"></i><span class="nt-pt"><b>Avisos fora da aba ativados</b><span>Toque em Testar e mude de aba para ouvir.</span></span><button type="button" id="ntTeste" class="nt-pb">Testar</button>';
 }
+let ntTesteRes = null;
+document.addEventListener('click', e => {
+  const t = e.target.closest('#ntTeste'); if (!t || t.dataset.busy) return;
+  t.dataset.busy = '1'; t.textContent = '6…';
+  aviso('Mude para outra aba agora: o teste toca em 6 segundos');
+  let s = 6; const iv = setInterval(() => { s--; if (s > 0 && t.isConnected) t.textContent = s + '…'; }, 1000);
+  setTimeout(() => {
+    clearInterval(iv); delete t.dataset.busy; if (t.isConnected) t.textContent = 'Testar';
+    const tocou = ntSom(true);
+    ntSistema([{ tipo:'meta_site', dados:{ nome:'Teste', meta:100 } }], tocou);
+    ntTesteRes = tocou ? 'Som do site: funcionando' : 'O navegador bloqueou o som do site (a notificação usa o som do sistema). Clique na página e teste de novo.';
+    if (!document.hidden){ aviso(ntTesteRes); ntTesteRes = null; }
+  }, 6000);
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && ntTesteRes){ aviso(ntTesteRes); ntTesteRes = null; } });
 document.addEventListener('click', async e => {
   if (!e.target.closest('#ntPermBtn')) return;
   try{ await Notification.requestPermission(); }catch(_){}
