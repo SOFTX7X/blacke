@@ -1669,3 +1669,8 @@ details.sl{display:block;padding:0}
 .sg-li .sg-b.on:not(.seg-lnk):hover,.sg-li .sg-rm:hover{background:rgba(255,255,255,.16)!important}
 .sg-li .sg-b i{font-size:12px;line-height:1}
 .sg-li{min-height:56px}
+
+/* Seguidores / Seguindo: título centralizado no topo, X à direita */
+#modalSeg .sheet-head{position:relative;justify-content:center;min-height:40px;margin-bottom:10px}
+#modalSeg .sheet-head h3{margin:0;text-align:center;font-size:20px}
+#modalSeg .sheet-head .icon-btn{position:absolute;right:0;top:50%;transform:translateY(-50%)}
