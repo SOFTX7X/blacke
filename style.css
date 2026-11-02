@@ -1896,15 +1896,26 @@ body[data-aba="chat"]::before{display:none}
 
 .ch-m.pend{opacity:.75}
 .ch-quem{cursor:pointer}
-.ch-perf{position:absolute;top:0;right:0;bottom:0;z-index:8;width:min(400px,100%);display:flex;flex-direction:column;background:var(--bg);border-left:1px solid var(--ch-linha);box-shadow:-20px 0 40px -20px rgba(0,0,0,.6)}
+.ch-perf{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.55)}
 .ch-perf[hidden]{display:none}
-.ch-perf-h{flex:none;display:flex;align-items:center;gap:10px;height:58px;padding:0 12px;border-bottom:1px solid var(--ch-linha);font:600 16px system-ui,sans-serif}
-.ch-perf-c{flex:1;min-height:0;overflow-y:auto;padding:10px 14px 24px}
-.ch-perf .ig-fundo,.ch-perf .ig-tab,.ch-perf [data-chat-btn]{display:none!important}
-.ch-perf .ig{margin:0;padding:8px 0 0;border:0;background:none;box-shadow:none}
-.ch-perf .ig{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
-.ch-perf .ig-av{width:112px;height:112px;margin:0}
-.ch-perf .ig-nome{justify-content:center}
-.ch-perf .ig-nums{justify-content:center;gap:16px}
-.ch-perf .ig-btns{justify-content:center}
-.ch-perf .ig-bio{width:100%}
+.chp{position:relative;width:min(380px,100%);max-height:min(640px,92dvh);overflow-y:auto;padding:26px 0 8px;border-radius:18px;background:#181a2e;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Color Emoji',sans-serif}
+.chp-x{z-index:2;position:absolute;top:10px;right:10px;width:34px;height:34px;border:0;border-radius:50%;background:none;color:#aeb2cf;font-size:18px;cursor:pointer}
+.chp-x:hover{background:rgba(255,255,255,.08)}
+.chp-av{display:grid;place-items:center}
+.chp-av .amini{width:96px!important;height:96px!important;font-size:36px!important}
+.chp-n{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 16px 2px;font:600 19px system-ui,sans-serif}
+.chp-st{text-align:center;font:400 13.5px system-ui,sans-serif;color:var(--muted);min-height:18px}
+.chp-ac{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 14px 12px}
+.chp-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:64px;padding:0 4px;border:0;border-radius:12px;background:rgba(255,255,255,.07);color:#e3e5f6;font:500 12px system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.chp-t:hover{background:rgba(255,255,255,.12)}
+.chp-t i{font-size:18px}
+.chp-t.on,.chp-t.pri{background:rgba(255,255,255,.07);color:#e3e5f6}
+.chp-t.perigo{color:#ff8a9b}
+.chp-i{border-top:8px solid rgba(0,0,0,.18)}
+.chp-l{display:flex;align-items:flex-start;gap:16px;padding:11px 18px;color:inherit;text-decoration:none}
+a.chp-l:hover{background:rgba(255,255,255,.05)}
+.chp-l>i{flex:none;width:22px;margin-top:3px;text-align:center;color:#8c92b3;font-size:17px}
+.chp-l>div{min-width:0}
+.chp-v{display:block;font:400 15px/1.35 system-ui,sans-serif;color:#eceef8;overflow-wrap:anywhere;white-space:pre-wrap}
+.chp-l small{display:block;margin-top:1px;font:400 12.5px system-ui,sans-serif;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.chp .sg-vz{padding:30px 16px}

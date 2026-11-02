@@ -1890,12 +1890,36 @@ async function chPerfilAbrir(h){
   if (!data){ c.innerHTML = '<div class="sg-vz">Não foi possível carregar agora.</div>'; return; }
   if (temVerif(data)) VERIF.add(data.handle);
   if (temSeloB(data)) NINJA.add(data.handle);
-  c.innerHTML = cartaoPerfil(data, false);
+  if (/^https:\/\//.test(data.foto || '')) FOTOS.set(data.handle, data.foto);
+  const H = esc(data.handle), x = CH.cont && CH.cont.get(h);
+  const st = x ? (x.on ? '<span class="ch-on">Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>')) : '';
+  const ct = Array.isArray(data.contatos) ? data.contatos.filter(k => /^https:\/\//.test(k.url || '')) : [];
+  const desde = data.desde ? new Date(data.desde).toLocaleDateString(LOC(), { month:'long', year:'numeric' }) : '';
+  const linha = (ic, t, sub) => `<div class="chp-l"><i class="${ic}" aria-hidden="true"></i><div><span class="chp-v">${t}</span><small>${sub}</small></div></div>`;
+  c.innerHTML = `<div class="chp-av ch-av">${miniAv(data.handle)}</div>
+    <h3 class="chp-n"><span translate="no">@${H}</span>${selosDe(data.handle)}</h3>
+    <div class="chp-st">${st}</div>
+    <div class="chp-ac">
+      <button type="button" class="chp-t" data-seg-btn data-h="${H}"></button>
+      <a class="chp-t" href="/bio/${H}" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i><span>Links</span></a>
+      <button type="button" class="chp-t" data-chp="bloq"><i class="fa-solid fa-ban"></i><span>${CH.bloqueei ? 'Desbloquear' : 'Bloquear'}</span></button>
+      <button type="button" class="chp-t perigo" data-chp="den"><i class="fa-solid fa-flag"></i><span>Denunciar</span></button>
+    </div>
+    <div class="chp-i">
+      ${data.bio ? linha('fa-regular fa-circle-user', `<span translate="no">${esc(data.bio)}</span>`, 'Bio') : ''}
+      ${ct.map(k => `<a class="chp-l" href="${esc(k.url)}" target="_blank" rel="noopener noreferrer"><i class="${CT_ICO[k.tipo] || 'fa-solid fa-link'}"></i><div><span class="chp-v">${nomeContato(k)}</span><small>${esc(k.url.replace('https://', ''))}</small></div></a>`).join('')}
+      ${linha('fa-solid fa-user-group', `${fmtN(+data.seguidores || 0)} <span>seguidores</span> · ${fmtN(+data.seguindo || 0)} <span>seguindo</span>`, `${fmtN(+data.sites || 0)} <span>sites</span>`)}
+      ${desde ? linha('fa-regular fa-calendar', esc(desde), 'No mural desde') : ''}
+    </div>`;
   c.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
 }
 function chPerfilFechar(){ CH.perf = null; $('chPerf').hidden = true; }
 $('chPerfX').addEventListener('click', chPerfilFechar);
-$('chPerf').addEventListener('click', e => { if (e.target.closest('[data-chat-btn]')){ e.stopPropagation(); chPerfilFechar(); } });
+$('chPerf').addEventListener('click', e => {
+  if (e.target === $('chPerf')){ chPerfilFechar(); return; }
+  const t = e.target.closest('[data-chp]'); if (!t) return;
+  chPerfilFechar(); $(t.dataset.chp === 'bloq' ? 'chBloq' : 'chDen').click();
+});
 document.querySelector('.ch-quem').addEventListener('click', () => chPerfilAbrir(CH.h));
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('chPerf').hidden && S.aba === 'chat') chPerfilFechar(); });
 let chEmjCat = 0;
