@@ -1242,7 +1242,7 @@ function desenharNotif(){
   const b = $('ntN'); b.textContent = NT.n > 9 ? '9+' : String(NT.n); b.hidden = !NT.n;
   $('ntTodas').hidden = !NT.n; atualizarTitulo(); ntPerm();
   $('ntBtn').hidden = !(NT.itens.length || (S.perfil && S.perfil.handle));
-  const tinha = !$('msgBtn').hidden; $('msgBtn').hidden = !chAtivo(); if (!tinha && !$('msgBtn').hidden) chNaoLidas();
+  const tinha = !$('msgBtn').hidden; $('msgBtn').hidden = !chAtivo(); if (!tinha && !$('msgBtn').hidden){ chNaoLidas(); chPing(); }
 }
 async function carregarNotif(){
   if (!S.token) return;
@@ -1812,15 +1812,23 @@ function chAbrir(h){
   if (h) chConversa(h); else chLista();
 }
 /* presença: "estou aqui" a cada minuto com a aba visível */
+function chDev(){
+  try{ let d = localStorage.getItem('bl_dev'); if (!/^[0-9a-f]{32}$/.test(d || '')){ d = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join(''); localStorage.setItem('bl_dev', d); } return d; }catch(_){ return null; }
+}
+async function chPingRpc(extra){
+  let r = await _supabase.rpc('chat_ping', { p_token:S.token, ...extra, p_dev:chDev() });
+  if (r.error && /p_dev|schema cache|PGRST202/i.test(r.error.message || r.error.code || '')) r = await _supabase.rpc('chat_ping', { p_token:S.token, ...extra });   // servidor ainda sem pistas
+  return r;
+}
 async function chPing(){
   if (!chAtivo() || document.hidden) return;
-  try{ const { data, error } = await _supabase.rpc('chat_ping', { p_token:S.token }); if (!error && typeof data === 'boolean'){ CH.oculto = data; const c = $('chVis'); if (c) c.checked = !data; } }catch(_){}
+  try{ const { data, error } = await chPingRpc({}); if (!error && typeof data === 'boolean'){ CH.oculto = data; const c = $('chVis'); if (c) c.checked = !data; } }catch(_){}
 }
 setInterval(chPing, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) chPing(); });
 $('chVis').addEventListener('change', async e => {
   const oculto = !e.target.checked;
-  try{ const r = await _supabase.rpc('chat_ping', { p_token:S.token, p_oculto:oculto }); if (r.error){ aviso(chErro(r)); e.target.checked = !oculto; return; } CH.oculto = oculto; }catch(_){ aviso('Não foi possível agora.'); e.target.checked = !oculto; }
+  try{ const r = await chPingRpc({ p_oculto:oculto }); if (r.error){ aviso(chErro(r)); e.target.checked = !oculto; return; } CH.oculto = oculto; }catch(_){ aviso('Não foi possível agora.'); e.target.checked = !oculto; }
 });
 const chVisto = d => { try{ const s = Math.max(1, Math.round((Date.now() - new Date(d)) / 60000)); const rtf = new Intl.RelativeTimeFormat(LOC(), { numeric:'auto' });
   return s < 60 ? rtf.format(-s, 'minute') : s < 1440 ? rtf.format(-Math.round(s / 60), 'hour') : rtf.format(-Math.round(s / 1440), 'day'); }catch(_){ return ''; } };
