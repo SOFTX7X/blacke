@@ -160,6 +160,36 @@ def selo(base, x, y, d):
     m = m.resize((d, d), Image.LANCZOS)
     base.paste(BG, (x, y), m)
 
+
+META_V, META_SELO = 1000, 10000
+def regras(pf):
+    # mesmas regras do site: verificado manual ou 1000 acessos; Selo BLACKE manual ou 10000 acessos
+    ac = int((pf or {}).get('acessos') or 0)
+    return bool((pf or {}).get('verificado')) or ac >= META_V, bool((pf or {}).get('selo')) or ac >= META_SELO
+
+def selo_ninja(base, x, y, d):
+    # Selo BLACKE: rótulo roxo com ninja preto e dois olhos roxos (mesmo desenho do site)
+    S = 8; N = d * S; k = N / 24.0
+    P = lambda pts: [(a * k, b * k) for a, b in pts]
+    lay = Image.new('RGBA', (N, N), (0, 0, 0, 0)); g = ImageDraw.Draw(lay)
+    hexa = [(12, .9), (21.6, 6.4), (21.6, 17.6), (12, 23.1), (2.4, 17.6), (2.4, 6.4)]
+    g.polygon(P(hexa), fill=(74, 63, 214, 255))
+    g.polygon(P([(12, .9), (2.4, 6.4), (2.4, 12), (12, 6.4)]), fill=(141, 127, 255, 190))
+    g.line(P(hexa + [hexa[0]]), fill=(111, 214, 255, 235), width=max(2, round(.9 * k)), joint='curve')
+    g.polygon(P([(17.9, 8.3), (21, 6.6), (20.1, 9.2), (21.6, 11), (18.3, 10.6)]), fill=(0, 0, 0, 255))
+    cab = Image.new('L', (N, N), 0)
+    ImageDraw.Draw(cab).ellipse(((12 - 6.9) * k, (12.6 - 6.9) * k, (12 + 6.9) * k, (12.6 + 6.9) * k), fill=255)
+    lay.paste((0, 0, 0, 255), (0, 0), cab)
+    faixa = Image.new('L', (N, N), 0)
+    ImageDraw.Draw(faixa).rectangle((5.6 * k, 8.6 * k, 18.4 * k, 9.9 * k), fill=255)
+    faixa = Image.composite(faixa, Image.new('L', (N, N), 0), cab)
+    lay.paste((123, 108, 255, 255), (0, 0), faixa)
+    olho = [(6.8, 12.3), (10.4, 13.3), (10.75, 13.6), (10.75, 14.0), (10.4, 14.3), (8, 14.9), (7.2, 15.05), (6.6, 14.6), (6.55, 13.9)]
+    g.polygon(P(olho), fill=(169, 155, 255, 255))
+    g.polygon(P([(24 - a, b) for a, b in olho]), fill=(169, 155, 255, 255))
+    lay = lay.resize((d, d), Image.LANCZOS)
+    base.paste(lay, (x, y), lay)
+
 def largura(txt, f):
     return f.getlength(txt)
 
@@ -236,7 +266,7 @@ def avatar(base, img, letra, cx, cy, d, esp):
         ImageDraw.Draw(base).text((cx, cy), letra, font=f, fill=TEXTO, anchor='mm')
 
 # ---------- cartões ----------
-def cartao_site(s, foto):
+def cartao_site(s, foto, regra=(False, False)):
     im = fundo(); d = ImageDraw.Draw(im)
     capa = baixar_imagem(s.get('image_url'))
     # capa à esquerda
@@ -266,7 +296,11 @@ def cartao_site(s, foto):
     if s.get('handle'):
         letra = (s['handle'][:1] or '@').upper()
         avatar(im, foto, letra, x + 22, y + 22, 40, 3)
-        d.text((x + 58, y + 22), '@' + s['handle'], font=fonte('IBMPlexMono-SemiBold', 26), fill=GELO, anchor='lm')
+        fh = fonte('IBMPlexMono-SemiBold', 26); hx = x + 58
+        d.text((hx, y + 22), '@' + s['handle'], font=fh, fill=GELO, anchor='lm')
+        hx += round(fh.getlength('@' + s['handle'])) + 12
+        if regra[0]: selo(im, hx, y + 8, 28); hx += 38
+        if regra[1]: selo_ninja(im, hx, y + 4, 36)
         y += 62
     # números
     fn = fonte('SpaceGrotesk-Bold', 36)
@@ -288,10 +322,13 @@ def cartao_perfil(p, sites):
     x = 470; larg = W - x - 64
     marca(im, x, 64, 28)
     y = 168
-    f, linhas = titulo_ajustado('@' + h, larg - (60 if p.get('verificado') else 0), 1, [66, 58, 50, 44, 38], 'IBMPlexMono-SemiBold')
+    f, linhas = titulo_ajustado('@' + h, larg - (60 if regras(p)[0] else 0) - (70 if regras(p)[1] else 0), 1, [66, 58, 50, 44, 38], 'IBMPlexMono-SemiBold')
     d.text((x, y), linhas[0], font=f, fill=TEXTO)
-    if p.get('verificado'):
-        selo(im, x + round(f.getlength(linhas[0])) + 16, y + round(f.size * .22), round(f.size * .66))
+    ver, nin = regras(p); sx = x + round(f.getlength(linhas[0])) + 16
+    if ver:
+        selo(im, sx, y + round(f.size * .22), round(f.size * .66)); sx += round(f.size * .66) + 14
+    if nin:
+        selo_ninja(im, sx, y + round(f.size * .12), round(f.size * .86))
     y += round(f.size * 1.3)
     bio = limpo(p.get('bio'))
     if bio:
@@ -300,12 +337,19 @@ def cartao_perfil(p, sites):
             d.text((x, y + i * 38), l, font=fb, fill=(200, 204, 230))
         y += 2 * 38 if len(quebrar(bio, fb, larg, 2)) > 1 else 38
     y += 18
-    # números
-    fn, fl = fonte('SpaceGrotesk-Bold', 38), fonte('SpaceGrotesk-Medium', 20)
+    # números: sites, acessos, seguidores, seguindo
+    itens = [(p.get('sites') or 0, 'site', 'sites'), (p.get('acessos') or 0, 'acesso', 'acessos')]
+    if p.get('seguidores') is not None:
+        itens += [(p.get('seguidores') or 0, 'seguidor', 'seguidores'), (p.get('seguindo') or 0, 'seguindo', 'seguindo')]
+    for tn, tl in ((38, 20), (32, 18), (28, 16)):
+        fn, fl = fonte('SpaceGrotesk-Bold', tn), fonte('SpaceGrotesk-Medium', tl)
+        tot = sum(fn.getlength(num(n)) + 10 + fl.getlength(um if n == 1 else varios) for n, um, varios in itens) + 30 * (len(itens) - 1)
+        if tot <= larg: break
     cx = x
-    for n, um, varios in [(p.get('sites') or 0, 'site', 'sites'), (p.get('acessos') or 0, 'acesso', 'acessos')]:
+    for n, um, varios in itens:
         t = num(n); d.text((cx, y), t, font=fn, fill=TEXTO); cx += fn.getlength(t) + 10
-        d.text((cx, y + 14), um if n == 1 else varios, font=fl, fill=MUTED); cx += fl.getlength(varios) + 36
+        lab = um if n == 1 else varios
+        d.text((cx, y + round(tn * .37)), lab, font=fl, fill=MUTED); cx += fl.getlength(lab) + 30
     # miniaturas dos sites
     caps = []
     for s in sites[:3]:
@@ -340,11 +384,13 @@ def gerar(q):
     if re.fullmatch(r'\d{1,12}', s):
         a = pedir(f'/rest/v1/sites_publicos?select=id,brand_name,categoria,image_url,handle,cliques,verificado&id=eq.{s}&oculto=eq.false&denuncias=lt.5&limit=1')
         if a:
-            site = a[0]; foto = None
+            site = a[0]; foto = None; regra = (False, False)
             if site.get('handle'):
                 pf = pedir('/rest/v1/rpc/perfil_publico', {'p_handle': site['handle']})
-                if pf and pf.get('foto'): foto = baixar_imagem(pf['foto'], 300)
-            return cartao_site(site, foto)
+                if pf:
+                    regra = regras(pf)
+                    if pf.get('foto'): foto = baixar_imagem(pf['foto'], 300)
+            return cartao_site(site, foto, regra)
     h = p.lstrip('@').lower()
     if re.fullmatch(r'[a-z0-9_]{3,30}', h):
         pf = pedir('/rest/v1/rpc/perfil_publico', {'p_handle': h})

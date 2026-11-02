@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
         if (pf && pf.handle){
           achou = true;
           titulo = '@' + pf.handle + ' — BLACKE LAVEX';
-          desc = cortar(pf.bio, 160) || (pf.sites + (pf.sites === 1 ? ' site' : ' sites') + ' publicados no mural · ' + pf.acessos + (pf.acessos === 1 ? ' acesso' : ' acessos'));
+          desc = cortar(pf.bio, 160) || (pf.sites + (pf.sites === 1 ? ' site' : ' sites') + ' publicados no mural · ' + pf.acessos + (pf.acessos === 1 ? ' acesso' : ' acessos') + (+pf.seguidores > 0 ? ' · ' + pf.seguidores + (+pf.seguidores === 1 ? ' seguidor' : ' seguidores') : ''));
           img = base + '/api/og?p=' + pf.handle;
         }
       }
