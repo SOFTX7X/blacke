@@ -1861,7 +1861,7 @@ function chMsgsHtml(msgs){
     const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
     const q = m.r ? `<button type="button" class="ch-q" data-chat-ir="${m.r.id || ''}"><b translate="no">${m.r.m ? '<span>Você</span>' : '@' + esc(CH.h)}</b><span class="ch-qt" translate="no">${m.r.ap ? '' : esc(m.r.t)}</span>${m.r.ap ? '<span class="ch-qt"><i>Mensagem apagada</i></span>' : ''}</button>` : '';
     const ac = '';
-    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}${m.m && !m.ap ? ` <i class="fa-solid ${m.l ? 'fa-check-double lido' : 'fa-check'}" aria-hidden="true"></i>` : ''}</span>${ac}</div>`;
+    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}${CH.sel.has(m.id) ? ' ck' : ''}" id="chm-${m.id}"><span class="ch-ckm" aria-hidden="true"><i class="fa-solid fa-check"></i></span>${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no"><span class="ch-hm">${chHora(m.at)}</span>${m.m && !m.ap ? ` <i class="fa-solid ${m.l ? 'fa-check-double lido' : 'fa-check'}" aria-hidden="true"></i>` : ''}</span>${ac}</div>`;
     ant = { dia, m:m.m, t:new Date(m.at) };
   });
   return out;

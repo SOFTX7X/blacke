@@ -231,6 +231,8 @@ html.claro .chat-sec .icon-btn:hover,html.claro .chat-sec .ch-rmb:hover,html.cla
 html.claro .chat-sec .ch-ac button{color:#2b3051!important}
 html.claro .chat-sec .ch-ac button[data-chat-del],html.claro .chat-sec .ch-ac button[data-chat-rm]{color:#990018!important}
 html.claro .ch-rmb{color:#5c6182!important}
+html.claro .ch-tk.lido{color:#1a73e8!important}
+html.claro .ch-tk{color:#7a80a3!important}
 html.claro .perigo,html.claro .ch-menu .perigo,html.claro .ch-menu .perigo i{color:#d6385a!important}
 html.claro .chat-sec{background:#ffffff!important;--ch-bg:#ffffff;--ch-linha:rgba(20,22,43,.09)}
 html.claro .ch-m.ele{background:#eceef8!important;color:#14162b!important}

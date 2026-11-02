@@ -2042,3 +2042,12 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ap-n{font-size:15px;font-weight:600}
 .ap-a{font-size:13px;font-weight:400;color:var(--muted)}
 @media (max-width:420px){.ap-fontes{grid-template-columns:1fr}}
+/* ✓/✓✓ maiores e esticados (estilo WhatsApp) */
+.ch-h i{display:inline-block;font-size:14px;margin-left:4px;opacity:.9;transform:scaleX(1.25);transform-origin:left center;vertical-align:-1px}
+.ch-h i.lido{color:#5cc8ff;opacity:1}
+.ch-tk{display:inline-block;font-size:14px;margin-right:6px;transform:scaleX(1.25);transform-origin:right center;color:var(--muted)}
+.ch-tk.lido{color:#2f9bff}
+.ch-h{opacity:1}
+.ch-hm{opacity:.62}
+.ch-m.eu .ch-h i:not(.lido){color:#dcd8ff;opacity:.85}
+.ch-m.ele .ch-h,.ch-m.ele .ch-hm{opacity:1}
