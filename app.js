@@ -2567,3 +2567,11 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-sug]'); if (!b) return;
   fecharSug(); $('busca').value = ''; S.busca = ''; irParaPerfil(b.dataset.sug);
 });
+
+/* Comunidade (Telegram): confirma antes de sair do site */
+document.addEventListener('click', async e => {
+  const l = e.target.closest('a[href^="https://t.me/BlackeLavex"]');
+  if (!l) return;
+  e.preventDefault();
+  if (await confirmar({ titulo:'Abrir a comunidade?', texto:'Você vai para o Telegram do BLACKE LAVEX, fora do site. O link abre em uma nova aba.', botao:'Abrir Telegram' })) window.open(l.href, '_blank', 'noopener');
+});
