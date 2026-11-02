@@ -2085,3 +2085,12 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 body.banido{overflow:hidden}
 html.claro #telaBan{background:#f4f5fb;color:#14162b}
 html.claro #telaBan p{color:#4b5075}
+
+/* Filtros: no PC os chips quebram de linha (nada cortado); no celular rolam com a ponta esmaecida */
+@media (min-width:900px){
+  .toolbar:not(.fixa) .chips{flex-wrap:wrap;overflow:visible}
+  .toolbar:not(.fixa) .filtros{align-items:flex-start}
+}
+@media (max-width:899px){
+  .chips{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);padding-right:28px}
+}
