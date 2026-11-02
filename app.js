@@ -2306,6 +2306,55 @@ $('chBMsgUp').addEventListener('click', () => chBuscaIr(-1));
 $('chBMsgDn').addEventListener('click', () => chBuscaIr(1));
 $('chBMsgX').addEventListener('click', chBuscaFechar);
 
+/* ---------- Aparência: tema claro/escuro e 10 fontes para o site todo ---------- */
+const FONTES = [
+  { id:'padrao', nome:'Padrão BLACKE', q:null },
+  { id:'inter', nome:'Inter', q:'Inter:wght@400;500;600;700' },
+  { id:'poppins', nome:'Poppins', q:'Poppins:wght@400;500;600;700' },
+  { id:'montserrat', nome:'Montserrat', q:'Montserrat:wght@400;500;600;700' },
+  { id:'nunito', nome:'Nunito', q:'Nunito:wght@400;500;600;700' },
+  { id:'outfit', nome:'Outfit', q:'Outfit:wght@400;500;600;700' },
+  { id:'sora', nome:'Sora', q:'Sora:wght@400;500;600;700' },
+  { id:'lexend', nome:'Lexend', q:'Lexend:wght@400;500;600;700' },
+  { id:'playfair', nome:'Playfair Display', q:'Playfair+Display:wght@400;500;600;700' },
+  { id:'jetbrains', nome:'JetBrains Mono', q:'JetBrains+Mono:wght@400;500;600;700' }
+];
+const apLS = { get:k => { try{ return localStorage.getItem(k); }catch(_){ return null; } }, set:(k, v) => { try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); }catch(_){} } };
+function aplicarTema(t){
+  const claro = t === 'claro'; document.documentElement.classList.toggle('claro', claro); apLS.set('bl_tema', claro ? 'claro' : null);
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', claro ? '#f4f5fb' : '#06070d');
+  document.querySelectorAll('#modalAparencia [data-tema]').forEach(b => b.classList.toggle('on', b.dataset.tema === (claro ? 'claro' : 'escuro')));
+}
+function aplicarFonte(id){
+  const f = FONTES.find(x => x.id === id) || FONTES[0], d = document.documentElement.style;
+  if (!f.q){ d.removeProperty('--display'); d.removeProperty('--fonte-chat'); ['bl_fonte_n', 'bl_fonte_q'].forEach(k => apLS.set(k, null)); }
+  else{
+    apFonteLink(f.q);
+    d.setProperty('--display', `'${f.nome}',system-ui,sans-serif`); d.setProperty('--fonte-chat', `'${f.nome}',system-ui,'Noto Color Emoji',sans-serif`);
+    apLS.set('bl_fonte_n', f.nome); apLS.set('bl_fonte_q', f.q);
+  }
+  document.querySelectorAll('#apFontes [data-fonte]').forEach(b => b.classList.toggle('on', b.dataset.fonte === f.id));
+}
+function apFonteLink(q){ const href = 'https://fonts.googleapis.com/css2?family=' + q + '&display=swap'; if (![...document.querySelectorAll('link[rel=stylesheet]')].some(l => l.href === href)){ const k = document.createElement('link'); k.rel = 'stylesheet'; k.href = href; document.head.appendChild(k); } }
+function abrirAparencia(){
+  if (!$('apFontes').children.length){
+    apFonteLink(FONTES.filter(f => f.q).map(f => f.q).join('&family='));
+    $('apFontes').innerHTML = FONTES.map(f => `<button type="button" data-fonte="${f.id}" style="font-family:${f.q ? `'${f.nome}',` : ''}'Space Grotesk',system-ui,sans-serif"><span class="ap-n">${f.nome}</span><span class="ap-a">Aa Bb Cc 123</span></button>`).join('');
+  }
+  const atual = FONTES.find(f => f.nome === apLS.get('bl_fonte_n')) || FONTES[0];
+  document.querySelectorAll('#apFontes [data-fonte]').forEach(b => b.classList.toggle('on', b.dataset.fonte === atual.id));
+  aplicarTema(document.documentElement.classList.contains('claro') ? 'claro' : 'escuro');
+  abrir('modalAparencia');
+}
+$('btnAparencia').addEventListener('click', abrirAparencia);
+$('chOpcAp').addEventListener('click', () => { $('chOpcM').hidden = true; abrirAparencia(); });
+$('apOk').addEventListener('click', () => fechar('modalAparencia'));
+$('modalAparencia').addEventListener('click', e => {
+  const t = e.target.closest('[data-tema]'); if (t){ aplicarTema(t.dataset.tema); return; }
+  const f = e.target.closest('[data-fonte]'); if (f) aplicarFonte(f.dataset.fonte);
+});
+aplicarTema(apLS.get('bl_tema') === 'claro' ? 'claro' : 'escuro');
+
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };
 function desenharUsuarios(lista, vazio){
