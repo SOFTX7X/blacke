@@ -101,7 +101,6 @@ html.claro .topbar.buscando .searchbar:not([hidden]){background:rgba(23,23,23,0.
 html.claro .dest-tit h1{color:#131c4f!important}
 html.claro .dest-tabs button{background:rgba(241,242,248,0.9)!important;color:#1a1e37!important}
 html.claro .dest-tabs button.on{color:#171717!important}
-html.claro .vz{border:1px dashed #aaaed6!important;background:rgba(241,242,248,0.6)!important}
 html.claro .vz-ic{color:#1900b1!important}
 html.claro .vz h3{color:#131c4f!important}
 html.claro .rx-b,html.claro .rx-add{border:1px solid #aaaed6!important;background:rgba(231,232,243,0.85)!important;color:#1a1e37!important}
@@ -110,6 +109,7 @@ html.claro .rx-b.on{color:#171717!important}
 html.claro .rx-add{color:#4c5273!important}
 html.claro .rx-pop{background:rgba(235,236,244,0.98)!important}
 html.claro .rx-pop button:hover{background:rgba(23,23,23,0.06)!important}
+html.claro .ig-lk-ic{color:#1900b1!important}
 html.claro .ig-lk-t b{color:#171717!important}
 html.claro .nm{background:linear-gradient(160deg,rgba(233,234,244,0.82),rgba(241,242,248,0.82))!important}
 html.claro .nm-h h3{color:#171717!important}
@@ -131,7 +131,7 @@ html.claro .nm-sub b{color:#171717!important}
 html.claro .nm-meta-t>b{color:#12008b!important}
 html.claro .nm-meta-t span b{color:#171717!important}
 html.claro .nm-meta .nm-br i{background:linear-gradient(90deg,#4a3fd6,#7b6cff,#1900b1)!important}
-html.claro .sl-h:hover{background:rgba(23,23,23,0.025)!important}
+html.claro .sl-ic{color:#1900b1!important}
 html.claro .rk{border-top:1px solid rgba(23,23,23,0.07)!important;border-bottom:1px solid rgba(23,23,23,0.07)!important}
 html.claro .rk .nm-r li[data-act]:hover{background:rgba(23,23,23,0.03)!important}
 html.claro .rk .nm-r li:nth-child(2) .nm-pos{color:#12008b!important}
@@ -187,7 +187,6 @@ html.claro .ch-r:hover{background:rgba(23,23,23,0.05)!important}
 html.claro .ch-dot{background:#878ba4!important}
 html.claro .ch-vc{color:#1900b1!important}
 html.claro .ch-li.sel .ch-pv,html.claro .ch-li.sel .ch-hr{color:#0b0079!important}
-html.claro .ch-vazio p{background:rgba(23,23,23,0.06)!important}
 html.claro .ch-dia b{background:rgba(23,23,23,0.1)!important;color:#252c68!important}
 html.claro .ch-m.ele{background:#e3e5f0!important;color:#1c234b!important}
 html.claro .ch-form input{background:rgba(23,23,23,0.07)!important}
@@ -231,6 +230,7 @@ html.claro .chat-sec .icon-btn:hover,html.claro .chat-sec .ch-rmb:hover,html.cla
 html.claro .chat-sec .ch-ac button{color:#2b3051!important}
 html.claro .chat-sec .ch-ac button[data-chat-del],html.claro .chat-sec .ch-ac button[data-chat-rm]{color:#990018!important}
 html.claro .ch-rmb{color:#5c6182!important}
+html.claro .ch-m.eu .ch-h i:not(.lido){color:#0c0073!important}
 html.claro .ch-tk.lido{color:#1a73e8!important}
 html.claro .ch-tk{color:#7a80a3!important}
 html.claro .perigo,html.claro .ch-menu .perigo,html.claro .ch-menu .perigo i{color:#d6385a!important}
