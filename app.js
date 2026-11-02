@@ -932,7 +932,7 @@ document.addEventListener('click', async e => {
 let SGATUAL = null;
 async function abrirListaSeg(h, tipo, quieto){
   SGATUAL = { h, tipo };
-  $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span> <small translate="no">@${esc(h)}</small>`;
+  $('sgTitulo').innerHTML = `<span>${tipo === 'seguindo' ? 'Seguindo' : 'Seguidores'}</span>`;
   const ul = $('sgLista'); if (!quieto){ ul.innerHTML = '<li class="sg-vz">Carregando…</li>'; abrir('modalSeg'); }
   let lista = [], ok = false;
   try{ const { data, error } = await _supabase.rpc('lista_seguir', { p_handle:h, p_tipo:tipo, p_limite:100 }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}

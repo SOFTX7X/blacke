@@ -1661,3 +1661,11 @@ details.sl{display:block;padding:0}
 .nm-g.g30 .nm-c span{font-size:10px;white-space:nowrap}
 .nm-g.g30 .nm-c:not(.pico):not(.hj) em{display:none}
 .nm-g.g30 .nm-c:hover em{display:block}
+
+/* botões das listas de seguidores: pílula limpa, mesma largura */
+.sg-li .sg-b:not(.seg-lnk){box-sizing:border-box;min-width:122px;height:34px;padding:0 14px;justify-content:center;border:0!important;border-radius:999px!important;box-shadow:none!important;outline:none!important;background-clip:padding-box}
+.sg-li .sg-b.pri:not(.seg-lnk){background:linear-gradient(135deg,#5a4ce8,#6f9bff)!important;color:#fff!important}
+.sg-li .sg-b.on:not(.seg-lnk),.sg-li .sg-rm{background:rgba(255,255,255,.1)!important;color:#fff!important}
+.sg-li .sg-b.on:not(.seg-lnk):hover,.sg-li .sg-rm:hover{background:rgba(255,255,255,.16)!important}
+.sg-li .sg-b i{font-size:12px;line-height:1}
+.sg-li{min-height:56px}
