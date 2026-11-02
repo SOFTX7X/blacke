@@ -25,14 +25,25 @@ function clientePC(url = PC_URL){
     return fetch(String(u).replace('/rest/v1/', '/'), { ...o, headers:h });
   } } });
 }
+function manutencao(){
+  if (document.getElementById('manut')) return;
+  const d = document.createElement('div'); d.id = 'manut'; d.setAttribute('role', 'alert');
+  d.innerHTML = '<img src="/logo-mark.png" alt=""><h1>ESTAMOS EM MANUTENÇÃO</h1><p>Voltamos em instantes. Esta página atualiza sozinha.</p>';
+  document.body.appendChild(d);
+}
 async function escolherBanco(){
   const sim = /[?&]simularqueda\b/.test(location.search);   // ?simularqueda=1 só para testar o banco de segurança
   let cli, nome;
   if (PC_PRIMARIO){
-    if (!sim && await responde(PRIM_URL, PC_KEY, 6000, true)) return;
-    if (await responde(SUPABASE_URL, SUPABASE_KEY, 5000)){ cli = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); nome = 'espelho'; }
-    else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
-    else return;
+    // PC fora do ar: nada de banco antigo; mostra a tela de manutenção e recarrega sozinho quando ele voltar
+    if (!sim){
+      if (await responde(PRIM_URL, PC_KEY, 6000, true)) return;
+      await new Promise(r => setTimeout(r, 3000));                       // dá uma segunda chance (início lento / oscilação)
+      if (await responde(PRIM_URL, PC_KEY, 6000, true)) return;
+    }
+    manutencao();
+    const t = setInterval(async () => { if (!sim && await responde(PRIM_URL, PC_KEY, 6000, true)){ clearInterval(t); location.reload(); } }, 10000);
+    return;
   } else {
     if (!sim && await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;
     if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }

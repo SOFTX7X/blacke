@@ -1697,3 +1697,9 @@ details.sl{display:block;padding:0}
 .av-s .av-venc{color:#ff6b81}
 .av-ok{flex:none;white-space:nowrap}
 @media (max-width:640px){.av-ban{flex-wrap:wrap}.av-ok{width:100%;justify-content:center}}
+
+/* tela de manutenção (servidor principal fora do ar) */
+#manut{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:var(--bg)}
+#manut img{width:min(150px,38vw);height:auto;object-fit:contain}
+#manut h1{font:700 clamp(20px,4.6vw,30px)/1.2 var(--display);letter-spacing:.14em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+#manut p{font:500 15px var(--display);color:var(--muted);max-width:34ch}
