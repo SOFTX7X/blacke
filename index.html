@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="/style.css?v=1793632873">
+  <link rel="stylesheet" href="/style.css?v=1793633448">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -132,6 +132,37 @@
         <input id="usrBusca" type="search" inputmode="search" placeholder="Procurar usuário (@nome)" aria-label="Procurar usuário" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="31"></label>
       <div class="usr-sub" id="usrSub">Em destaque</div>
       <ul class="usr-lista" id="usrLista"></ul>
+    </section>
+
+    <section class="chat-sec" id="chatSec" hidden aria-label="Chat">
+      <aside class="ch-lado" id="chListaBox">
+        <div class="ch-lado-h"><h2>Mensagens</h2>
+          <label class="ch-vis"><input type="checkbox" id="chVis" checked><span>Aparecer online</span></label></div>
+        <ul id="chConv" class="ch-pess"></ul>
+      </aside>
+      <div class="ch-main">
+        <div class="ch-vazio" id="chVazio"><i class="fa-regular fa-comments" aria-hidden="true"></i><p>Escolha uma pessoa para conversar</p></div>
+        <div id="chConversa" class="ch-conv" hidden>
+          <div class="ch-topo">
+            <button class="icon-btn" id="chVoltar" type="button" aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="ch-quem"><h3 id="chTitulo">Mensagens</h3><span class="ch-st" id="chSt"></span></div>
+            <div class="ch-acoes">
+              <button class="icon-btn" id="chMais" type="button" aria-label="Mais opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i></button>
+              <div class="ch-menu" id="chMenu" hidden role="menu">
+                <button type="button" role="menuitem" id="chBloq"></button>
+                <button type="button" role="menuitem" id="chDen" class="perigo">Denunciar conversa</button>
+              </div>
+            </div>
+          </div>
+          <div class="ch-msgs" id="chMsgs"></div>
+          <div class="ch-aviso" id="chAviso" hidden></div>
+          <form class="ch-form" id="chForm" autocomplete="off">
+            <input id="chTexto" type="text" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
+            <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+          </form>
+          <p class="ch-reg">Sem links e sem arquivos. Conversas só são vistas por quem participa; denúncias vão para análise.</p>
+        </div>
+      </div>
     </section>
 
     <!-- Painel "Meus sites" -->
@@ -333,34 +364,7 @@
   </div>
 
   <!-- Chat -->
-  <div id="modalChat" class="modal" hidden>
-    <div class="sheet ch" role="dialog" aria-modal="true" aria-labelledby="chTitulo">
-      <div class="sheet-head">
-        <button class="icon-btn" id="chVoltar" type="button" hidden aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></button>
-        <h3 id="chTitulo">Mensagens</h3>
-        <div class="ch-acoes">
-          <button class="icon-btn" id="chMais" type="button" hidden aria-label="Mais opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i></button>
-          <div class="ch-menu" id="chMenu" hidden role="menu">
-            <button type="button" role="menuitem" id="chBloq"></button>
-            <button type="button" role="menuitem" id="chDen" class="perigo">Denunciar conversa</button>
-          </div>
-          <button class="icon-btn" type="button" onclick="fechar('modalChat')" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </div>
-      <div id="chListaBox" class="ch-box"><ul id="chConv" class="sg-l"></ul></div>
-      <div id="chConversa" class="ch-box" hidden>
-        <div class="ch-msgs" id="chMsgs"></div>
-        <div class="ch-aviso" id="chAviso" hidden></div>
-        <form class="ch-form" id="chForm" autocomplete="off">
-          <input id="chTexto" type="text" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
-          <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
-        </form>
-        <p class="ch-reg">Sem links e sem arquivos. Conversas só são vistas por quem participa; denúncias vão para análise.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Denúncia -->
+<!-- Denúncia -->
   <div id="modalDenuncia" class="modal" hidden>
     <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="dnTitulo">
       <h3 id="dnTitulo">Denunciar este site</h3>
@@ -435,7 +439,7 @@
   </nav>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="/i18n.js?v=1793632873"></script>
-  <script src="/app.js?v=1793632873"></script>
+  <script src="/i18n.js?v=1793633448"></script>
+  <script src="/app.js?v=1793633448"></script>
 </body>
 </html>

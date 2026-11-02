@@ -37,6 +37,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/chat",
+      "destination": "/index.html"
+    },
+    {
       "source": "/meus-sites",
       "destination": "/index.html"
     },

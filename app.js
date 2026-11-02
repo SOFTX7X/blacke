@@ -645,7 +645,8 @@ function atualizarTitulo(){
 }
 const _tituloBase = atualizarTitulo;
 atualizarTitulo = function(){ _tituloBase(); if (typeof NT !== 'undefined' && NT.n > 0) document.title = `(${NT.n > 9 ? '9+' : NT.n}) ` + document.title; };
-const ROTA = { mural:'/', destaques:'/destaques', usuarios:'/usuarios', meus:'/conta', publicar:'/publicar' };
+const CH = { h:null, sig:'', t:0, enviando:false, bloqueei:false, oculto:false, lista:null, cont:null };
+const ROTA = { mural:'/', destaques:'/destaques', usuarios:'/usuarios', chat:'/chat', meus:'/conta', publicar:'/publicar' };
 // a Conta usa o endereço do próprio @ (/@nome); sem @ reservado, /conta
 const rotaDe = aba => aba === 'meus' && S.perfil && S.perfil.handle ? '/@' + S.perfil.handle : (ROTA[aba] || '/');
 function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : rotaDe(S.aba); }
@@ -829,16 +830,23 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
+  if (aba !== 'chat'){ clearInterval(CH.t); }
   S.aba = aba; document.body.dataset.aba = aba; setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques'); $('tabUsr').classList.toggle('on', aba === 'usuarios');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   document.querySelector('#bnav .bn-pub').classList.toggle('on', aba === 'publicar');
-  $('pubTela').hidden = aba !== 'publicar'; $('usuarios').hidden = aba !== 'usuarios';
+  $('pubTela').hidden = aba !== 'publicar'; $('usuarios').hidden = aba !== 'usuarios'; $('chatSec').hidden = aba !== 'chat'; $('msgBtn').classList.toggle('on', aba === 'chat');
   if (aba === 'publicar'){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
     ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
     scrollTo({ top:0 }); return;
+  }
+  if (aba === 'chat'){
+    $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
+    ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
+    scrollTo({ top:0 }); if (!chAtivo()){ aviso('Reserve seu @ para usar o chat'); trocarAba('mural'); return; }
+    chPing(); if (!CH.h) chLista(); else { chPessoas(false); if (CH.t) clearInterval(CH.t); const h = CH.h; CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000); chCarregar(false); } return;
   }
   if (aba === 'usuarios'){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
@@ -1770,7 +1778,7 @@ function rotear(){
   }else if (!ms){
     if (p === '/publicar'){ if (S.aba !== 'publicar') abrirPublicar(); }
     else{
-      const aba = p === '/destaques' ? 'destaques' : p === '/usuarios' ? 'usuarios' : (p === '/conta' || p === '/meus-sites') ? 'meus' : 'mural';
+      const aba = p === '/destaques' ? 'destaques' : p === '/usuarios' ? 'usuarios' : p === '/chat' ? 'chat' : (p === '/conta' || p === '/meus-sites') ? 'meus' : 'mural';
       if (document.body.classList.contains('modo-perfil') || S.aba !== aba) trocarAba(aba, true);
     }
   }
@@ -1787,7 +1795,6 @@ async function abrirLinkDireto(){
 }
 
 /* ---------- Chat: mensagens entre quem se segue mutuamente ---------- */
-const CH = { h:null, sig:'', t:0, enviando:false, bloqueei:false };
 const chAtivo = () => !!(S.token && S.perfil && S.perfil.handle);
 const chErro = r => (r && r.error && r.error.message) || 'Não foi possível agora.';
 const chHora = d => { try{ return new Date(d).toLocaleTimeString(LOC(), { hour:'2-digit', minute:'2-digit' }); }catch(_){ return ''; } };
@@ -1797,38 +1804,65 @@ async function chNaoLidas(){
   try{ const { data, error } = await _supabase.rpc('chat_nao_lidas', { p_token:S.token }); if (!error && typeof data === 'number') chBadge(data); }catch(_){}
 }
 setInterval(chNaoLidas, 30000);
+setInterval(() => { if (S.aba === 'chat' && !document.hidden && chAtivo()) chPessoas(false); }, 20000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) chNaoLidas(); });
 function chAbrir(h){
   if (!chAtivo()){ aviso('Reserve seu @ para usar o chat'); return; }
-  abrir('modalChat'); if (h) chConversa(h); else chLista();
+  if (S.aba !== 'chat' || document.body.classList.contains('modo-perfil')) trocarAba('chat');
+  if (h) chConversa(h); else chLista();
 }
-function chLinha(h, l2, nl){
-  const H = esc(h);
-  return `<li class="sg-li ch-li"><button type="button" class="sg-r" data-chat-abrir="${H}">${miniAv(h)}<span class="usr-info"><span class="usr-l1"><span class="sg-n" translate="no">@${H}</span>${selosDe(h)}</span>${l2 ? `<span class="usr-l2">${l2}</span>` : ''}</span>${nl ? `<span class="ch-nl">${nl}</span>` : ''}</button></li>`;
+/* presença: "estou aqui" a cada minuto com a aba visível */
+async function chPing(){
+  if (!chAtivo() || document.hidden) return;
+  try{ const { data, error } = await _supabase.rpc('chat_ping', { p_token:S.token }); if (!error && typeof data === 'boolean'){ CH.oculto = data; const c = $('chVis'); if (c) c.checked = !data; } }catch(_){}
+}
+setInterval(chPing, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) chPing(); });
+$('chVis').addEventListener('change', async e => {
+  const oculto = !e.target.checked;
+  try{ const r = await _supabase.rpc('chat_ping', { p_token:S.token, p_oculto:oculto }); if (r.error){ aviso(chErro(r)); e.target.checked = !oculto; return; } CH.oculto = oculto; }catch(_){ aviso('Não foi possível agora.'); e.target.checked = !oculto; }
+});
+const chVisto = d => { try{ const s = Math.max(1, Math.round((Date.now() - new Date(d)) / 60000)); const rtf = new Intl.RelativeTimeFormat(LOC(), { numeric:'auto' });
+  return s < 60 ? rtf.format(-s, 'minute') : s < 1440 ? rtf.format(-Math.round(s / 60), 'hour') : rtf.format(-Math.round(s / 1440), 'day'); }catch(_){ return ''; } };
+const chStatus = x => x.on ? '<span class="ch-on">Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
+function chLinha(x){
+  const H = esc(x.handle);
+  const l2 = x.t != null ? (x.ap ? 'Mensagem apagada' : (x.meu ? 'Você: ' : '') + esc(x.t)) : chStatus(x);
+  return `<li class="ch-li${CH.h === x.handle ? ' sel' : ''}"><button type="button" class="ch-r" data-chat-abrir="${H}"><span class="ch-av${x.on ? ' on' : ''}">${miniAv(x.handle)}<i class="ch-dot" aria-hidden="true"></i></span><span class="usr-info"><span class="usr-l1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span><span class="usr-l2">${l2}</span></span>${x.nl ? `<span class="ch-nl">${x.nl > 99 ? '99+' : x.nl}</span>` : ''}</button></li>`;
 }
 async function chLista(){
   CH.h = null; clearInterval(CH.t);
-  $('chTitulo').textContent = 'Mensagens'; $('chVoltar').hidden = $('chMais').hidden = $('chMenu').hidden = true;
-  $('chConversa').hidden = true; $('chListaBox').hidden = false;
-  const ul = $('chConv'); ul.innerHTML = '<li class="sg-vz">Carregando…</li>';
+  $('chatSec').classList.remove('abriu'); $('chConversa').hidden = true; $('chVazio').hidden = false; $('chMenu').hidden = true;
+  await chPessoas(true);
+}
+async function chPessoas(primeira){
+  const ul = $('chConv');
+  if (primeira && !CH.lista) ul.innerHTML = '<li class="sg-vz">Carregando…</li>';
   let lista = [], ok = false;
-  try{ const { data, error } = await _supabase.rpc('chat_conversas', { p_token:S.token }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
-  if (CH.h || $('modalChat').hidden) return;
-  if (!ok){ ul.innerHTML = '<li class="sg-vz">Não foi possível carregar agora.</li>'; return; }
+  try{ const { data, error } = await _supabase.rpc('chat_contatos', { p_token:S.token }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
+  if (S.aba !== 'chat') return;
+  if (!ok){ if (!CH.lista) ul.innerHTML = '<li class="sg-vz">Não foi possível carregar agora.</li>'; return; }
   lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
-  const com = new Set(lista.map(x => x.handle));
-  const amigos = [...SEGUINDO].filter(h => SEGUEME.has(h) && !com.has(h));
-  let html = lista.map(x => chLinha(x.handle, x.ap ? 'Mensagem apagada' : (x.meu ? 'Você: ' : '') + esc(x.t), x.nl)).join('');
-  if (amigos.length) html += '<li class="usr-sub ch-sub">Começar uma conversa</li>' + amigos.map(h => chLinha(h, '', 0)).join('');
-  ul.innerHTML = html || '<li class="sg-vz">Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.</li>';
-  chNaoLidas();
+  CH.lista = lista; CH.cont = new Map(lista.map(x => [x.handle, x]));
+  const on = lista.filter(x => x.on), off = lista.filter(x => !x.on);
+  const ordena = (a, b) => (b.nl - a.nl) || ((b.ord || 0) - (a.ord || 0)) || a.handle.localeCompare(b.handle);
+  on.sort(ordena); off.sort(ordena);
+  ul.innerHTML = lista.length
+    ? (on.length ? `<li class="ch-sub"><span>Online</span><b>${on.length}</b></li>` + on.map(chLinha).join('') : '') + (off.length ? `<li class="ch-sub"><span>Offline</span><b>${off.length}</b></li>` + off.map(chLinha).join('') : '')
+    : '<li class="sg-vz">Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.</li>';
+  chNaoLidas(); if (CH.h) chStatusTopo();
+}
+function chStatusTopo(){
+  const x = CH.cont && CH.cont.get(CH.h), el = $('chSt'); if (!x){ el.innerHTML = ''; return; }
+  el.className = 'ch-st' + (x.on ? ' on' : ''); el.innerHTML = x.on ? '<span>Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
 }
 async function chConversa(h){
   CH.h = h; CH.sig = ''; clearInterval(CH.t);
-  $('chTitulo').innerHTML = `<span translate="no">@${esc(h)}</span>`; $('chVoltar').hidden = $('chMais').hidden = false; $('chMenu').hidden = true;
-  $('chListaBox').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
-  await chCarregar(true);
-  CH.t = setInterval(() => { if ($('modalChat').hidden || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000);
+  $('chTitulo').innerHTML = `<span translate="no">@${esc(h)}</span>`; $('chMenu').hidden = true;
+  $('chatSec').classList.add('abriu'); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
+  chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
+  await chCarregar(true); chPessoas(false);
+  CH.t = setInterval(() => { if (S.aba !== 'chat' || CH.h !== h){ clearInterval(CH.t); return; } if (!document.hidden) chCarregar(false); }, 5000);
   if (matchMedia('(hover:hover)').matches && !$('chForm').hidden) $('chTexto').focus();
 }
 async function chCarregar(rolar){
@@ -1854,7 +1888,7 @@ $('chForm').addEventListener('submit', async e => {
   CH.enviando = true;
   try{
     const r = await _supabase.rpc('chat_enviar', { p_handle:CH.h, p_token:S.token, p_texto:t });
-    if (r.error) aviso(chErro(r)); else { inp.value = ''; await chCarregar(true); }
+    if (r.error) aviso(chErro(r)); else { inp.value = ''; await chCarregar(true); chPessoas(false); }
   }catch(_){ aviso('Não foi possível enviar agora.'); }
   CH.enviando = false;
 });
