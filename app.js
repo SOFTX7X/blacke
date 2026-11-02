@@ -892,14 +892,17 @@ document.addEventListener('click', async e => {
     b.dataset.busy = '1';
   } else b.dataset.busy = '1';
   on ? SEGUINDO.add(h) : SEGUINDO.delete(h); document.querySelectorAll(`[data-seg-btn][data-h="${CSS.escape(h)}"]`).forEach(pintarSeguir);
+  const dlt = on ? 1 : -1, meuH = S.perfil && S.perfil.handle;
+  if (meuH) ajustarN(meuH, 'seguindo', dlt); ajustarN(h, 'seguidores', dlt);
   try{
     const { data, error } = await _supabase.rpc('seguir', { p_handle:h, p_token:S.token, p_on:on });
     if (error) throw error;
     if (data && data.seguidores != null) document.querySelectorAll('[data-segn]').forEach(n => { if (n.dataset.segn === h + ':seguidores'){ n.textContent = fmtN(data.seguidores); n.dataset.v = String(data.seguidores); } });
-    if (S.perfil){ S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + (on ? 1 : -1)); if (S.perfil.handle) pintarSegn(S.perfil.handle, { seguindo:S.perfil.seguindo }); }
+    if (S.perfil) S.perfil.seguindo = Math.max(0, (+S.perfil.seguindo || 0) + dlt);
     atualizarContagens();
   }catch(err){
     on ? SEGUINDO.delete(h) : SEGUINDO.add(h); document.querySelectorAll(`[data-seg-btn][data-h="${CSS.escape(h)}"]`).forEach(pintarSeguir);
+    if (meuH) ajustarN(meuH, 'seguindo', -dlt); ajustarN(h, 'seguidores', -dlt);
     const m = String((err && err.message) || '');
     aviso(/Reserve|Limite|si mesmo|encontrado/.test(m) ? m : 'Não foi possível seguir agora.');
   }
@@ -910,6 +913,9 @@ document.addEventListener('click', async e => {
   const h = b.dataset.h; b.dataset.busy = '1';
   const ok = await confirmar({ titulo:'Remover seguidor?', texto:'O perfil não será avisado de que foi removido. Ele poderá voltar a seguir você.', botao:'Remover', quem:h });
   if (!ok){ delete b.dataset.busy; return; }
+  const eu0 = S.perfil && S.perfil.handle, li0 = b.closest('li');
+  if (eu0) ajustarN(eu0, 'seguidores', -1);
+  if (li0) li0.style.display = 'none';
   try{
     const { data, error } = await _supabase.rpc('remover_seguidor', { p_handle:h, p_token:S.token });
     if (error) throw error;
@@ -921,7 +927,7 @@ document.addEventListener('click', async e => {
     if (!document.querySelector('#sgLista .sg-li')) $('sgLista').innerHTML = '<li class="sg-vz">Nenhum seguidor ainda.</li>';
     aviso('Seguidor removido');
     atualizarContagens();
-  }catch(_){ aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
+  }catch(_){ if (eu0) ajustarN(eu0, 'seguidores', 1); if (li0) li0.style.display = ''; aviso('Não foi possível remover agora.'); delete b.dataset.busy; }
 });
 let SGATUAL = null;
 async function abrirListaSeg(h, tipo, quieto){
@@ -1158,6 +1164,13 @@ async function atualizarContagens(){
       if (data){ S.perfil.seguidores = data.seguidores; S.perfil.seguindo = data.seguindo; pintarSegn(S.perfil.handle, data); }
     }catch(_){}
   }
+}
+function ajustarN(h, tp, d){
+  document.querySelectorAll('[data-segn]').forEach(n => {
+    if (n.dataset.segn !== h + ':' + tp) return;
+    const v = Math.max(0, (+n.dataset.v || parseInt(String(n.textContent).replace(/\D/g,''), 10) || 0) + d);
+    n.textContent = fmtN(v); n.dataset.v = String(v);
+  });
 }
 let sincOcupado = false;
 async function sincronizar(){
