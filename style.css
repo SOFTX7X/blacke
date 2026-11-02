@@ -1990,3 +1990,8 @@ a.chp-l:hover{background:rgba(255,255,255,.05)}
 .ch-arqv b{margin-left:auto;font:600 13px system-ui,sans-serif;color:var(--muted)}
 /* o fundo do chat passa por baixo do menu lateral */
 @media (min-width:900px){.chat-sec{inset:0;padding-left:84px;box-sizing:border-box}}
+/* menu lateral no chat: sem brilho, mesma família de cor do fundo */
+@media (min-width:900px){
+  body[data-aba="chat"] .bnav{background:#1f2240;border-color:rgba(255,255,255,.06);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 10px 30px -12px rgba(0,0,0,.55)}
+  body[data-aba="chat"] .bnav.aberto,body[data-aba="chat"] html.tecla .bnav:has(:focus-visible){box-shadow:0 12px 34px -12px rgba(0,0,0,.6)}
+}
