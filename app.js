@@ -645,7 +645,7 @@ function atualizarTitulo(){
 }
 const _tituloBase = atualizarTitulo;
 atualizarTitulo = function(){ _tituloBase(); if (typeof NT !== 'undefined' && NT.n > 0) document.title = `(${NT.n > 9 ? '9+' : NT.n}) ` + document.title; };
-const CH = { h:null, sig:'', t:0, enviando:false, bloqueei:false, oculto:false, lista:null, cont:null };
+const CH = { h:null, sig:'', t:0, enviando:false, bloqueei:false, dig:false, resp:null, msgs:new Map(), tdig:0, oculto:false, lista:null, cont:null };
 const ROTA = { mural:'/', destaques:'/destaques', usuarios:'/usuarios', chat:'/chat', meus:'/conta', publicar:'/publicar' };
 // a Conta usa o endereço do próprio @ (/@nome); sem @ reservado, /conta
 const rotaDe = aba => aba === 'meus' && S.perfil && S.perfil.handle ? '/@' + S.perfil.handle : (ROTA[aba] || '/');
@@ -1829,12 +1829,15 @@ const chStatus = x => x.on ? '<span class="ch-on">Online</span>' : (x.visto ? `<
 const chDia = d => { const x = new Date(d), h = new Date(), o = new Date(Date.now() - 864e5), mesmo = (a, b) => a.toDateString() === b.toDateString();
   return mesmo(x, h) ? '<span>Hoje</span>' : mesmo(x, o) ? '<span>Ontem</span>' : esc(x.toLocaleDateString(LOC(), { day:'numeric', month:'long', ...(x.getFullYear() !== h.getFullYear() ? { year:'numeric' } : {}) })); };
 function chMsgsHtml(msgs){
-  let ant = null, out = '';
+  let ant = null, out = ''; CH.msgs = new Map(msgs.map(m => [m.id, m]));
   msgs.forEach(m => {
     const dia = new Date(m.at).toDateString();
     if (!ant || ant.dia !== dia) out += `<div class="ch-dia"><b>${chDia(m.at)}</b></div>`;
     const seq = ant && ant.dia === dia && ant.m === m.m && (new Date(m.at) - ant.t) < 300000;
-    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}">${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${m.m && !m.ap ? `<button type="button" class="ch-del" data-chat-del="${m.id}" aria-label="Apagar mensagem"><i class="fa-regular fa-trash-can"></i></button>` : ''}</div>`;
+    const q = m.r ? `<button type="button" class="ch-q" data-chat-ir="${m.r.id || ''}"><b translate="no">${m.r.m ? '<span>Você</span>' : '@' + esc(CH.h)}</b><span class="ch-qt" translate="no">${m.r.ap ? '' : esc(m.r.t)}</span>${m.r.ap ? '<span class="ch-qt"><i>Mensagem apagada</i></span>' : ''}</button>` : '';
+    const ac = m.ap ? `<span class="ch-ac"><button type="button" data-chat-rm="${m.id}" aria-label="Remover" title="Remover"><i class="fa-regular fa-trash-can"></i></button></span>`
+      : `<span class="ch-ac"><button type="button" data-chat-resp="${m.id}" aria-label="Responder" title="Responder"><i class="fa-solid fa-reply"></i></button>${m.m ? `<button type="button" data-chat-del="${m.id}" aria-label="Apagar mensagem" title="Apagar"><i class="fa-regular fa-trash-can"></i></button>` : ''}</span>`;
+    out += `<div class="ch-m ${m.m ? 'eu' : 'ele'}${m.ap ? ' ap' : ''}${seq ? ' seq' : ''}" id="chm-${m.id}">${q}${m.ap ? '<i>Mensagem apagada</i>' : `<span class="ch-t" translate="no">${esc(m.t)}</span>`}<span class="ch-h" translate="no">${chHora(m.at)}</span>${ac}</div>`;
     ant = { dia, m:m.m, t:new Date(m.at) };
   });
   return out;
@@ -1910,10 +1913,11 @@ async function chPessoas(primeira){
 }
 function chStatusTopo(){
   const x = CH.cont && CH.cont.get(CH.h), el = $('chSt'); if (!x){ el.innerHTML = ''; return; }
+  if (CH.dig && x.amigo !== false){ el.className = 'ch-st on dig'; el.innerHTML = '<span>digitando</span><b class="ch-pts"><i></i><i></i><i></i></b>'; return; }
   el.className = 'ch-st' + (x.on ? ' on' : ''); el.innerHTML = x.on ? '<span>Online</span>' : (x.visto ? `<span>Visto</span> <span>${esc(chVisto(x.visto))}</span>` : '<span>Offline</span>');
 }
 async function chConversa(h){
-  CH.h = h; CH.sig = ''; clearInterval(CH.t);
+  CH.h = h; CH.sig = ''; CH.dig = false; chRespLimpar(); clearInterval(CH.t);
   $('chTitulo').innerHTML = `<span class="ch-av">${miniAv(h)}</span><span class="ch-nm"><span class="ch-n1"><span translate="no">@${esc(h)}</span>${selosDe(h)}</span><span class="ch-st" id="chSt"></span></span>`; $('chMenu').hidden = true;
   $('chatSec').classList.add('abriu'); document.body.classList.add('ch-aberto'); chEmjAbrir(false); $('chVazio').hidden = true; $('chConversa').hidden = false; $('chMsgs').innerHTML = '<div class="sg-vz">Carregando…</div>';
   chStatusTopo(); document.querySelectorAll('#chConv .ch-li').forEach(li => li.classList.toggle('sel', li.querySelector('[data-chat-abrir]').dataset.chatAbrir === h));
@@ -1932,19 +1936,35 @@ async function chCarregar(rolar){
   CH.bloqueei = !!d.bloqueei; $('chBloq').textContent = CH.bloqueei ? 'Desbloquear' : 'Bloquear';
   $('chForm').hidden = !d.pode; $('chAviso').hidden = !!d.pode;
   $('chAviso').textContent = d.bloqueei ? 'Você bloqueou este usuário.' : 'Vocês precisam se seguir mutuamente para conversar.';
-  const sig = msgs.map(m => m.id + (m.ap ? 'x' : '')).join(',') + '|' + d.pode + d.bloqueei;
+  const dig = !!d.dig; if (dig !== CH.dig){ CH.dig = dig; chStatusTopo(); }
+  const sig = msgs.map(m => m.id + (m.ap ? 'x' : '') + (m.r ? 'r' + (m.r.ap ? 'x' : '') : '')).join(',') + '|' + d.pode + d.bloqueei;
   if (sig === CH.sig) return; CH.sig = sig;
   const box = $('chMsgs'), perto = rolar || box.scrollHeight - box.scrollTop - box.clientHeight < 90;
   box.innerHTML = msgs.length ? chMsgsHtml(msgs) : '<div class="sg-vz">Diga oi 👋</div>';
   if (perto) box.scrollTop = box.scrollHeight;
   chNaoLidas();
 }
+
+function chRespLimpar(){ CH.resp = null; const b = $('chRespBar'); if (b) b.hidden = true; }
+function chResponder(id){
+  const m = CH.msgs.get(id); if (!m || m.ap) return;
+  CH.resp = { id, quem:m.m, t:m.t };
+  $('chRespQ').textContent = m.m ? 'Você' : '@' + CH.h; $('chRespT').textContent = m.t.slice(0, 90);
+  $('chRespBar').hidden = false; $('chTexto').focus();
+}
+$('chRespX').addEventListener('click', chRespLimpar);
+$('chTexto').addEventListener('keydown', e => { if (e.key === 'Escape' && CH.resp) chRespLimpar(); });
+$('chTexto').addEventListener('input', () => {
+  if (!CH.h || !$('chTexto').value.trim() || Date.now() - CH.tdig < 3000) return;
+  CH.tdig = Date.now(); const h = CH.h;
+  try{ _supabase.rpc('chat_digitando', { p_handle:h, p_token:S.token }).then(() => {}, () => {}); }catch(_){}
+});
 $('chForm').addEventListener('submit', async e => {
   e.preventDefault(); const inp = $('chTexto'), t = inp.value.trim(); if (!t || CH.enviando || !CH.h) return;
   CH.enviando = true;
   try{
-    const r = await _supabase.rpc('chat_enviar', { p_handle:CH.h, p_token:S.token, p_texto:t });
-    if (r.error) aviso(chErro(r)); else { inp.value = ''; await chCarregar(true); chPessoas(false); }
+    const r = await _supabase.rpc('chat_enviar', { p_handle:CH.h, p_token:S.token, p_texto:t, ...(CH.resp ? { p_resp:CH.resp.id } : {}) });
+    if (r.error) aviso(chErro(r)); else { inp.value = ''; chRespLimpar(); await chCarregar(true); chPessoas(false); }
   }catch(_){ aviso('Não foi possível enviar agora.'); }
   CH.enviando = false;
 });
@@ -1968,6 +1988,14 @@ $('chDen').addEventListener('click', async () => {
 document.addEventListener('click', async e => {
   const a = e.target.closest('[data-chat-abrir]'); if (a){ chConversa(a.dataset.chatAbrir); return; }
   const b = e.target.closest('[data-chat-btn]'); if (b){ chAbrir(b.dataset.h); return; }
+  const rs = e.target.closest('[data-chat-resp]'); if (rs){ chResponder(+rs.dataset.chatResp); return; }
+  const ir = e.target.closest('[data-chat-ir]'); if (ir){ const el = ir.dataset.chatIr && document.getElementById('chm-' + ir.dataset.chatIr); if (el){ el.scrollIntoView({ block:'center', behavior:'smooth' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); } return; }
+  const rm = e.target.closest('[data-chat-rm]'); if (rm){
+    rm.disabled = true;
+    try{ const r = await _supabase.rpc('chat_remover', { p_id:+rm.dataset.chatRm, p_token:S.token }); if (r.error) aviso(chErro(r)); }catch(_){ aviso('Não foi possível agora.'); }
+    CH.sig = ''; chCarregar(false); return;
+  }
+  const bm = e.target.closest('#chMsgs .ch-m'); if (bm && !e.target.closest('button') && matchMedia('(hover:none)').matches){ const on = bm.classList.contains('ac'); document.querySelectorAll('#chMsgs .ch-m.ac').forEach(x => x.classList.remove('ac')); if (!on) bm.classList.add('ac'); }
   const d = e.target.closest('[data-chat-del]'); if (d){
     d.disabled = true;
     try{ const r = await _supabase.rpc('chat_apagar', { p_id:+d.dataset.chatDel, p_token:S.token }); if (r.error) aviso(chErro(r)); }catch(_){ aviso('Não foi possível agora.'); }
