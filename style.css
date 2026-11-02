@@ -1861,10 +1861,10 @@ body[data-aba="chat"]::before{display:none}
   .ch-m{max-width:86%}
 }
 
-.ch-ac{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:4px;opacity:0;pointer-events:none;transition:opacity .15s}
-.ch-m.eu .ch-ac{right:calc(100% + 8px)}
-.ch-m.ele .ch-ac{left:calc(100% + 8px)}
-.ch-m:hover .ch-ac,.ch-ac:focus-within{opacity:1;pointer-events:auto}
+.ch-ac{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:4px;padding:6px 10px;opacity:0;transition:opacity .12s}
+.ch-m.eu .ch-ac{right:100%}
+.ch-m.ele .ch-ac{left:100%}
+.ch-m:hover .ch-ac,.ch-ac:focus-within{opacity:1}
 .ch-ac button{width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,.1);color:#cfd2ee;font-size:12px;cursor:pointer}
 .ch-ac button:hover{background:rgba(255,255,255,.2)}
 .ch-ac button[data-chat-del],.ch-ac button[data-chat-rm]{color:#ffb3bf}

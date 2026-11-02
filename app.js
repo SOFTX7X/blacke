@@ -1985,6 +1985,7 @@ $('chDen').addEventListener('click', async () => {
   try{ const r = await _supabase.rpc('chat_denunciar', { p_handle:h, p_token:S.token, p_motivo:'denúncia pelo chat' }); if (r.error){ aviso(chErro(r)); return; } }catch(_){ aviso('Não foi possível agora.'); return; }
   aviso('Denúncia enviada. Obrigado.'); chLista();
 });
+$('chMsgs').addEventListener('dblclick', e => { const m = e.target.closest('.ch-m'); if (m && !e.target.closest('button')) chResponder(+m.id.slice(4)); });
 document.addEventListener('click', async e => {
   const a = e.target.closest('[data-chat-abrir]'); if (a){ chConversa(a.dataset.chatAbrir); return; }
   const b = e.target.closest('[data-chat-btn]'); if (b){ chAbrir(b.dataset.h); return; }
