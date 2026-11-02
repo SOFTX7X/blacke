@@ -371,6 +371,7 @@ async function carregarVerificados(){
       if (b.querySelectorAll('.selo,.selo-b').length === (novo.match(/class="selo/g) || []).length) return;
       b.querySelectorAll('.selo,.selo-b').forEach(x => x.remove()); b.insertAdjacentHTML('beforeend', novo);
     });
+    if (RANK) desenharRanking();
   }catch(_){}
 }
 function criarCard(item, i){
@@ -1223,7 +1224,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
   escolherBanco().then(() => { if (MODO.reserva){ buscarMural(true); carregarPerfil(); carregarVerificados(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
-  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSemana(); carregarRanking();
+  atualizarMeusUI(); buscarMural(true); carregarPerfil(); carregarVerificados(); carregarRanking();
   if (FAVS.length && S.token && !lerLS('bl_fav_sync')){
     Promise.all(FAVS.slice(0, 100).map(id => _supabase.rpc('salvar_site', { p_id:String(id), p_token:S.token, p_on:true }))).then(() => gravarLS('bl_fav_sync', '1'), () => {});
   }
@@ -1427,7 +1428,7 @@ async function carregarSemana(){
 }
 function desenharSemana(){
   const el = $('semana'); if (!el) return;
-  const mostrar = SEMANA && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
+  const mostrar = false && SEMANA && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
   el.hidden = !mostrar; if (!mostrar) return;
   const it = SEMANA;
   if (!acharItem(it.id)) S.itens.push(it);
@@ -1460,11 +1461,11 @@ async function carregarRanking(){
 function desenharRanking(){
   const el = $('ranking'); if (!el) return;
   const mostrar = RANK && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
-  el.hidden = !mostrar; const sw = $('semana'); if (sw) sw.classList.toggle('com-rk', !!mostrar); if (!mostrar) return;
+  el.hidden = !mostrar; if (!mostrar) return;
   RANK.forEach(it => { if (!acharItem(it.id)) S.itens.push(it); });
   const topo = Math.max(1, +RANK[0].n7 || 1), tot = RANK.reduce((t, s) => t + (+s.n7 || 0), 0);
-  const faces = RANK.slice(0, 3).map(s => `<img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}">`).join('');
-  const linhas = RANK.map((s, i) => `<li style="--i:${i}" data-act="detalhes" data-id="${esc(s.id)}" role="button" tabindex="0"><span class="nm-pos">${i + 1}</span><span class="nm-im"><img src="${esc(s.image_url)}" alt="" loading="lazy" decoding="async" style="object-position:${posSegura(s.img_pos)}"></span><div class="nm-nm"><b translate="no">${esc(s.brand_name)}${selo(s)}</b>${s.handle ? `<small class="rk-h" translate="no">@${esc(s.handle)}</small>` : ''}<span class="nm-br"><i style="--w:${Math.max(4, Math.round((+s.n7 || 0) / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(+s.n7 || 0)}</b>${+s.hj ? `<small>+${fmtN(+s.hj)} hoje</small>` : ''}</span></li>`).join('');
+  const faces = RANK.slice(0, 3).map(s => miniAv(s.handle)).join('');
+  const linhas = RANK.map((s, i) => `<li style="--i:${i}"><span class="nm-pos">${i + 1}</span><button type="button" class="rk-av" data-act="perfil" data-h="${esc(s.handle)}" aria-label="Ver @${esc(s.handle)}">${miniAv(s.handle)}</button><div class="nm-nm"><b translate="no">@${esc(s.handle)}${selosDe(s.handle)}</b><span class="nm-br"><i style="--w:${Math.max(4, Math.round((+s.n7 || 0) / topo * 100))}%"></i></span></div><span class="nm-v"><b>${fmtN(+s.n7 || 0)}</b>${+s.hj ? `<small>+${fmtN(+s.hj)} hoje</small>` : ''}</span><span class="rk-ac"><button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(s.id)}">Detalhes</button><a class="btn-primary" data-act="visitar" data-id="${esc(s.id)}" href="${urlSegura(s.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a></span></li>`).join('');
   el.innerHTML = `<details class="nm rk" data-rk${S.rkAberto ? ' open' : ''}>
     <summary class="nm-h"><div><h3>Ranking da semana</h3><small class="nm-sub">Top ${RANK.length} · <b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> <span>em 7 dias</span></small></div><div class="nm-ch"><span class="rk-f">${faces}</span><i class="nm-cv" aria-hidden="true"></i></div></summary>
     <div class="nm-b"><ol class="nm-r">${linhas}</ol></div>
