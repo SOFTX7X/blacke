@@ -177,7 +177,7 @@
     ['Reserve seu @ e siga perfis para ver os sites deles aqui.','Reserve your @ and follow profiles to see their sites here.','Reserva tu @ y sigue perfiles para ver sus sitios aquí.'],
     ['Carregando…','Loading…','Cargando…'],
     ['Ranking da semana','Weekly ranking','Ranking de la semana'],['em 7 dias','in 7 days','en 7 días'],
-    ['Site da semana','Site of the week','Sitio de la semana'],['Ver detalhes','See details','Ver detalles'],
+    ['Ver detalhes','See details','Ver detalles'],
     ['Prévia da capa','Cover preview','Vista previa de la portada'],
     ['Arraste para ajustar','Drag to adjust','Arrastra para ajustar'],
     ['Centralizar','Center','Centrar'],

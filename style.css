@@ -1337,41 +1337,6 @@ body[data-aba="publicar"] .tb-busca,body[data-aba="meus"] .tb-busca,body[data-ab
 .previa .rx,body[data-aba="meus"] .card .rx-add{display:none}
 @media (max-width:640px){.rx{gap:5px;margin-top:8px}.rx-b,.rx-add{height:30px}.rx-add{width:30px}.rx-pop button{width:42px;height:42px}}
 
-/* ===== Site da semana ===== */
-.semana{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:center;margin:18px 0 6px;padding:20px;border:1px solid rgba(123,108,255,.45);border-radius:20px!important;
-  background:linear-gradient(135deg,rgba(123,108,255,.14),rgba(111,214,255,.04) 55%,transparent),var(--panel);animation:pcIn .4s ease both}
-.semana[hidden]{display:none}
-.sm-capa{display:block;width:100%;padding:0;border:0;border-radius:14px!important;overflow:hidden;cursor:pointer;background:#000;aspect-ratio:6/5}
-.sm-capa img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
-.sm-capa:hover img{transform:scale(1.03)}
-.sm-selo{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:99px!important;background:rgba(123,108,255,.2);border:1px solid rgba(123,108,255,.55);color:#d6cfff;font:700 12px var(--display);letter-spacing:.06em;text-transform:uppercase}
-.sm-selo svg{color:#ffd166}
-.sm-info h2{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font:700 clamp(24px,2.6vw,36px)/1.15 var(--display);letter-spacing:-.02em;color:#fff}
-.sm-info h2 .selo{width:.75em;height:.75em}
-.sm-ar .arroba{font-size:14px}
-.sm-info p{margin:12px 0 0;color:#c9cde8;font-size:15px;line-height:1.55;max-width:560px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-.sm-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.sm-acts .btn-primary,.sm-acts .btn-ghost{display:inline-flex;align-items:center;height:44px;padding:0 20px;border-radius:12px!important;text-decoration:none;font-size:14.5px}
-@media (max-width:640px){
-  .semana{grid-template-columns:1fr;gap:14px;padding:14px;margin:12px 0 4px}
-  .sm-info h2{margin-top:10px;font-size:22px}
-  .sm-acts .btn-primary,.sm-acts .btn-ghost{flex:1;justify-content:center;height:42px}
-}
-@media (max-width:640px){
-  .semana{grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:start;padding:12px}
-  .sm-capa{aspect-ratio:1/1;border-radius:12px!important}
-  .sm-selo{height:24px;padding:0 9px;font-size:10px}
-  .sm-info h2{margin:8px 0 2px;font-size:18px}
-  .sm-ar .arroba{font-size:12px}
-  .sm-info p{display:none}
-  .sm-acts{grid-column:1/-1;margin-top:4px;gap:8px}
-  .sm-acts .btn-primary,.sm-acts .btn-ghost{height:40px;font-size:13.5px}
-}
-@media (max-width:640px){
-  .sm-acts{flex-wrap:nowrap}
-  .sm-acts .btn-primary,.sm-acts .btn-ghost{padding:0 10px;height:36px;font-size:12.5px;white-space:nowrap}
-  .sm-info h2{font-size:17px;flex-wrap:wrap}
-}
 
 /* página de links (Conta) */
 .ig{grid-template-areas:"av nome" "av nums" "av bio" "btns btns" "lk lk"}
@@ -1453,42 +1418,6 @@ main{overflow-x:clip}
 }
 @media (prefers-reduced-motion:reduce){.nm,.nm-c i,.nm-r li,.nm-br i{animation:none!important}}
 
-/* Site da semana: linha compacta (estilo ranking) */
-.sw{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px 18px;margin:18px 0 6px;padding:12px 0;border:0;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);border-radius:0!important;background:none;animation:pcIn .4s ease both}
-.sw[hidden]{display:none}
-.sw-img{grid-row:1;width:92px;height:64px;padding:0;border:0;border-radius:12px!important;overflow:hidden;cursor:pointer;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.sw-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
-.sw-img:hover img{transform:scale(1.06)}
-.sw-in{min-width:0;display:flex;flex-direction:column;gap:6px}
-.sw-top{display:flex;align-items:center;gap:10px;min-width:0}
-.sw-selo{flex:none;display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:99px!important;background:rgba(123,108,255,.18);box-shadow:inset 0 0 0 1px rgba(123,108,255,.5);color:#d9d4ff;font:700 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase}
-.sw-selo svg{color:#ffd166}
-.sw-nota{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted)}
-.sw-nm{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
-.sw-nm h2{display:flex;align-items:center;gap:7px;margin:0;font:700 clamp(17px,1.6vw,21px)/1.2 var(--display);color:#fff;letter-spacing:-.01em;min-width:0}
-.sw-nm h2 .selo{width:.8em;height:.8em}
-.sw-nm .arroba{font-size:13px}
-.sw-br{display:block;height:5px;border-radius:99px!important;background:rgba(255,255,255,.06);overflow:hidden}
-.sw-br i{display:block;height:100%;width:var(--w);border-radius:99px!important;background:linear-gradient(90deg,var(--indigo),var(--violet),var(--ice));transform-origin:left;animation:nmBar .9s cubic-bezier(.2,.8,.2,1) .2s both}
-.sw-v{display:flex;flex-direction:column;align-items:flex-end;min-width:64px;line-height:1.2}
-.sw-v b{font:700 22px var(--display);color:#fff}
-.sw-v span{font-size:12px;color:var(--muted)}
-.sw-v small{margin-top:2px;font:500 11px var(--mono);color:#3ddc97}
-.sw-acts{display:flex;gap:8px}
-.sw-acts .btn-primary,.sw-acts .btn-ghost{display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 18px;border-radius:12px!important;text-decoration:none;font-size:14px;white-space:nowrap}
-@media (max-width:900px){
-  .sw{grid-template-columns:auto minmax(0,1fr) auto}
-  .sw-acts{grid-column:1/-1}
-  .sw-acts .btn-primary,.sw-acts .btn-ghost{flex:1}
-}
-@media (max-width:560px){
-  .sw{padding:12px 0;gap:10px 12px;margin:12px 0 4px}
-  .sw-img{width:64px;height:64px}
-  .sw-nota{display:none}
-  .sw-v b{font-size:18px}
-  .sw-v{min-width:52px}
-}
-@media (prefers-reduced-motion:reduce){.sw,.sw-br i{animation:none!important}}
 
 /* ---------- Selo "Estou no BLACKE" (Conta) ---------- */
 .sl{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"t t" "pv a";gap:14px 22px;align-items:center;margin:12px 0 4px;padding:18px 20px;border-radius:20px!important;background:linear-gradient(135deg,rgba(123,108,255,.12),rgba(111,214,255,.04));box-shadow:inset 0 0 0 1px rgba(123,108,255,.28)}
@@ -1550,7 +1479,6 @@ details.sl{display:block;padding:0}
 /* mini foto de perfil ao lado do @ */
 .arroba .amini{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;margin-right:7px;border-radius:50%!important;overflow:hidden;background:linear-gradient(135deg,#4a3fd6,#7b6cff);box-shadow:0 0 0 1.5px rgba(123,108,255,.55);color:#fff;font:700 10px var(--display);line-height:1}
 .arroba .amini img{width:100%;height:100%;object-fit:cover;display:block}
-.sw-nm .arroba .amini{width:22px;height:22px}
 
 /* Selo BLACKE (ninja): rótulo em hexágono com fumaça preta saindo das bordas */
 /* Selo BLACKE: rótulo roxo com ninja preto e olhos roxos */
@@ -1564,8 +1492,6 @@ details.sl{display:block;padding:0}
 .rk .nm-h:hover{background:none}
 .rk .nm-h h3{font-size:15px}
 .rk .nm-b{padding:0 0 8px}
-.sw.com-rk{border-bottom:0;margin-bottom:0;padding-bottom:6px}
-.sw.com-rk + #ranking .rk{border-top:0}
 .rk[hidden],#ranking[hidden]{display:none}
 .rk-f{display:inline-flex}
 .rk .nm-r li[data-act]{cursor:pointer;border-radius:10px;transition:background .2s}

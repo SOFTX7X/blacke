@@ -674,7 +674,6 @@ async function carregarAlta(){
   try{ const { data, error } = await _supabase.rpc('ids_em_alta', { p_limite:200 }); if (!error && Array.isArray(data)){ ALTA = data; ALTA_T = Date.now(); } }catch(_){}
 }
 async function buscarMural(reset){
-  if (typeof desenharSemana === 'function') setTimeout(desenharSemana, 0);
   if (typeof desenharRanking === 'function') setTimeout(desenharRanking, 0);
   const meu = ++S.seq;
   if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
@@ -754,7 +753,7 @@ async function trocarAba(aba, semHistorico, manterPerfil){
     if (aba === 'mural' && S.aba === 'mural'){ sairPerfil(); return; }
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
-  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharSemana, 0); setTimeout(desenharRanking, 0);
+  S.aba = aba; document.body.dataset.aba = aba; setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
@@ -1487,45 +1486,6 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
   new MutationObserver(() => { if ($('busca').value && S.busca && !document.body.classList.contains('modo-perfil')) tb.classList.add('buscando'); }).observe(document.body, { attributes:true, attributeFilter:['class'] });
 })();
 
-
-/* ---------- Site da semana (escolhido no admin) ---------- */
-let SEMANA = null, SEMANA_ST = null;
-async function carregarSemana(){
-  try{
-    const { data } = await _supabase.rpc('site_da_semana');
-    SEMANA = data && data.id ? data : null;
-  }catch(_){ SEMANA = null; }
-  SEMANA_ST = null; desenharSemana();
-  if (SEMANA){
-    const id = SEMANA.id;
-    try{
-      const { data, error } = await _supabase.rpc('site_stats_publico', { p_id:String(id) });
-      if (!error && data && data.dias && SEMANA && SEMANA.id === id){ SEMANA_ST = data.dias; desenharSemana(); }
-    }catch(_){}
-  }
-}
-function desenharSemana(){
-  const el = $('semana'); if (!el) return;
-  const mostrar = false && SEMANA && S.aba === 'mural' && !document.body.classList.contains('modo-perfil') && !S.busca && S.cat === 'Todas';
-  el.hidden = !mostrar; if (!mostrar) return;
-  const it = SEMANA;
-  if (!acharItem(it.id)) S.itens.push(it);
-  const total = +it.cliques || 0, hoje = SEMANA_ST && SEMANA_ST.length ? +SEMANA_ST[SEMANA_ST.length - 1].n || 0 : 0;
-  const topo = Math.max(total, 1, ...S.itens.map(s => +s.cliques || 0));
-  const nota = (it.nota || '').trim();
-  el.innerHTML = `
-    <button type="button" class="sw-img" data-act="detalhes" data-id="${esc(it.id)}" aria-label="Ver ${esc(it.brand_name)}"><img src="${esc(it.image_url)}" alt="" style="object-position:${posSegura(it.img_pos)}"></button>
-    <div class="sw-in">
-      <div class="sw-top"><span class="sw-selo"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> Site da semana</span>${nota ? `<span class="sw-nota" translate="no">${esc(nota)}</span>` : ''}</div>
-      <div class="sw-nm"><h2 translate="no">${esc(it.brand_name)}${selo(it)}</h2>${it.handle ? arrobaBtn(it.handle) : ''}</div>
-      <span class="sw-br"><i style="--w:${Math.max(6, Math.round(total / topo * 100))}%"></i></span>
-    </div>
-    <div class="sw-v"><b>${fmtN(total)}</b><span>${total === 1 ? 'acesso' : 'acessos'}</span>${hoje ? `<small>+${fmtN(hoje)} hoje</small>` : ''}</div>
-    <div class="sw-acts">
-      <button type="button" class="btn-ghost" data-act="detalhes" data-id="${esc(it.id)}">Detalhes</button>
-      <a class="btn-primary" data-act="visitar" data-id="${esc(it.id)}" href="${urlSegura(it.link_url)}" target="_blank" rel="noopener noreferrer">Acessar site</a>
-    </div>`;
-}
 
 /* ---------- Ranking da semana (top sites dos últimos 7 dias) ---------- */
 let RANK = null;
