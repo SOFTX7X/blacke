@@ -1,21 +1,34 @@
 const SUPABASE_URL = 'https://wyjrjioipqfltdyupfna.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
-/* Banco reserva: cópia semanal do principal. Se o principal não responder, o site lê daqui (só leitura). */
+/* Bancos de segurança, em ordem: (1) PC próprio, cópia a cada 6 h; (2) projeto reserva, cópia semanal.
+   Se o principal não responder, o site lê do primeiro que responder (só leitura). */
+const PC_URL = 'https://desktop-muskj8q.tail4de325.ts.net';
+const PC_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6ImJsYWNrZS1yZXNlcnZhIiwiaWF0IjoxNzkzNjE0MjM0LCJleHAiOjIxMDg5NzQyMzR9.JFrbmZKNJyj2LPfBj8w63U2OzcnEHn1ewv_RCsg_UP4';
 const RESERVA_URL = 'https://ldghexvlbkiqduzlpdss.supabase.co';
 const RESERVA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkZ2hleHZsYmtpcWR1emxwZHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjgzNzAsImV4cCI6MjEwMjkwNDM3MH0.MJOsPqcyc5J5TRH_JxvpH0Eul_v9bwfSeab-bFLe6vM';
 let _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const MODO = { reserva:false };
-async function responde(url, key, ms){
+async function responde(url, key, ms, pc){
   const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
-  try{ const r = await fetch(`${url}/rest/v1/sites_publicos?select=id&limit=1`, { headers:{ apikey:key, Authorization:'Bearer ' + key }, signal:c.signal }); return r.ok; }
+  const h = pc ? { Authorization:'Bearer ' + key } : { apikey:key, Authorization:'Bearer ' + key };
+  try{ const r = await fetch(`${url}${pc ? '' : '/rest/v1'}/sites_publicos?select=id&limit=1`, { headers:h, signal:c.signal }); return r.ok; }
   catch(_){ return false; } finally{ clearTimeout(t); }
+}
+/* o PostgREST do PC atende na raiz (sem /rest/v1) e não aceita os cabeçalhos extras do supabase-js */
+function clientePC(){
+  return supabase.createClient(PC_URL, PC_KEY, { global:{ fetch:(u, o = {}) => {
+    const h = new Headers(o.headers || {}); h.delete('apikey'); h.delete('x-client-info');
+    return fetch(String(u).replace('/rest/v1/', '/'), { ...o, headers:h });
+  } } });
 }
 async function escolherBanco(){
   if (await responde(SUPABASE_URL, SUPABASE_KEY, 6000)) return;
-  if (!(await responde(RESERVA_URL, RESERVA_KEY, 4500))) return;          // os dois fora: segue no principal e mostra o erro normal
+  let cli, nome;
+  if (await responde(PC_URL, PC_KEY, 5000, true)){ cli = clientePC(); nome = 'pc'; }
+  else if (await responde(RESERVA_URL, RESERVA_KEY, 4500)){ cli = supabase.createClient(RESERVA_URL, RESERVA_KEY); nome = 'reserva'; }
+  else return;                                                            // todos fora: segue no principal e mostra o erro normal
   MODO.reserva = true;
-  const cli = supabase.createClient(RESERVA_URL, RESERVA_KEY);
   const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta','meu_aviso'];
   const rpcOrig = cli.rpc.bind(cli);
   cli.rpc = (nome, args) => {
@@ -28,7 +41,7 @@ async function escolherBanco(){
   const b = document.createElement('div'); b.className = 'aviso-reserva'; b.setAttribute('role', 'status');
   b.textContent = 'Modo de segurança: o mural está no ar, mas publicar e editar estão pausados por alguns instantes.';
   document.body.prepend(b);
-  // capas guardadas no armazenamento do principal passam a vir do reserva
+  // capas guardadas no armazenamento do principal passam a vir do projeto reserva
   const DE = SUPABASE_URL + '/storage/', PARA = RESERVA_URL + '/storage/';
   const troca = img => { const s = img.getAttribute('src'); if (s && s.startsWith(DE)) img.setAttribute('src', PARA + s.slice(DE.length)); };
   document.querySelectorAll('img').forEach(troca);
