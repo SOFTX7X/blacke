@@ -943,6 +943,42 @@ function ntItem(x){
   const { ic, txt, alvo } = ntConteudo(x), tempo = `<time datetime="${esc(x.criado_em)}">${esc(ntTempo(x.criado_em))}</time>`;
   return `<li><button type="button" class="nt-i ${x.lida ? '' : 'nova'}" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><span class="nt-x">${txt}</span>${tempo}</span>${x.lida ? '' : '<i class="nt-d" aria-hidden="true"></i>'}</button></li>`;
 }
+
+/* som das notificações (gerado no navegador: dois toques curtos e agudos, sem arquivo) */
+let AC = null;
+const somLigado = () => lerLS('bl_nt_som') !== '0';
+function acordarAudio(){
+  try{ AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); }catch(_){}
+}
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, acordarAudio, { once:true, passive:true }));
+function ntSom(forcar){
+  if (!forcar && !somLigado()) return;
+  try{
+    acordarAudio(); if (!AC || AC.state !== 'running') return;
+    const t0 = AC.currentTime + 0.02, mestre = AC.createGain();
+    mestre.gain.value = 0.16; mestre.connect(AC.destination);
+    [[783.99, 0], [1174.66, 0.13], [1567.98, 0.28]].forEach(([f, d], i) => {
+      [[f, 1, 'sine'], [f * 2, 0.22, 'sine']].forEach(([fr, v, tp]) => {
+        const o = AC.createOscillator(), g = AC.createGain(), t = t0 + d;
+        o.type = tp; o.frequency.setValueAtTime(fr, t);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v * (i === 2 ? 0.8 : 1), t + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + (i === 2 ? 0.75 : 0.34));
+        o.connect(g); g.connect(mestre); o.start(t); o.stop(t + 0.8);
+      });
+    });
+  }catch(_){}
+}
+function pintarSom(){
+  const b = $('ntSom'); if (!b) return;
+  const on = somLigado(); b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on);
+  b.innerHTML = `<i class="fa-solid ${on ? 'fa-volume-high' : 'fa-volume-xmark'}"></i>`;
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ntSom')) return;
+  gravarLS('bl_nt_som', somLigado() ? '0' : '1'); pintarSom(); if (somLigado()) ntSom(true);
+});
+pintarSom();
+
 /* bolha no topo (estilo notificação de celular) quando chega aviso novo */
 let ntTimer = 0;
 function ntBolha(novos){
@@ -953,6 +989,7 @@ function ntBolha(novos){
   b.innerHTML = `<button type="button" class="nt-bn" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><b class="nt-tt">BLACKE LAVEX</b><span class="nt-x">${txt}</span></span>${mais}</button>`;
   b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
   clearTimeout(ntTimer); ntTimer = setTimeout(ntBolhaOff, 6500);
+  ntSom();
 }
 function ntBolhaOff(){ const b = $('ntBolha'); if (b) b.classList.remove('on'); }
 function desenharNotif(){
@@ -1000,8 +1037,35 @@ document.addEventListener('click', e => {
   if (!$('ntPanel').hidden && !e.target.closest('#ntPanel')) ntAbrir(false);
 });
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('ntPanel').hidden) ntAbrir(false); });
-setInterval(() => { if (!document.hidden) carregarNotif(); }, 40000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) carregarNotif(); });
+/* mantém tudo em dia entre navegadores/abas: avisos, quem eu sigo e as contagens na tela */
+function pintarSegn(h, d){
+  document.querySelectorAll('[data-segn]').forEach(n => {
+    const [hh, tp] = n.dataset.segn.split(':'); if (hh !== h || d[tp] == null) return;
+    n.textContent = fmtN(d[tp]); n.dataset.v = String(d[tp]);
+  });
+}
+let sincOcupado = false;
+async function sincronizar(){
+  if (document.hidden || sincOcupado || !S.token) return;
+  sincOcupado = true;
+  try{
+    carregarNotif();
+    await carregarSeguindo();
+    const hs = [...new Set([...document.querySelectorAll('[data-segn]')].map(n => n.dataset.segn.split(':')[0]))].slice(0, 6);
+    await Promise.all(hs.map(async h => {
+      try{ const { data } = await _supabase.rpc('perfil_publico', { p_handle:h }); if (data) pintarSegn(h, data); }catch(_){}
+    }));
+    if (S.perfil && S.perfil.handle){
+      try{
+        const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token });
+        if (data){ S.perfil.seguidores = data.seguidores; S.perfil.seguindo = data.seguindo; pintarSegn(S.perfil.handle, data); }
+      }catch(_){}
+    }
+  }finally{ sincOcupado = false; }
+}
+setInterval(sincronizar, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizar(); });
+addEventListener('focus', sincronizar);
 
 /* ---------- cartão de perfil ---------- */
 const fmtN = n => { try{ return new Intl.NumberFormat(LOC(), { notation:'compact', maximumFractionDigits:1 }).format(n || 0); }catch(_){ return String(n || 0); } };

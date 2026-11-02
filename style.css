@@ -1613,3 +1613,7 @@ details.sl{display:block;padding:0}
 .nt-bn .amini img{width:100%;height:100%;object-fit:cover}
 .nt-mais{margin-left:auto;font:700 12px var(--display);font-style:normal;color:#fff;background:rgba(255,255,255,.14);padding:3px 9px;border-radius:99px;flex:none}
 @media(prefers-reduced-motion:reduce){.nt-bolha{transition:opacity .2s}}
+.nt-ac{display:flex;align-items:center;gap:6px}
+.nt-som{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.07);color:var(--ice);font-size:13px;cursor:pointer;outline:none!important;transition:background .15s,color .15s}
+.nt-som:hover{background:rgba(255,255,255,.14)}
+.nt-som.off{color:rgba(255,255,255,.4)}
