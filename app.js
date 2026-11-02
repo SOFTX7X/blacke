@@ -676,7 +676,7 @@ async function carregarAlta(){
 async function buscarMural(reset){
   if (typeof desenharRanking === 'function') setTimeout(desenharRanking, 0);
   const meu = ++S.seq;
-  if (reset){ S.pagina = 0; S.itens = []; skeleton(); }
+  if (reset){ S.pagina = 0; S.itens = []; if (S.aba === 'mural') skeleton(); }
   try{
     let q = _supabase.from('sites_publicos').select(COLS, { count:'exact' }).lt('denuncias', 5).eq('oculto', false);
     if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
@@ -708,6 +708,7 @@ async function buscarMural(reset){
     const { data, error, count } = await (alta ? q.limit(200) : q.range(de, de + PAGE));
     if (meu !== S.seq) return;            // chegou uma busca mais nova
     if (error) throw error;
+    if (S.aba !== 'mural'){ fecharSplash(); return; }   // já saiu do mural (ex.: abriu a Conta): não joga sites de outros @ na tela
     let lote = (data || []).slice(0, alta ? 200 : PAGE);
     if (alta){ const pos = new Map(ALTA.map((id, i) => [String(id), i])); lote.sort((x, y) => pos.get(String(x.id)) - pos.get(String(y.id))); lote = lote.slice(de, de + PAGE); }
     S.temMais = alta ? (data || []).length > de + PAGE : (data || []).length > PAGE; S.total = count ?? lote.length;
@@ -725,7 +726,7 @@ async function buscarMural(reset){
         : vazio('grade', 'O mural está vazio', 'Seja o primeiro a publicar um site.', ['publicar']));
     } else setEstado('');
     fecharSplash();
-  }catch(err){ if (meu === S.seq) erroCarga(err); fecharSplash(); }
+  }catch(err){ if (meu === S.seq && S.aba === 'mural') erroCarga(err); fecharSplash(); }
 }
 
 /* ---------- Meus sites ---------- */
