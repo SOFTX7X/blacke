@@ -1745,6 +1745,7 @@ $('maisBtn').addEventListener('click', () => { $('maisBtn').disabled = true; $('
 /* ---------- início ---------- */
 (async function iniciar(){
   await iniciarChave();
+  checarBan(); setInterval(checarBan, 60000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checarBan(); });
   // confere o banco em paralelo (não atrasa o mural); se o principal estiver fora, recarrega os dados do reserva
   escolherBanco().then(() => { if (MODO.trocou){ buscarMural(true); carregarPerfil(); carregarVerificados(); carregarSeguindo(); carregarNotif(); carregarAviso(); } });
   try{ await buscarMeus(); }catch(_){ S.meus = []; }
@@ -2575,3 +2576,17 @@ document.addEventListener('click', async e => {
   e.preventDefault();
   if (await confirmar({ titulo:'Abrir a comunidade?', texto:'Você vai para o Telegram do BLACKE LAVEX, fora do site. O link abre em uma nova aba.', botao:'Abrir Telegram' })) window.open(l.href, '_blank', 'noopener');
 });
+
+/* ---------- Conta banida: tela cheia que prende o usuário até o fim do prazo ---------- */
+async function checarBan(){
+  if (!S.token) return;
+  let d = null;
+  try{ const r = await _supabase.rpc('minha_situacao', { p_token:S.token }); d = r.data; }catch(_){ return; }
+  let el = document.getElementById('telaBan');
+  if (!d || !d.banido){ if (el){ el.remove(); document.body.classList.remove('banido'); } return; }
+  const quando = d.ate ? new Date(d.ate) : null;
+  const txt = quando ? `Seu acesso está suspenso até ${quando.toLocaleDateString('pt-BR')} às ${quando.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}. Depois disso, tudo volta ao normal.` : 'Seu acesso está suspenso por tempo indeterminado.';
+  if (!el){ el = document.createElement('div'); el.id = 'telaBan'; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true'); document.body.appendChild(el); }
+  el.innerHTML = `<div class="tb-c"><i class="fa-solid fa-ban"></i><h2>Conta suspensa</h2><p>${esc(txt)}</p>${d.motivo ? `<p class="tb-m">Motivo: ${esc(d.motivo)}</p>` : ''}<p class="tb-s">Você não pode usar o BLACKE LAVEX enquanto a suspensão durar.</p></div>`;
+  document.body.classList.add('banido');
+}
