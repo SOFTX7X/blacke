@@ -688,7 +688,7 @@ body.carregando{overflow:hidden}
   .dest-head h2{font-size:15px}
 }
 @media (max-width:640px){
-  .bnav{grid-template-columns:repeat(5,1fr);left:10px;right:10px}
+  .bnav{grid-template-columns:repeat(6,1fr);left:10px;right:10px}
   .bnav button,.bnav a{min-width:0}
 }
 @media (max-width:640px){
@@ -865,7 +865,7 @@ footer a:hover{text-decoration:underline}
   .bnav,.bnav span{transition:none}
 }
 /* título do mural só na aba Mural */
-body[data-aba="meus"] .hero,body[data-aba="destaques"] .hero{display:none}
+body[data-aba="meus"] .hero,body[data-aba="destaques"] .hero,body[data-aba="usuarios"] .hero{display:none}
 /* Meus sites: sem painel; insights na grade */
 #painelMeus{display:none!important}
 .pc-btn.perigo:hover{border-color:#ff5c7a;color:#ff8da1}
@@ -1703,3 +1703,24 @@ details.sl{display:block;padding:0}
 #manut img{width:min(150px,38vw);height:auto;object-fit:contain}
 #manut h1{font:700 clamp(20px,4.6vw,30px)/1.2 var(--display);letter-spacing:.14em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 #manut p{font:500 15px var(--display);color:var(--muted);max-width:34ch}
+
+/* usuários: busca de pessoas */
+.usr{max-width:720px;margin:0 auto;padding:18px var(--pn-x,20px) 90px;width:100%}
+.usr-busca{display:flex;align-items:center;gap:10px;margin:14px 0 6px;padding:0 14px;height:48px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--muted)}
+.usr-busca:focus-within{border-color:#3a3f87;box-shadow:0 0 0 3px rgba(123,108,255,.16)}
+.usr-busca input{flex:1;min-width:0;height:100%;border:0;outline:0;background:none;color:var(--text);font:600 15px var(--display)}
+.usr-busca input::placeholder{color:var(--muted);font-weight:500}
+.usr-sub{margin:16px 2px 4px;font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.usr-lista{list-style:none;padding:0;margin:0}
+.usr-li{border-bottom:1px solid rgba(255,255,255,.05)}
+.usr-li .sg-r{flex:1;min-width:0}
+.usr-info{display:flex;flex-direction:column;min-width:0;gap:2px}
+.usr-l1{display:flex;align-items:center;gap:4px}
+.usr-l2{font:500 12.5px var(--display);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.usr-lista .sg-vz{padding:28px 4px;color:var(--muted);text-align:center;list-style:none}
+@media (max-width:640px){
+  .bnav{padding:5px 4px;gap:0}
+  .bnav button,.bnav a{font-size:9.5px;padding:0 2px}
+  .bnav svg{width:22px;height:22px}
+}
+@media (max-width:380px){ .bnav button,.bnav a{font-size:8.5px} }

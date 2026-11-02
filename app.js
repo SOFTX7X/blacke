@@ -51,7 +51,7 @@ async function escolherBanco(){
     else return;
   }                                                            // todos fora: segue no principal e mostra o erro normal
   MODO.trocou = true; MODO.reserva = (nome !== 'pc');
-  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','ids_em_alta','meu_aviso'];
+  const LEITURA = ['meu_perfil','perfil_publico','perfis_verificados','meus_stats','site_stats_publico','perfis_selos','ranking_semana','meus_seguindo','meus_seguidores','lista_seguir','buscar_usuarios','ids_em_alta','meu_aviso'];
   const rpcOrig = cli.rpc.bind(cli);
   const ESCRITA = ['salvar_site','seguir','reservar_arroba','remover_seguidor','registrar_clique','reagir','publicar_site','ajustar_posicao_foto','marcar_notificacoes_lidas','marcar_corrigido','liberar_arroba','excluir_meus_sites','excluir_meu_site','editar_perfil','editar_meu_site','denunciar_site'];
   if (nome === 'pc'){
@@ -645,7 +645,7 @@ function atualizarTitulo(){
 }
 const _tituloBase = atualizarTitulo;
 atualizarTitulo = function(){ _tituloBase(); if (typeof NT !== 'undefined' && NT.n > 0) document.title = `(${NT.n > 9 ? '9+' : NT.n}) ` + document.title; };
-const ROTA = { mural:'/', destaques:'/destaques', meus:'/conta', publicar:'/publicar' };
+const ROTA = { mural:'/', destaques:'/destaques', usuarios:'/usuarios', meus:'/conta', publicar:'/publicar' };
 // a Conta usa o endereço do próprio @ (/@nome); sem @ reservado, /conta
 const rotaDe = aba => aba === 'meus' && S.perfil && S.perfil.handle ? '/@' + S.perfil.handle : (ROTA[aba] || '/');
 function urlBase(){ return document.body.classList.contains('modo-perfil') && S.busca.startsWith('@') ? '/@' + S.busca.slice(1) : rotaDe(S.aba); }
@@ -831,14 +831,19 @@ async function trocarAba(aba, semHistorico, manterPerfil){
   }
   S.aba = aba; document.body.dataset.aba = aba; setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
-  $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques');
+  $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques'); $('tabUsr').classList.toggle('on', aba === 'usuarios');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
   document.querySelector('#bnav .bn-pub').classList.toggle('on', aba === 'publicar');
-  $('pubTela').hidden = aba !== 'publicar';
+  $('pubTela').hidden = aba !== 'publicar'; $('usuarios').hidden = aba !== 'usuarios';
   if (aba === 'publicar'){
     $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
     ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
     scrollTo({ top:0 }); return;
+  }
+  if (aba === 'usuarios'){
+    $('filtros').hidden = $('searchbar').hidden = $('painelMeus').hidden = $('meuPerfil').hidden = $('destaques').hidden = true;
+    ['muralGrid','estado','maisBtn','perfilBox'].forEach(id => $(id).hidden = true);
+    abrirUsuarios(); scrollTo({ top:0 }); return;
   }
   $('filtros').hidden = $('searchbar').hidden = aba !== 'mural'; $('painelMeus').hidden = $('meuPerfil').hidden = aba !== 'meus';
   $('destaques').hidden = aba !== 'destaques';
@@ -1762,7 +1767,7 @@ function rotear(){
   }else if (!ms){
     if (p === '/publicar'){ if (S.aba !== 'publicar') abrirPublicar(); }
     else{
-      const aba = p === '/destaques' ? 'destaques' : (p === '/conta' || p === '/meus-sites') ? 'meus' : 'mural';
+      const aba = p === '/destaques' ? 'destaques' : p === '/usuarios' ? 'usuarios' : (p === '/conta' || p === '/meus-sites') ? 'meus' : 'mural';
       if (document.body.classList.contains('modo-perfil') || S.aba !== aba) trocarAba(aba, true);
     }
   }
@@ -1777,6 +1782,40 @@ async function abrirLinkDireto(){
   if (location.pathname.startsWith('/s/')) S.fichaEntrada = true;
   rotear();
 }
+
+/* ---------- Usuários: procurar pessoas pelo @ ---------- */
+const USR = { sug:null, n:0, t:0 };
+function desenharUsuarios(lista, vazio){
+  const ul = $('usrLista'), eu = S.perfil && S.perfil.handle;
+  lista.forEach(x => { if (x.v) VERIF.add(x.handle); if (x.n) NINJA.add(x.handle); if (/^https:\/\//.test(x.f || '')) FOTOS.set(x.handle, x.f); });
+  ul.innerHTML = lista.length ? lista.map(x => {
+    const H = esc(x.handle), outro = eu && eu !== x.handle, n = Number(x.s) || 0;
+    const l2 = `${n} ${n === 1 ? 'seguidor' : 'seguidores'}${x.b ? ' · ' + esc(x.b) : ''}`;
+    return `<li class="sg-li usr-li"><button type="button" class="sg-r" data-sgp="${H}">${miniAv(x.handle)}<span class="usr-info"><span class="usr-l1"><span class="sg-n" translate="no">@${H}</span>${selosDe(x.handle)}</span><span class="usr-l2">${l2}</span></span></button>${outro ? `<button type="button" class="seg-btn sg-b" data-seg-btn data-h="${H}"></button>` : ''}</li>`;
+  }).join('') : `<li class="sg-vz">${vazio}</li>`;
+  ul.querySelectorAll('[data-seg-btn]').forEach(pintarSeguir);
+}
+async function buscarUsuarios(q){
+  const id = ++USR.n;
+  let lista = [], ok = false;
+  try{ const { data, error } = await _supabase.rpc('buscar_usuarios', { p_q:q, p_limite:30 }); lista = Array.isArray(data) ? data : []; ok = !error && Array.isArray(data); }catch(_){}
+  if (id !== USR.n || S.aba !== 'usuarios') return;
+  if (!ok){ $('usrLista').innerHTML = '<li class="sg-vz">Não foi possível buscar agora. Tente de novo.</li>'; return; }
+  if (!q) USR.sug = lista;
+  desenharUsuarios(lista, q ? 'Nenhum usuário encontrado.' : 'Ainda não há usuários.');
+}
+function abrirUsuarios(){
+  const q = $('usrBusca').value.replace(/^@/, '').trim().toLowerCase();
+  $('usrSub').textContent = q ? 'Resultados' : 'Em destaque';
+  if (!q && USR.sug) desenharUsuarios(USR.sug, 'Ainda não há usuários.'); else if (!$('usrLista').children.length) $('usrLista').innerHTML = '<li class="sg-vz">Carregando…</li>';
+  buscarUsuarios(q);
+  if (matchMedia('(hover:hover)').matches) setTimeout(() => $('usrBusca').focus({ preventScroll:true }), 50);
+}
+$('usrBusca').addEventListener('input', e => {
+  const v = e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, '').replace(/@/g, ''); if (v !== e.target.value.toLowerCase()) e.target.value = v;
+  clearTimeout(USR.t); $('usrSub').textContent = v ? 'Resultados' : 'Em destaque';
+  USR.t = setTimeout(() => buscarUsuarios(v), 300);
+});
 
 /* ---------- Destaques: seção própria (mais acessados e novos) ---------- */
 function desenharDestaques(){

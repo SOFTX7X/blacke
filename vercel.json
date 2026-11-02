@@ -33,6 +33,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/usuarios",
+      "destination": "/index.html"
+    },
+    {
       "source": "/meus-sites",
       "destination": "/index.html"
     },
