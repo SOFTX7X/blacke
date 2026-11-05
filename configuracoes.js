@@ -62,24 +62,32 @@
       b.setAttribute('aria-pressed', String(!!f && (fam ? (f.fam || f.nome) === fam : f.id === 'padrao')));
     });
   }
-  let screenAnimation=null;
+  // Ajustes é uma tela real do fluxo do documento, não uma camada fixa.
+  function switchScreen(show, animate=true){
+    const update=()=>{
+      screen.hidden=!show;
+      document.body.classList.toggle('cfg-open',show);
+      $cfg('cfgOpen').classList.toggle('on',show);
+      if(show)showPage('home',false);
+      window.scrollTo(0,0);
+    };
+    if(!animate || motionOff() || !document.startViewTransition){update();return;}
+    const root=document.documentElement;
+    root.dataset.navDirection=show?'forward':'back';
+    try{
+      const transition=document.startViewTransition(update);
+      transition.finished.finally(()=>{delete root.dataset.navDirection;}).catch(()=>{});
+    }catch(e){delete root.dataset.navDirection;update();}
+  }
   function open(push=true){
     if(push && location.pathname!=='/configuracoes')history.pushState({configuracoes:true},'','/configuracoes');
-    const wasHidden=screen.hidden;
-    if(screenAnimation){screenAnimation.cancel();screenAnimation=null;}
-    screen.hidden=false;document.body.classList.add('cfg-open');$cfg('cfgOpen').classList.add('on');showPage('home',false);
-    if(wasHidden && !motionOff()){
-      screenAnimation=screen.animate([{transform:'translate3d(100%,0,0)',opacity:.95},{transform:'translate3d(0,0,0)',opacity:1}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)'});
-    }
+    if(!screen.hidden){showPage('home',false);return;}
+    switchScreen(true);
   }
-  function close(){
+  function close(animate=true){
     ++transitionId;stopAnimations();
-    if(screenAnimation){screenAnimation.cancel();screenAnimation=null;}
-    document.body.classList.remove('cfg-open');$cfg('cfgOpen').classList.remove('on');
-    if(motionOff()||screen.hidden){screen.hidden=true;return;}
-    screenAnimation=screen.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d(100%,0,0)',opacity:.95}],{duration:360,easing:'cubic-bezier(.4,0,.2,1)'});
-    const closing=screenAnimation;
-    closing.finished.then(()=>{if(screenAnimation===closing){screen.hidden=true;screenAnimation=null;}}).catch(()=>{});
+    if(screen.hidden)return;
+    switchScreen(false,animate);
   }
   function back(){
     if(page==='fontes'){showPage('aparencia');return;}
@@ -92,7 +100,7 @@
   $cfg('cfgFontOpen').addEventListener('click', () => showPage('fontes'));
   $cfg('cfgIdiomas').addEventListener('click', e => { const b=e.target.closest('[data-cfg-lang]'); if (!b) return; const original=document.querySelector('#langMenu [data-l="'+b.dataset.cfgLang+'"]'); if (original) original.click(); refresh(); });
   $cfg('cfgOpen').addEventListener('click', () => open());
-  document.querySelectorAll('#bnav button:not(#cfgOpen)').forEach(b => b.addEventListener('click', () => { if (!screen.hidden) close(); }));
+  document.querySelectorAll('#bnav button:not(#cfgOpen)').forEach(b => b.addEventListener('click', () => { if (!screen.hidden) close(false); }));
   $cfg('cfgTemas').addEventListener('click', e => {
     const b = e.target.closest('[data-cfg-tema]'); if (!b) return;
     aplicarTema(b.dataset.cfgTema); refresh();
