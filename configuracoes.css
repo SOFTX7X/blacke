@@ -187,3 +187,16 @@ main>.cfg-screen.bl-page .cfg-shell{max-width:680px}
 .cfg-pages>.cfg-page{position:relative!important;inset:auto!important;width:100%!important;transform:none;opacity:1;z-index:auto!important;min-height:100%;background:var(--panel)}
 .cfg-pages>.cfg-page[hidden]{display:none!important}
 .cfg-page.cfg-enter,.cfg-page.cfg-leave,.cfg-page.cfg-enter-back,.cfg-page.cfg-leave-back{animation:none!important}
+
+/* Ajustes compacto: sem faixa clara no topo, cabeçalho só nas subpáginas */
+.cfg-head[hidden],.cfg-back[hidden]{display:none!important}
+main>.cfg-screen.bl-page{padding-top:0!important}
+.cfg-shell{background:var(--bg)!important}
+.cfg-head{position:relative;top:auto;min-height:54px;padding:7px 16px!important;background:var(--bg)!important;border-bottom:0!important}
+.cfg-head h1{font-size:18px}
+.cfg-pages{min-height:calc(100dvh - 110px)}
+.cfg-pages>.cfg-page{background:var(--bg)!important}
+.cfg-list{background:transparent}
+.cfg-section{padding-top:12px}
+.cfg-profile{padding-top:20px}
+@media(max-width:600px){.cfg-head{padding:6px 12px!important}.cfg-section{padding-top:10px}}
