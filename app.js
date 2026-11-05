@@ -846,6 +846,11 @@ function trocarAba(aba, semHistorico, manterPerfil){
   }
 }
 async function trocarAbaCore(aba, semHistorico, manterPerfil){
+  // Fechar Ajustes antes de atualizar a aba, inclusive em navegação desktop e histórico.
+  if(document.body.classList.contains('cfg-open')){
+    if(typeof window.BLCloseSettings==='function')window.BLCloseSettings();
+    else {document.body.classList.remove('cfg-open');document.getElementById('cfgOpen')?.classList.remove('on');}
+  }
   if (aba === 'destaques') aba = 'mural';   // Destaques saiu do menu: o Mural já abre em "Em alta"
   if (!semHistorico) irUrl(rotaDe(aba), { aba });
   if (!manterPerfil && document.body.classList.contains('modo-perfil')){
