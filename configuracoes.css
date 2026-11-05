@@ -200,3 +200,12 @@ main>.cfg-screen.bl-page{padding-top:0!important}
 .cfg-section{padding-top:12px}
 .cfg-profile{padding-top:20px}
 @media(max-width:600px){.cfg-head{padding:6px 12px!important}.cfg-section{padding-top:10px}}
+
+/* Cabeçalho de perfil de Ajustes, centralizado como referência móvel */
+#cfgHome .cfg-profile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px 18px 28px;border-bottom:0;background:transparent}
+#cfgHome .cfg-avatar{width:112px;height:112px;font-size:42px;border-radius:50%;margin:0 auto;flex:none}
+#cfgHome .cfg-profile>div:last-child{width:100%;min-width:0}
+#cfgHome .cfg-profile strong{font-size:25px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+#cfgHome .cfg-profile small{margin-top:7px;font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+#cfgHome .cfg-list{padding-top:0}
+@media(min-width:601px){#cfgHome .cfg-profile{padding-top:32px;padding-bottom:32px}#cfgHome .cfg-avatar{width:124px;height:124px}}
