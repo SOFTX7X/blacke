@@ -257,3 +257,16 @@ body.cfg-open #cfgScreen:has(#cfgHeader:not([hidden])) #cfgPages{
 }
 /* Sem animações entre opções de Ajustes em qualquer tamanho */
 #cfgScreen .cfg-page,#cfgScreen .cfg-head{animation:none!important;transition:none!important}
+
+/* Rolagem natural: somente quando o conteúdo ultrapassa a área disponível. */
+body.cfg-open{overflow-y:auto}
+body.cfg-open main>.cfg-screen.bl-page{min-height:0!important;height:auto!important}
+body.cfg-open #cfgScreen .cfg-shell{min-height:0!important;height:auto!important}
+body.cfg-open #cfgScreen #cfgPages{min-height:0!important;height:auto!important}
+body.cfg-open #cfgScreen .cfg-page:not([hidden]){min-height:0!important;height:auto!important}
+@media(min-width:900px){
+  /* No PC, filtros do Mural acompanham a rolagem normal. */
+  .toolbar.fixa{position:static!important;top:auto!important;z-index:auto!important;animation:none!important;transform:none!important;background:transparent!important;border-bottom:0!important}
+  body.barra-fixa .toolbar{position:static!important}
+  body.cfg-open #cfgScreen #cfgHeader:not([hidden]){position:sticky!important}
+}
