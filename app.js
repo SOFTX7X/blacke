@@ -853,7 +853,7 @@ async function trocarAbaCore(aba, semHistorico, manterPerfil){
     modoPerfil(false); S.busca = ''; $('busca').value = '';
   }
   if (aba !== 'chat'){ clearInterval(CH.t); document.body.classList.remove('ch-aberto'); }
-  S.aba = aba; document.body.dataset.aba = aba; setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
+  S.aba = aba; document.body.dataset.aba = aba; if(window.BLPages)window.BLPages.show(aba); setTimeout(desenharAviso, 0); if (aba === 'meus') carregarAviso(); setTimeout(atualizarTitulo, 0); setTimeout(desenharRanking, 0);
   if (aba !== 'mural') $('perfilBox').hidden = true;   // o perfil de outra pessoa não fica junto com o meu
   $('tabMural').classList.toggle('on', aba === 'mural'); $('tabMeus').classList.toggle('on', aba === 'meus'); $('tabDest').classList.toggle('on', aba === 'destaques'); $('tabUsr').classList.toggle('on', aba === 'usuarios');
   document.querySelectorAll('#bnav [data-nav]').forEach(x => x.classList.toggle('on', x.dataset.nav === aba));
