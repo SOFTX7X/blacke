@@ -7,32 +7,38 @@
   const safeText = (el, value) => { el.textContent = String(value || ''); };
   const pages = {home:'cfgHome',aparencia:'cfgAppearance',fontes:'cfgFontPage',idioma:'cfgLanguage'};
   const titles = {home:'Configurações',aparencia:'Aparência',fontes:'Fontes',idioma:'Idioma'};
-  let page='home', transitionId=0;
+  let page='home', transitionId=0, activeAnimations=[];
+  const motionOff=() => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function stopAnimations(){
+    activeAnimations.forEach(a => a.cancel());
+    activeAnimations=[];
+    Object.values(pages).forEach(id => { const el=$cfg(id); el.style.removeProperty('position'); el.style.removeProperty('inset'); el.style.removeProperty('width'); el.style.removeProperty('z-index'); });
+  }
   function showPage(next, animate=true){
     next=pages[next] ? next : 'home';
     const previous=page, outgoing=$cfg(pages[previous]), incoming=$cfg(pages[next]);
-    if (previous === next && !incoming.hidden) { refresh(); return; }
+    if(previous===next && !incoming.hidden){refresh();return;}
     const seq=++transitionId;
+    stopAnimations();
     const backwards=(previous==='fontes' && next==='aparencia') || next==='home';
-    document.querySelectorAll('.cfg-page').forEach(el => {
-      el.classList.remove('cfg-enter','cfg-enter-back','cfg-leave','cfg-leave-back');
-      if (el!==outgoing && el!==incoming) el.hidden=true;
-    });
-    const viewport=$cfg('cfgPages');
-    if (viewport) viewport.scrollTop=0;
-    page=next;
-    incoming.hidden=false;
-    safeText($cfg('cfgTitle'),titles[page]);
-    if (animate && !screen.hidden && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && outgoing!==incoming){
-      outgoing.classList.add(backwards?'cfg-leave-back':'cfg-leave');
-      incoming.classList.add(backwards?'cfg-enter-back':'cfg-enter');
-      setTimeout(() => {
-        if (seq!==transitionId) return;
-        outgoing.hidden=true;
-        outgoing.classList.remove('cfg-leave','cfg-leave-back');
-        incoming.classList.remove('cfg-enter','cfg-enter-back');
-      },410);
-    } else if(outgoing!==incoming) outgoing.hidden=true;
+    Object.entries(pages).forEach(([key,id])=>{if(key!==previous && key!==next)$cfg(id).hidden=true;});
+    page=next; incoming.hidden=false;
+    safeText($cfg('cfgTitle'),titles[next]);
+    if(animate && !screen.hidden && !motionOff() && outgoing!==incoming){
+      const container=$cfg('cfgPages');
+      container.style.minHeight=Math.max(outgoing.scrollHeight,incoming.scrollHeight,container.clientHeight)+'px';
+      for(const el of [outgoing,incoming]){el.style.position='absolute';el.style.inset='0 auto auto 0';el.style.width='100%';}
+      incoming.style.zIndex='2';outgoing.style.zIndex='1';
+      const timing={duration:520,easing:'cubic-bezier(.22, 1, .36, 1)',fill:'both'};
+      const from=backwards?'-100%':'100%', to=backwards?'30%':'-30%';
+      const incomingAnim=incoming.animate([{transform:'translate3d('+from+',0,0)',opacity:.92},{transform:'translate3d(0,0,0)',opacity:1}],timing);
+      const outgoingAnim=outgoing.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d('+to+',0,0)',opacity:.65}],timing);
+      activeAnimations=[incomingAnim,outgoingAnim];
+      incomingAnim.finished.then(()=>{
+        if(seq!==transitionId)return;
+        stopAnimations();outgoing.hidden=true;container.style.removeProperty('min-height');
+      }).catch(()=>{});
+    }else{if(outgoing!==incoming)outgoing.hidden=true;}
     refresh();
   }
   function refresh(){
@@ -56,19 +62,30 @@
       b.setAttribute('aria-pressed', String(!!f && (fam ? (f.fam || f.nome) === fam : f.id === 'padrao')));
     });
   }
+  let screenAnimation=null;
   function open(push=true){
-    if (push && location.pathname !== '/configuracoes') history.pushState({configuracoes:true}, '', '/configuracoes');
-    screen.hidden = false; document.body.classList.add('cfg-open'); $cfg('cfgOpen').classList.add('on'); showPage('home',false);
+    if(push && location.pathname!=='/configuracoes')history.pushState({configuracoes:true},'','/configuracoes');
+    const wasHidden=screen.hidden;
+    if(screenAnimation){screenAnimation.cancel();screenAnimation=null;}
+    screen.hidden=false;document.body.classList.add('cfg-open');$cfg('cfgOpen').classList.add('on');showPage('home',false);
+    if(wasHidden && !motionOff()){
+      screenAnimation=screen.animate([{transform:'translate3d(100%,0,0)',opacity:.95},{transform:'translate3d(0,0,0)',opacity:1}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)'});
+    }
   }
   function close(){
-    ++transitionId; screen.hidden = true; document.body.classList.remove('cfg-open'); $cfg('cfgOpen').classList.remove('on');
-    document.querySelectorAll('.cfg-page').forEach(el => { el.hidden=el.id!==pages[page]; el.classList.remove('cfg-enter','cfg-enter-back','cfg-leave','cfg-leave-back'); });
+    ++transitionId;stopAnimations();
+    if(screenAnimation){screenAnimation.cancel();screenAnimation=null;}
+    document.body.classList.remove('cfg-open');$cfg('cfgOpen').classList.remove('on');
+    if(motionOff()||screen.hidden){screen.hidden=true;return;}
+    screenAnimation=screen.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d(100%,0,0)',opacity:.95}],{duration:360,easing:'cubic-bezier(.4,0,.2,1)'});
+    const closing=screenAnimation;
+    closing.finished.then(()=>{if(screenAnimation===closing){screen.hidden=true;screenAnimation=null;}}).catch(()=>{});
   }
   function back(){
-    if (page === 'fontes') { showPage('aparencia'); return; }
-    if (page !== 'home') { showPage('home'); return; }
-    if (location.pathname === '/configuracoes' && history.state && history.state.configuracoes) history.back();
-    else { history.replaceState({aba:'meus'}, '', '/conta'); close(); if (typeof trocarAba === 'function') trocarAba('meus',true); }
+    if(page==='fontes'){showPage('aparencia');return;}
+    if(page!=='home'){showPage('home');return;}
+    if(location.pathname==='/configuracoes' && history.state && history.state.configuracoes)history.back();
+    else{history.replaceState({aba:'meus'},'','/conta');close();if(typeof trocarAba==='function')trocarAba('meus',true);}
   }
   $cfg('cfgBack').addEventListener('click', back);
   $cfg('cfgHome').addEventListener('click', e => { const b=e.target.closest('[data-cfg-page]'); if (b) showPage(b.dataset.cfgPage); });
