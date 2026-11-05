@@ -7,38 +7,41 @@
   const safeText = (el, value) => { el.textContent = String(value || ''); };
   const pages = {home:'cfgHome',aparencia:'cfgAppearance',fontes:'cfgFontPage',idioma:'cfgLanguage'};
   const titles = {home:'Configurações',aparencia:'Aparência',fontes:'Fontes',idioma:'Idioma'};
-  let page='home', transitionId=0, activeAnimations=[];
+  let page='home';
   const motionOff=() => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function stopAnimations(){
-    activeAnimations.forEach(a => a.cancel());
-    activeAnimations=[];
-    Object.values(pages).forEach(id => { const el=$cfg(id); el.style.removeProperty('position'); el.style.removeProperty('inset'); el.style.removeProperty('width'); el.style.removeProperty('z-index'); });
+    Object.values(pages).forEach(id=>{
+      const el=$cfg(id);
+      el.getAnimations().forEach(a=>a.cancel());
+      el.style.removeProperty('position');
+      el.style.removeProperty('inset');
+      el.style.removeProperty('width');
+      el.style.removeProperty('z-index');
+      el.style.removeProperty('transform');
+      el.style.removeProperty('opacity');
+    });
+    $cfg('cfgPages').style.removeProperty('min-height');
   }
   function showPage(next, animate=true){
     next=pages[next] ? next : 'home';
-    const previous=page, outgoing=$cfg(pages[previous]), incoming=$cfg(pages[next]);
-    if(previous===next && !incoming.hidden){refresh();return;}
-    const seq=++transitionId;
+    const previous=page;
     stopAnimations();
-    const backwards=(previous==='fontes' && next==='aparencia') || next==='home';
-    Object.entries(pages).forEach(([key,id])=>{if(key!==previous && key!==next)$cfg(id).hidden=true;});
-    page=next; incoming.hidden=false;
+    page=next;
+    // A página anterior é removida antes da animação: nenhuma sobra fica visível.
+    Object.entries(pages).forEach(([key,id])=>{
+      const el=$cfg(id);
+      el.hidden=key!==next;
+      el.setAttribute('aria-hidden',String(key!==next));
+    });
     safeText($cfg('cfgTitle'),titles[next]);
-    if(animate && !screen.hidden && !motionOff() && outgoing!==incoming){
-      const container=$cfg('cfgPages');
-      container.style.minHeight=Math.max(outgoing.scrollHeight,incoming.scrollHeight,container.clientHeight)+'px';
-      for(const el of [outgoing,incoming]){el.style.position='absolute';el.style.inset='0 auto auto 0';el.style.width='100%';}
-      incoming.style.zIndex='2';outgoing.style.zIndex='1';
-      const timing={duration:520,easing:'cubic-bezier(.22, 1, .36, 1)',fill:'both'};
-      const from=backwards?'-100%':'100%', to=backwards?'30%':'-30%';
-      const incomingAnim=incoming.animate([{transform:'translate3d('+from+',0,0)',opacity:1},{transform:'translate3d(0,0,0)',opacity:1}],timing);
-      const outgoingAnim=outgoing.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d('+to+',0,0)',opacity:1}],timing);
-      activeAnimations=[incomingAnim,outgoingAnim];
-      incomingAnim.finished.then(()=>{
-        if(seq!==transitionId)return;
-        stopAnimations();outgoing.hidden=true;container.style.removeProperty('min-height');
-      }).catch(()=>{});
-    }else{if(outgoing!==incoming)outgoing.hidden=true;}
+    const incoming=$cfg(pages[next]);
+    if(animate && previous!==next && !screen.hidden && !motionOff()){
+      const backwards=next==='home'||(previous==='fontes'&&next==='aparencia');
+      incoming.animate([
+        {transform:'translate3d('+(backwards?'-24px':'24px')+',0,0)'},
+        {transform:'translate3d(0,0,0)'}
+      ],{duration:280,easing:'cubic-bezier(.22,1,.36,1)'});
+    }
     refresh();
   }
   function refresh(){
@@ -86,7 +89,7 @@
     switchScreen(true);
   }
   function close(animate=true){
-    ++transitionId;stopAnimations();
+    stopAnimations();
     if(screen.hidden)return;
     switchScreen(false,animate);
   }
