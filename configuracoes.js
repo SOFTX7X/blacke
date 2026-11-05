@@ -101,6 +101,7 @@
     if(location.pathname==='/configuracoes' && history.state && history.state.configuracoes)history.back();
     else{history.replaceState({aba:'meus'},'','/conta');close();if(typeof trocarAba==='function')trocarAba('meus',true);}
   }
+  window.BLCloseSettings=()=>close(false);
   $cfg('cfgBack').addEventListener('click', back);
   $cfg('cfgHome').addEventListener('click', e => { const b=e.target.closest('[data-cfg-page]'); if (b) showPage(b.dataset.cfgPage); });
   $cfg('cfgFontOpen').addEventListener('click', () => showPage('fontes'));
