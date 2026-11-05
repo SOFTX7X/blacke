@@ -34,6 +34,8 @@
       el.setAttribute('aria-hidden',String(key!==next));
     });
     safeText($cfg('cfgTitle'),titles[next]);
+    $cfg('cfgBack').hidden=next==='home';
+    $cfg('cfgHeader').hidden=next==='home';
     const incoming=$cfg(pages[next]);
     if(animate && previous!==next && !screen.hidden && !motionOff()){
       const backwards=next==='home'||(previous==='fontes'&&next==='aparencia');
