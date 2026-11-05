@@ -8,7 +8,7 @@
   const pages = {home:'cfgHome',aparencia:'cfgAppearance',fontes:'cfgFontPage',idioma:'cfgLanguage'};
   const titles = {home:'Configurações',aparencia:'Aparência',fontes:'Fontes',idioma:'Idioma'};
   let page='home';
-  const motionOff=() => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionOff=() => true; // Subpáginas de Ajustes sem animações.
   function stopAnimations(){
     Object.values(pages).forEach(id=>{
       const el=$cfg(id);
