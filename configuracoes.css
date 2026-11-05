@@ -270,3 +270,21 @@ body.cfg-open #cfgScreen .cfg-page:not([hidden]){min-height:0!important;height:a
   body.barra-fixa .toolbar{position:static!important}
   body.cfg-open #cfgScreen #cfgHeader:not([hidden]){position:sticky!important}
 }
+
+/* Ajustes: remover as duas reservas de rodapé somadas (body + tela).
+   A barra de navegação é fixa e não precisa aumentar a altura do documento. */
+body.cfg-open{padding-bottom:0!important;min-height:100dvh;overflow-y:auto!important}
+body.cfg-open>main{flex:0 0 auto!important;min-height:0!important;padding-bottom:0!important}
+body.cfg-open main>.cfg-screen.bl-page{
+  padding-bottom:0!important;
+  margin-bottom:0!important;
+  min-height:0!important;
+  height:auto!important;
+}
+body.cfg-open #cfgScreen .cfg-shell,
+body.cfg-open #cfgScreen #cfgPages,
+body.cfg-open #cfgScreen .cfg-page:not([hidden]){
+  min-height:0!important;
+  height:auto!important;
+  padding-bottom:0;
+}
