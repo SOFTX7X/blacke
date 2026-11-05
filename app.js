@@ -826,7 +826,7 @@ function desenharMeus(){
 }
 
 function trocarAba(aba, semHistorico, manterPerfil){
-  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
   const order=['mural','usuarios','chat','publicar','meus'];
   const oldIndex=order.indexOf(S.aba), newIndex=order.indexOf(aba);
   const changing=oldIndex!==newIndex && oldIndex>=0 && newIndex>=0;
