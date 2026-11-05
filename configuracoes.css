@@ -167,3 +167,17 @@ html.claro .cfg-screen{background:#f4f5fa}
 @keyframes bl-page-in-right{from{transform:translate3d(100%,0,0)}}
 @keyframes bl-page-out-right{to{transform:translate3d(100%,0,0)}}
 @keyframes bl-page-in-left{from{transform:translate3d(-100%,0,0)}}
+
+/* Estrutura de telas independentes: somente a tela ativa ocupa o documento */
+.bl-page[hidden]{display:none!important}
+.bl-page{display:block;position:relative;min-width:0;width:100%;min-height:calc(100dvh - 120px);background:var(--bg,#10111c)}
+main[data-active-page="configuracoes"]{max-width:none!important;padding:0!important;width:100%!important}
+body.cfg-open>main{display:block!important}
+body.cfg-open main>.bl-page:not([data-page="configuracoes"]){display:none!important}
+main>.cfg-screen.bl-page{width:100%;max-width:none!important;min-height:100dvh}
+main>.cfg-screen.bl-page .cfg-shell{max-width:680px}
+@media(min-width:900px){main>.cfg-screen.bl-page{padding-left:0}}
+@media(prefers-reduced-motion:no-preference){
+  html[data-nav-direction]::view-transition-old(root),
+  html[data-nav-direction]::view-transition-new(root){opacity:1!important}
+}

@@ -31,8 +31,8 @@
       incoming.style.zIndex='2';outgoing.style.zIndex='1';
       const timing={duration:520,easing:'cubic-bezier(.22, 1, .36, 1)',fill:'both'};
       const from=backwards?'-100%':'100%', to=backwards?'30%':'-30%';
-      const incomingAnim=incoming.animate([{transform:'translate3d('+from+',0,0)',opacity:.92},{transform:'translate3d(0,0,0)',opacity:1}],timing);
-      const outgoingAnim=outgoing.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d('+to+',0,0)',opacity:.65}],timing);
+      const incomingAnim=incoming.animate([{transform:'translate3d('+from+',0,0)',opacity:1},{transform:'translate3d(0,0,0)',opacity:1}],timing);
+      const outgoingAnim=outgoing.animate([{transform:'translate3d(0,0,0)',opacity:1},{transform:'translate3d('+to+',0,0)',opacity:1}],timing);
       activeAnimations=[incomingAnim,outgoingAnim];
       incomingAnim.finished.then(()=>{
         if(seq!==transitionId)return;
@@ -65,7 +65,8 @@
   // Ajustes é uma tela real do fluxo do documento, não uma camada fixa.
   function switchScreen(show, animate=true){
     const update=()=>{
-      screen.hidden=!show;
+      if(window.BLPages)window.BLPages.show(show?'configuracoes':(typeof S!=='undefined'?S.aba:'mural'));
+      else screen.hidden=!show;
       document.body.classList.toggle('cfg-open',show);
       $cfg('cfgOpen').classList.toggle('on',show);
       if(show)showPage('home',false);
