@@ -239,3 +239,21 @@ body.cfg-open #cfgScreen:has(#cfgHeader:not([hidden])) #cfgPages{
     width:calc(100% - 84px);
   }
 }
+
+/* Desktop: restaurar o fluxo e a aparência anteriores à divisão das telas.
+   Os wrappers não interferem no grid nem nos espaçamentos do main. */
+@media(min-width:900px){
+  main>.bl-page:not([hidden]):not(.cfg-screen){display:contents!important}
+  main>.bl-page[hidden]{display:none!important}
+  main[data-active-page="configuracoes"]>.bl-page:not(.cfg-screen){display:none!important}
+  body.cfg-open main>.cfg-screen.bl-page{display:block!important;position:relative!important;background:var(--bg)!important}
+  body.cfg-open main>.cfg-screen.bl-page .cfg-shell{margin:0 auto!important}
+  body.cfg-open #cfgScreen #cfgHeader:not([hidden]){position:sticky!important;top:0!important;left:auto!important;width:100%!important}
+  body.cfg-open #cfgScreen:has(#cfgHeader:not([hidden])) #cfgPages{padding-top:0!important}
+  .cfg-screen,.cfg-page,.cfg-head{animation:none!important;transition:none!important}
+  .cfg-page{transform:none!important}
+  html[data-nav-direction]::view-transition-old(root),
+  html[data-nav-direction]::view-transition-new(root){animation:none!important}
+}
+/* Sem animações entre opções de Ajustes em qualquer tamanho */
+#cfgScreen .cfg-page,#cfgScreen .cfg-head{animation:none!important;transition:none!important}
