@@ -107,3 +107,18 @@ body[data-aba="meus"] .cfg-entry{display:block}
 @media(prefers-reduced-motion:reduce){.cfg-page{animation:none!important}}
 
 .cfg-pages{position:relative;min-height:calc(100dvh - 160px)}
+
+/* Transição lateral contínua: páginas sobrepostas, sem salto de layout */
+.cfg-pages{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100dvh - 160px)}
+.cfg-page.cfg-enter,.cfg-page.cfg-enter-back,.cfg-page.cfg-leave,.cfg-page.cfg-leave-back{position:absolute;inset:0 auto auto 0;width:100%;min-height:100%;will-change:transform,opacity;backface-visibility:hidden}
+.cfg-page.cfg-enter,.cfg-page.cfg-enter-back{z-index:2;background:var(--panel);box-shadow:-12px 0 32px rgba(0,0,0,.12)}
+.cfg-page.cfg-leave,.cfg-page.cfg-leave-back{z-index:1}
+.cfg-page.cfg-enter{animation:cfg-slide-in .4s cubic-bezier(.22,1,.36,1) both}
+.cfg-page.cfg-leave{animation:cfg-slide-out .4s cubic-bezier(.22,1,.36,1) both}
+.cfg-page.cfg-enter-back{animation:cfg-slide-back-in .4s cubic-bezier(.22,1,.36,1) both}
+.cfg-page.cfg-leave-back{animation:cfg-slide-back-out .4s cubic-bezier(.22,1,.36,1) both}
+@keyframes cfg-slide-in{from{transform:translate3d(100%,0,0);opacity:.88}to{transform:translate3d(0,0,0);opacity:1}}
+@keyframes cfg-slide-out{from{transform:translate3d(0,0,0);opacity:1}to{transform:translate3d(-28%,0,0);opacity:.75}}
+@keyframes cfg-slide-back-in{from{transform:translate3d(-28%,0,0);opacity:.75}to{transform:translate3d(0,0,0);opacity:1}}
+@keyframes cfg-slide-back-out{from{transform:translate3d(0,0,0);opacity:1}to{transform:translate3d(100%,0,0);opacity:.88}}
+@media(prefers-reduced-motion:reduce){.cfg-page.cfg-enter,.cfg-page.cfg-enter-back,.cfg-page.cfg-leave,.cfg-page.cfg-leave-back{animation:none!important;will-change:auto}}
