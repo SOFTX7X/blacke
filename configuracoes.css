@@ -215,3 +215,27 @@ body.cfg-open::before{display:none!important;content:none!important}
 #cfgScreen .cfg-head:not([hidden]){display:flex!important;visibility:visible;opacity:1;position:relative;z-index:3}
 #cfgScreen .cfg-back:not([hidden]){display:inline-flex!important;align-items:center;justify-content:center;visibility:visible;opacity:1}
 #cfgScreen .cfg-head[hidden],#cfgScreen .cfg-back[hidden]{display:none!important}
+
+/* Cabeçalho persistente somente nas subpáginas de Ajustes.
+   Fixed evita o corte causado pelos ancestrais com overflow:hidden. */
+body.cfg-open #cfgScreen #cfgHeader:not([hidden]){
+  position:fixed!important;
+  top:0!important;
+  left:0;
+  right:0;
+  width:100%;
+  z-index:28!important;
+  min-height:56px;
+  background:var(--bg)!important;
+  border-bottom:1px solid var(--line)!important;
+  padding-top:env(safe-area-inset-top)!important;
+}
+body.cfg-open #cfgScreen:has(#cfgHeader:not([hidden])) #cfgPages{
+  padding-top:calc(56px + env(safe-area-inset-top));
+}
+@media(min-width:900px){
+  body.cfg-open #cfgScreen #cfgHeader:not([hidden]){
+    left:84px;
+    width:calc(100% - 84px);
+  }
+}
