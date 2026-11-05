@@ -2501,22 +2501,7 @@ addEventListener('load', () => setTimeout(() => document.documentElement.classLi
 
 
 /* PC: ao rolar, busca + categorias ficam fixas logo abaixo do topo */
-(() => {
-  const hero = document.querySelector('.hero'), bar = document.querySelector('.toolbar'), sb = $('searchbar');
-  if (!hero || !bar || !sb || !('IntersectionObserver' in window)) return;
-  const pc = matchMedia('(min-width:900px)'), lar = sb.parentNode, prox = sb.nextSibling;
-  const ajustarTopo = () => { const t = document.querySelector('.topbar'); document.documentElement.style.setProperty('--topo', (t ? Math.round(t.getBoundingClientRect().height + 14) : 60) + 'px'); };
-  ajustarTopo(); addEventListener('resize', ajustarTopo);
-  let fixo = false;
-  const aplicar = on => {
-    on = on && pc.matches && S.aba === 'mural' && !document.body.classList.contains('modo-perfil');
-    if (on === fixo) return; fixo = on;
-    bar.classList.toggle('fixa', on); document.body.classList.toggle('barra-fixa', on);
-  };
-  new IntersectionObserver(([e]) => aplicar(!e.isIntersecting && e.boundingClientRect.top < 0), { rootMargin:'-70px 0px 0px 0px' }).observe(hero);
-  pc.addEventListener('change', () => aplicar(false));
-  document.addEventListener('click', e => { if (e.target.closest('#bnav')) setTimeout(() => aplicar(scrollY > hero.offsetTop + hero.offsetHeight), 50); });
-})();
+/* Filtros do Mural: fluxo normal, sem observador de fixação no desktop. */
 
 
 /* Cabeçalho em bolha: ícone de busca à esquerda, marca no centro, idioma à direita */
