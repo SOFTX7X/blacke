@@ -1790,6 +1790,7 @@ async function abrirSitePorId(id){
 }
 function rotear(){
   const p = location.pathname.replace(/\/+$/, '') || '/';
+  if (p === '/configuracoes') return;
   const ms = p.match(/^\/s\/(\d{1,12})$/), mp = p.match(/^\/@([a-z0-9_]{3,30})$/i);
   if (!ms) fecharFicha(false);
   if (mp){
