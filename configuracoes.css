@@ -45,3 +45,12 @@ body[data-aba="meus"] .cfg-entry{display:block}
 .cfg-fonts button>small{margin-right:auto}
 .cfg-note{padding:0 14px}
 .cfg-subrow>span{flex:1}
+
+/* Configurações integra a navegação principal, sem botão no perfil */
+.cfg-entry{display:none!important}
+@media(max-width:899px){
+  .bnav{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .bnav .bn-config span{font-size:clamp(7px,1.9vw,10px)}
+  .bnav .bn-config svg{flex:none}
+}
+.bnav .bn-config.on{background:rgba(123,108,255,.22);color:#a99bff}

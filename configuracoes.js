@@ -37,10 +37,10 @@
   }
   function open(push=true){
     if (push && location.pathname !== '/configuracoes') history.pushState({configuracoes:true}, '', '/configuracoes');
-    screen.hidden = false; document.body.classList.add('cfg-open'); showPage('home');
+    screen.hidden = false; document.body.classList.add('cfg-open'); $cfg('cfgOpen').classList.add('on'); showPage('home');
   }
   function close(){
-    screen.hidden = true; document.body.classList.remove('cfg-open');
+    screen.hidden = true; document.body.classList.remove('cfg-open'); $cfg('cfgOpen').classList.remove('on');
   }
   function back(){
     if (page === 'fontes') { showPage('aparencia'); return; }
