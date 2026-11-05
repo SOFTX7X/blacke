@@ -70,3 +70,40 @@ body[data-aba="meus"] .cfg-entry{display:block}
   .bnav button>span:not(.bn-av):not(.bn-n),.bnav .bn-config span{font-size:9px}
   .bnav button>svg,.bnav .bn-config svg{width:21px;height:21px}
 }
+
+/* Ajustes permanece selecionado e barra principal visível */
+.top-actions .lang[hidden]{display:none!important}
+.cfg-screen{z-index:30}
+@media(max-width:899px){
+  .cfg-screen{bottom:calc(76px + env(safe-area-inset-bottom));}
+  body.cfg-open .bnav{z-index:40}
+  body.cfg-open .bnav button.on:not(.bn-config){background:transparent;box-shadow:none;color:var(--muted)}
+  body.cfg-open .bnav button.on:not(.bn-config) svg{fill:none;color:inherit}
+  body.cfg-open .bnav .bn-config.on{background:rgba(123,108,255,.22);color:#a99bff}
+}
+@media(min-width:900px){
+  .cfg-screen{left:84px;z-index:30}
+  body.cfg-open .bnav{z-index:40}
+  body.cfg-open .bnav button.on:not(.bn-config){background:transparent;box-shadow:none;color:#b9bedc}
+  body.cfg-open .bnav button.on:not(.bn-config)::before{display:none}
+}
+.cfg-list>.cfg-link{display:flex;align-items:center;gap:17px;width:100%;min-height:62px;padding:12px 14px;border:0;border-radius:12px;color:var(--text);text-decoration:none;font:inherit}
+.cfg-list>.cfg-link:hover{background:rgba(123,108,255,.09)}
+.cfg-list>.cfg-link>i:first-child{width:28px;font-size:19px;color:#8c83fa;text-align:center}
+.cfg-list>.cfg-link>span{display:flex;flex:1;flex-direction:column;gap:4px}
+.cfg-list>.cfg-link>i:last-child{margin-left:auto;color:var(--muted);font-size:12px}
+.cfg-shell{overflow:hidden}
+.cfg-page{transform:translateX(0)}
+.cfg-page.cfg-leave,.cfg-page.cfg-leave-back{position:absolute;left:0;right:0;top:0;pointer-events:none}
+.cfg-shell{position:relative}
+.cfg-page.cfg-enter{animation:cfg-slide-in .23s ease-out both}
+.cfg-page.cfg-leave{animation:cfg-slide-out .23s ease-in both}
+.cfg-page.cfg-enter-back{animation:cfg-slide-back-in .23s ease-out both}
+.cfg-page.cfg-leave-back{animation:cfg-slide-back-out .23s ease-in both}
+@keyframes cfg-slide-in{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes cfg-slide-out{from{transform:translateX(0)}to{transform:translateX(-35%)}}
+@keyframes cfg-slide-back-in{from{transform:translateX(-35%)}to{transform:translateX(0)}}
+@keyframes cfg-slide-back-out{from{transform:translateX(0)}to{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.cfg-page{animation:none!important}}
+
+.cfg-pages{position:relative;min-height:calc(100dvh - 160px)}

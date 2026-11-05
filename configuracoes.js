@@ -7,11 +7,30 @@
   const safeText = (el, value) => { el.textContent = String(value || ''); };
   const pages = {home:'cfgHome',aparencia:'cfgAppearance',fontes:'cfgFontPage',idioma:'cfgLanguage'};
   const titles = {home:'Configurações',aparencia:'Aparência',fontes:'Fontes',idioma:'Idioma'};
-  let page='home';
-  function showPage(next){
-    page=pages[next] ? next : 'home';
-    Object.entries(pages).forEach(([key,id]) => { $cfg(id).hidden=key!==page; });
+  let page='home', transitionId=0;
+  function showPage(next, animate=true){
+    next=pages[next] ? next : 'home';
+    const previous=page, outgoing=$cfg(pages[previous]), incoming=$cfg(pages[next]);
+    if (previous === next && !incoming.hidden) { refresh(); return; }
+    const seq=++transitionId;
+    const backwards=(previous==='fontes' && next==='aparencia') || next==='home';
+    document.querySelectorAll('.cfg-page').forEach(el => {
+      el.classList.remove('cfg-enter','cfg-enter-back','cfg-leave','cfg-leave-back');
+      if (el!==outgoing && el!==incoming) el.hidden=true;
+    });
+    page=next;
+    incoming.hidden=false;
     safeText($cfg('cfgTitle'),titles[page]);
+    if (animate && !screen.hidden && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && outgoing!==incoming){
+      outgoing.classList.add(backwards?'cfg-leave-back':'cfg-leave');
+      incoming.classList.add(backwards?'cfg-enter-back':'cfg-enter');
+      setTimeout(() => {
+        if (seq!==transitionId) return;
+        outgoing.hidden=true;
+        outgoing.classList.remove('cfg-leave','cfg-leave-back');
+        incoming.classList.remove('cfg-enter','cfg-enter-back');
+      },240);
+    } else if(outgoing!==incoming) outgoing.hidden=true;
     refresh();
   }
   function refresh(){
@@ -37,10 +56,11 @@
   }
   function open(push=true){
     if (push && location.pathname !== '/configuracoes') history.pushState({configuracoes:true}, '', '/configuracoes');
-    screen.hidden = false; document.body.classList.add('cfg-open'); $cfg('cfgOpen').classList.add('on'); showPage('home');
+    screen.hidden = false; document.body.classList.add('cfg-open'); $cfg('cfgOpen').classList.add('on'); showPage('home',false);
   }
   function close(){
-    screen.hidden = true; document.body.classList.remove('cfg-open'); $cfg('cfgOpen').classList.remove('on');
+    ++transitionId; screen.hidden = true; document.body.classList.remove('cfg-open'); $cfg('cfgOpen').classList.remove('on');
+    document.querySelectorAll('.cfg-page').forEach(el => { el.hidden=el.id!==pages[page]; el.classList.remove('cfg-enter','cfg-enter-back','cfg-leave','cfg-leave-back'); });
   }
   function back(){
     if (page === 'fontes') { showPage('aparencia'); return; }
@@ -53,6 +73,7 @@
   $cfg('cfgFontOpen').addEventListener('click', () => showPage('fontes'));
   $cfg('cfgIdiomas').addEventListener('click', e => { const b=e.target.closest('[data-cfg-lang]'); if (!b) return; const original=document.querySelector('#langMenu [data-l="'+b.dataset.cfgLang+'"]'); if (original) original.click(); refresh(); });
   $cfg('cfgOpen').addEventListener('click', () => open());
+  document.querySelectorAll('#bnav button:not(#cfgOpen)').forEach(b => b.addEventListener('click', () => { if (!screen.hidden) close(); }));
   $cfg('cfgTemas').addEventListener('click', e => {
     const b = e.target.closest('[data-cfg-tema]'); if (!b) return;
     aplicarTema(b.dataset.cfgTema); refresh();
