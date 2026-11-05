@@ -67,6 +67,7 @@
       b.setAttribute('aria-pressed', String(!!f && (fam ? (f.fam || f.nome) === fam : f.id === 'padrao')));
     });
   }
+  window.addEventListener('bl:perfil-atualizado',refresh);
   // Ajustes é uma tela real do fluxo do documento, não uma camada fixa.
   function switchScreen(show, animate=true){
     const update=()=>{
