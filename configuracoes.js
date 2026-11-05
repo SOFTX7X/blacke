@@ -18,6 +18,8 @@
       el.classList.remove('cfg-enter','cfg-enter-back','cfg-leave','cfg-leave-back');
       if (el!==outgoing && el!==incoming) el.hidden=true;
     });
+    const viewport=$cfg('cfgPages');
+    if (viewport) viewport.scrollTop=0;
     page=next;
     incoming.hidden=false;
     safeText($cfg('cfgTitle'),titles[page]);
@@ -29,7 +31,7 @@
         outgoing.hidden=true;
         outgoing.classList.remove('cfg-leave','cfg-leave-back');
         incoming.classList.remove('cfg-enter','cfg-enter-back');
-      },240);
+      },410);
     } else if(outgoing!==incoming) outgoing.hidden=true;
     refresh();
   }
