@@ -25,3 +25,23 @@ body.cfg-open{overflow:hidden}
 .cfg-entry{display:none;text-align:center;margin:12px auto 20px;max-width:820px}
 body[data-aba="meus"] .cfg-entry{display:block}
 .cfg-entry button{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+
+/* Navegação por seções compactas */
+.cfg-page[hidden]{display:none!important}
+.cfg-list{display:flex;flex-direction:column;padding:10px 12px;background:var(--panel)}
+.cfg-list>button,.cfg-subrow{display:flex;align-items:center;gap:17px;width:100%;min-height:62px;padding:12px 14px;background:transparent;border:0;border-radius:12px;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.cfg-list>button:hover,.cfg-subrow:hover{background:rgba(123,108,255,.09)}
+.cfg-list>button>i:first-child,.cfg-subrow>i:first-child{width:28px;font-size:19px;color:#8c83fa;text-align:center}
+.cfg-list>button>span{display:flex;flex:1;flex-direction:column;gap:4px}
+.cfg-list strong{font-size:15px;font-weight:600}
+.cfg-list small,.cfg-subrow small{color:var(--muted);font-size:13px}
+.cfg-list>button>i:last-child,.cfg-subrow>i:last-child{margin-left:auto;color:var(--muted);font-size:12px}
+.cfg-select .cfg-check{display:none}
+.cfg-select button[aria-pressed="true"] .cfg-check{display:inline-block;color:#8c83fa}
+.cfg-section{padding:20px 12px;border-bottom:8px solid var(--bg)}
+.cfg-section h2{padding:0 14px;margin:2px 0 6px;color:#8c83fa}
+.cfg-fonts button{display:flex;flex-direction:row;align-items:center;gap:12px}
+.cfg-fonts button>span{flex:1}
+.cfg-fonts button>small{margin-right:auto}
+.cfg-note{padding:0 14px}
+.cfg-subrow>span{flex:1}
