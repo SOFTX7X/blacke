@@ -945,6 +945,7 @@ async function carregarPerfil(){
   try{ const { data } = await _supabase.rpc('meu_perfil', { p_token:S.token }); S.perfil = data || null; }
   catch(_){ S.perfil = null; }
   atualizarPerfilUI();
+  window.dispatchEvent(new Event('bl:perfil-atualizado'));
   if (S.aba === 'meus' && !document.body.classList.contains('modo-perfil')) irUrl(rotaDe('meus'), { aba:'meus' }, true);   // endereço da Conta = @ atual
   // abriu o link do próprio @ antes de o perfil carregar: mostra a Conta
   const h = S.perfil && S.perfil.handle;
