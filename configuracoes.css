@@ -288,3 +288,14 @@ body.cfg-open #cfgScreen .cfg-page:not([hidden]){
   height:auto!important;
   padding-bottom:0;
 }
+
+/* Rolagem segura das listas longas: último item acima da navegação fixa. */
+@media(max-width:899px){
+  body.cfg-open #cfgScreen #cfgFontPage:not([hidden]){
+    padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+    scroll-margin-bottom:calc(112px + env(safe-area-inset-bottom));
+  }
+  body.cfg-open #cfgScreen #cfgFontPage:not([hidden]) #cfgFontes{
+    scroll-padding-bottom:calc(112px + env(safe-area-inset-bottom));
+  }
+}

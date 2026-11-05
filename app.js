@@ -1751,7 +1751,7 @@ document.addEventListener('click', e => {
 const _pubAberto = () => !$('modalCadastro').hidden;
 $('bnav').addEventListener('click', e => { if (_pubAberto() && e.target.closest('.bn-pub')) e.stopPropagation(); }, true);
 document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('click', () => {
-  if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil')) trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
+  if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil') || document.body.classList.contains('cfg-open') || location.pathname === '/configuracoes') trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
 $('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', 'Verificados', 'Selo BLACKE', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c === 'Verificados' ? '✓ Verificados' : c}</button>`).join('');
