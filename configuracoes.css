@@ -105,3 +105,5 @@ body[data-aba="meus"] .cfg-entry{display:block}
 @keyframes cfg-slide-back-in{from{transform:translateX(-35%)}to{transform:translateX(0)}}
 @keyframes cfg-slide-back-out{from{transform:translateX(0)}to{transform:translateX(100%)}}
 @media(prefers-reduced-motion:reduce){.cfg-page{animation:none!important}}
+
+.cfg-pages{position:relative;min-height:calc(100dvh - 160px)}
