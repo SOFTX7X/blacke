@@ -299,3 +299,30 @@ body.cfg-open #cfgScreen .cfg-page:not([hidden]){
     scroll-padding-bottom:20px;
   }
 }
+
+/* Seletor de fontes: rótulos e geometria não herdam a fonte escolhida. */
+#cfgFontPage .cfg-section>h2,
+#cfgFontes [data-cfg-fonte],
+#cfgFontes [data-cfg-fonte]>span{
+  font-family:Arial,Helvetica,sans-serif!important;
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:normal;
+  line-height:1.4;
+}
+#cfgFontes [data-cfg-fonte]{
+  min-height:62px;
+  box-sizing:border-box;
+}
+#cfgFontes [data-cfg-fonte]>span{
+  min-width:0;
+}
+#cfgFontes [data-cfg-fonte]>small{
+  flex:0 0 auto;
+  font-size:13px;
+  line-height:1.4;
+  white-space:nowrap;
+}
+#cfgFontes [data-cfg-fonte="padrao"]>small{
+  font-family:Arial,Helvetica,sans-serif!important;
+}

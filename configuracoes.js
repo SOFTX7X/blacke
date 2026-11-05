@@ -118,7 +118,8 @@
     const b = document.createElement('button'); b.type='button'; b.dataset.cfgFonte=f.id;
     const title=document.createElement('span'); title.textContent=f.nome;
     const sample=document.createElement('small'); sample.textContent='Aa Bb Cc 123';
-    if (f.id !== 'padrao') b.style.fontFamily=(f.fam || f.nome)+',system-ui,sans-serif';
+    // Apenas a amostra demonstra a fonte; nomes e dimensões da lista ficam estáveis.
+    if (f.id !== 'padrao') sample.style.fontFamily=(f.fam || f.nome)+',system-ui,sans-serif';
     const check=document.createElement('i'); check.className='fa-solid fa-check cfg-check'; b.append(title,sample,check); fonts.append(b);
   });
   fonts.addEventListener('click', e => {
