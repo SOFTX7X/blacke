@@ -181,3 +181,9 @@ main>.cfg-screen.bl-page .cfg-shell{max-width:680px}
   html[data-nav-direction]::view-transition-old(root),
   html[data-nav-direction]::view-transition-new(root){opacity:1!important}
 }
+
+/* Ajustes: uma única subpágina por vez, sem conteúdo residual */
+.cfg-pages{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100dvh - 170px)}
+.cfg-pages>.cfg-page{position:relative!important;inset:auto!important;width:100%!important;transform:none;opacity:1;z-index:auto!important;min-height:100%;background:var(--panel)}
+.cfg-pages>.cfg-page[hidden]{display:none!important}
+.cfg-page.cfg-enter,.cfg-page.cfg-leave,.cfg-page.cfg-enter-back,.cfg-page.cfg-leave-back{animation:none!important}
