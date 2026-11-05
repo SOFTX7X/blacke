@@ -289,13 +289,13 @@ body.cfg-open #cfgScreen .cfg-page:not([hidden]){
   padding-bottom:0;
 }
 
-/* Rolagem segura das listas longas: último item acima da navegação fixa. */
+/* Lista longa de Fontes: respiro mínimo no fim, sem rolagem vazia. */
 @media(max-width:899px){
   body.cfg-open #cfgScreen #cfgFontPage:not([hidden]){
-    padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
-    scroll-margin-bottom:calc(112px + env(safe-area-inset-bottom));
+    padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
+    scroll-margin-bottom:20px;
   }
   body.cfg-open #cfgScreen #cfgFontPage:not([hidden]) #cfgFontes{
-    scroll-padding-bottom:calc(112px + env(safe-area-inset-bottom));
+    scroll-padding-bottom:20px;
   }
 }
