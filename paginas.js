@@ -24,7 +24,7 @@
     screens[key]=section;
   }
   const settings=document.getElementById('cfgScreen');
-  if(settings){host.appendChild(settings);settings.classList.add('bl-page');screens.configuracoes=settings;}
+  if(settings){host.appendChild(settings);settings.classList.add('bl-page');settings.dataset.page='configuracoes';screens.configuracoes=settings;}
   let active='mural';
   function show(key){
     if(!screens[key])return;
