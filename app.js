@@ -825,7 +825,27 @@ function desenharMeus(){
   setEstado(S.meus.length ? '' : (S.hash ? vazio('pasta', 'Nenhum site publicado', 'Os sites que você publicar neste navegador aparecem aqui.', ['publicar']) : vazio('chave', 'Chave bloqueada', 'Seu navegador bloqueou o recurso de chave. Abra o site em https.')));
 }
 
-async function trocarAba(aba, semHistorico, manterPerfil){
+function trocarAba(aba, semHistorico, manterPerfil){
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const order=['mural','usuarios','chat','publicar','meus'];
+  const oldIndex=order.indexOf(S.aba), newIndex=order.indexOf(aba);
+  const changing=oldIndex!==newIndex && oldIndex>=0 && newIndex>=0;
+  if(!changing || reduced || !document.startViewTransition || document.visibilityState==='hidden' || document.body.classList.contains('modo-perfil'))
+    return trocarAbaCore(aba,semHistorico,manterPerfil);
+  document.documentElement.dataset.navDirection=newIndex>oldIndex?'forward':'back';
+  try {
+    const transition=document.startViewTransition(()=>{
+      // O DOM muda na mesma atualização; carregamentos seguem em segundo plano.
+      void trocarAbaCore(aba,semHistorico,manterPerfil);
+    });
+    transition.finished.finally(()=>{delete document.documentElement.dataset.navDirection;}).catch(()=>{});
+    return transition.finished;
+  }catch(e){
+    delete document.documentElement.dataset.navDirection;
+    return trocarAbaCore(aba,semHistorico,manterPerfil);
+  }
+}
+async function trocarAbaCore(aba, semHistorico, manterPerfil){
   if (aba === 'destaques') aba = 'mural';   // Destaques saiu do menu: o Mural já abre em "Em alta"
   if (!semHistorico) irUrl(rotaDe(aba), { aba });
   if (!manterPerfil && document.body.classList.contains('modo-perfil')){

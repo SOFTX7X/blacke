@@ -122,3 +122,20 @@ body[data-aba="meus"] .cfg-entry{display:block}
 @keyframes cfg-slide-back-in{from{transform:translate3d(-28%,0,0);opacity:.75}to{transform:translate3d(0,0,0);opacity:1}}
 @keyframes cfg-slide-back-out{from{transform:translate3d(0,0,0);opacity:1}to{transform:translate3d(100%,0,0);opacity:.88}}
 @media(prefers-reduced-motion:reduce){.cfg-page.cfg-enter,.cfg-page.cfg-enter-back,.cfg-page.cfg-leave,.cfg-page.cfg-leave-back{animation:none!important;will-change:auto}}
+
+/* Navegação geral: páginas deslizam, barra permanece estável */
+@supports (view-transition-name: none){
+  #bnav{view-transition-name:bl-navigation}
+  ::view-transition-old(bl-navigation),::view-transition-new(bl-navigation){animation:none}
+  html[data-nav-direction="forward"]::view-transition-old(root){animation:bl-page-out-left .42s cubic-bezier(.22,1,.36,1) both}
+  html[data-nav-direction="forward"]::view-transition-new(root){animation:bl-page-in-right .42s cubic-bezier(.22,1,.36,1) both}
+  html[data-nav-direction="back"]::view-transition-old(root){animation:bl-page-out-right .42s cubic-bezier(.22,1,.36,1) both}
+  html[data-nav-direction="back"]::view-transition-new(root){animation:bl-page-in-left .42s cubic-bezier(.22,1,.36,1) both}
+}
+@keyframes bl-page-out-left{to{transform:translate3d(-30%,0,0);opacity:.75}}
+@keyframes bl-page-in-right{from{transform:translate3d(100%,0,0);opacity:.94}}
+@keyframes bl-page-out-right{to{transform:translate3d(100%,0,0);opacity:.94}}
+@keyframes bl-page-in-left{from{transform:translate3d(-30%,0,0);opacity:.75}}
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+}
