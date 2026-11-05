@@ -29,7 +29,7 @@
   <script>try{var d=document.documentElement,L=localStorage;if(L.getItem('bl_tema')==='claro')d.classList.add('claro');var f=L.getItem('bl_fonte_n');if(f){d.style.setProperty('--display',"'"+f+"',system-ui,sans-serif");d.style.setProperty('--fonte-chat',"'"+f+"',system-ui,'Noto Color Emoji',sans-serif");if(L.getItem('bl_fonte_q')){var k=document.createElement('link');k.rel='stylesheet';k.href='https://fonts.googleapis.com/css2?family='+L.getItem('bl_fonte_q')+'&display=swap';document.head.appendChild(k)}}}catch(e){}</script>
   <link rel="stylesheet" href="/style.css?v=1793646227">
   <link rel="stylesheet" href="/tema-claro.css?v=1793646227">
-  <link rel="stylesheet" href="/configuracoes.css?v=4">
+  <link rel="stylesheet" href="/configuracoes.css?v=5">
 </head>
 <body class="carregando">
   <noscript><style>#splash{display:none}body.carregando{overflow:auto}</style></noscript>
@@ -58,7 +58,7 @@
           <span class="nt-n" id="ntN" hidden>0</span>
         </button>
         <button type="button" class="btn-ghost" id="btnAparencia" aria-label="Aparência" title="Aparência"><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
-        <div class="lang">
+        <div class="lang" hidden aria-hidden="true">
           <button type="button" class="btn-ghost lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma / Language">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><b>PT</b>
           </button>
@@ -79,7 +79,7 @@
       <div class="hero-text">
         <h1 id="heroTitle" data-text="Mural de sites e marcas">Mural de sites e marcas</h1>
         <p class="hero-sub">Publique seu link com capa e legenda. Sem conta, sem cadastro.</p>
-        <p class="hero-legal"><a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></p>
+        
       </div>
       <div class="searchbar" id="searchbar">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -263,7 +263,7 @@
     <button id="maisBtn" class="btn-ghost mais" hidden>Carregar mais</button>
   </main>
 
-  <footer>BLACKE LAVEX · rede privada · <a href="https://t.me/BlackeLavex" target="_blank" rel="noopener noreferrer">Comunidade</a> · <a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></footer>
+  <footer>BLACKE LAVEX · rede privada · <a href="https://t.me/BlackeLavex" target="_blank" rel="noopener noreferrer">Comunidade</a></footer>
 
   <!-- Configurações em páginas, inspiradas no Telegram -->
   <section id="cfgScreen" class="cfg-screen" aria-label="Configurações" hidden>
@@ -274,6 +274,8 @@
         <div class="cfg-list">
           <button type="button" data-cfg-page="aparencia"><i class="fa-solid fa-palette"></i><span><strong>Aparência</strong><small>Temas e fontes</small></span><i class="fa-solid fa-chevron-right"></i></button>
           <button type="button" data-cfg-page="idioma"><i class="fa-solid fa-language"></i><span><strong>Idioma</strong><small id="cfgLangSummary">Português</small></span><i class="fa-solid fa-chevron-right"></i></button>
+          <a class="cfg-link" href="/termos"><i class="fa-solid fa-file-lines"></i><span><strong>Termos de uso</strong><small>Regras e condições</small></span><i class="fa-solid fa-chevron-right"></i></a>
+          <a class="cfg-link" href="/privacidade"><i class="fa-solid fa-shield-halved"></i><span><strong>Privacidade</strong><small>Como seus dados são tratados</small></span><i class="fa-solid fa-chevron-right"></i></a>
         </div>
       </div>
       <div id="cfgAppearance" class="cfg-page" hidden>
@@ -515,6 +517,6 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="/i18n.js?v=1793644730"></script>
   <script src="/app.js?v=1793646058"></script>
-  <script src="/configuracoes.js?v=3"></script>
+  <script src="/configuracoes.js?v=5"></script>
 </body>
 </html>
