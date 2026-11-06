@@ -2194,8 +2194,8 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 .chat-sec .ch-form input::placeholder{color:#9b9bb6}
 .chat-sec .ch-ebtn{margin-right:-6px;color:#a49bbd}
 .chat-sec .ch-env{width:42px;height:42px;border-radius:13px;background:#8673ff}
-.chat-sec .ch-m.ch-swipe-ready{outline:2px solid #80baff;outline-offset:1px}
-.chat-sec .ch-m.ch-swipe-ready::after{content:'↩';position:absolute;right:-32px;top:50%;transform:translateY(-50%);font-size:23px;color:#80baff}
+.chat-sec .ch-m.ch-swipe-ready{filter:brightness(1.08)}
+
 @media(max-width:760px){
  body.ch-aberto[data-aba="chat"] .chat-sec{height:var(--chat-viewport-height,100dvh);bottom:auto}
  .chat-sec .ch-conv{min-height:0}
