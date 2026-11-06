@@ -2152,3 +2152,11 @@ html.claro .brand-name{color:#7c6bd6}
   .card .sq{width:34px;height:34px;border:0!important;background:rgba(255,255,255,.06)!important}
 }
 html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!important}
+
+/* Mobile: a marca aparece só na tela inicial (Mural); as outras abas têm o próprio título */
+@media (max-width:899px){
+  body[data-aba="usuarios"] .topbar,body[data-aba="publicar"] .topbar,body[data-aba="meus"] .topbar{display:none!important}
+}
+@media (max-width:899px){
+  body[data-aba="usuarios"] main,body[data-aba="publicar"] main,body[data-aba="meus"] main{padding-top:calc(14px + env(safe-area-inset-top))}
+}
