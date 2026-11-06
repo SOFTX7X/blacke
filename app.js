@@ -880,11 +880,12 @@ async function trocarAbaCore(aba, semHistorico, manterPerfil){
   if (aba === 'mural'){ buscarMural(true); return; }
   const assinatura = () => S.meus.map(s => s.id + ':' + (s.cliques || 0) + ':' + (s.handle || '') + ':' + (s.verificado ? 1 : 0) + ':' + s.image_url).join('|');
   const ja = S._meusOk ? assinatura() : null;
-  if (S._meusOk) desenharMeus(); else skeleton();
+  if (S._meusOk){ if (S._meusSig !== ja) desenharMeus(); } else skeleton();   // não reconstrói a grade se nada mudou: evita travadinha ao trocar de aba
   try{
     await buscarMeus(); S._meusOk = true;
     if (S.aba !== 'meus') return;
-    if (assinatura() !== ja) desenharMeus();
+    const sig = assinatura();
+    if (sig !== ja){ desenharMeus(); S._meusSig = sig; }
   }catch(err){ if (!ja) erroCarga(err); }
   carregarStats();
 }
