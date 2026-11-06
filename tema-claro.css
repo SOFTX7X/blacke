@@ -237,7 +237,7 @@ html.claro #telaBan .tb-m{color:#111a52!important}
 @media (max-width:899px){html.claro .brand-name{color:#171717!important}}
 @media (max-width:899px){html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar,html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar[hidden]{background:rgba(23,23,23,0.07)!important}html.claro .chip,html.claro .chips .chip,html.claro .toolbar select,html.claro .toolbar .sel{background:rgba(23,23,23,0.06)!important}html.claro .chip.on{color:#12008b!important}html.claro .card .sq{background:rgba(23,23,23,0.06)!important}}
 @media (max-width:899px){html.claro .topbar{background:none!important;border:0!important;box-shadow:none!important}html.claro .tb-busca,html.claro .topbar .nt-btn{background:none!important;border:0!important}}
-html.claro .brand-ninja{filter:none!important}
+html.claro .brand-ninja{filter:brightness(1.3) saturate(.55)!important}
 @media (max-width:899px){html.claro .brand-name{color:#9254e3!important}}
 html.claro *,html.claro *::before,html.claro *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.claro .ig-fundo,html.claro .pn-aurora{display:none!important}
