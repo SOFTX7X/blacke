@@ -2174,3 +2174,30 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 .ig.pc-ver .ig-av{animation:none!important}
 .card::before,.card::after{display:none!important}
 *,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+
+
+/* Chat aprovado no laboratório testeblacke — escopo exclusivo do chat */
+.chat-sec{--ch-bg:#191b2b;--ch-linha:rgba(255,255,255,.075);background:#10111c;color:#eef0fa}
+.chat-sec .ch-lado{background:#191b2b}
+.chat-sec .ch-main{background:#10111c}
+.chat-sec .ch-topo{background:#191b2b;border-bottom-color:#ffffff12}
+.chat-sec .ch-m.eu{background:#7666d8;color:#fff}
+.chat-sec .ch-m.ele{background:#25283d;color:#f3f4fb}
+.chat-sec .ch-m{border-radius:15px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y}
+.chat-sec .ch-m.eu{border-bottom-right-radius:5px}
+.chat-sec .ch-m.ele{border-bottom-left-radius:5px}
+.chat-sec .ch-msgs{background:#10111c;overscroll-behavior:contain}
+.chat-sec .ch-form{background:#191b2b;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.chat-sec .ch-form input{background:#2a2d42;color:#f4f5ff}
+.chat-sec .ch-form input::placeholder{color:#a0a5bf}
+.chat-sec .ch-env{background:#7666d8}
+.chat-sec .ch-dia b{background:#303349;color:#e0e3f1}
+.chat-sec .ch-menu{background:#25283b;border-color:#ffffff1a}
+.chat-sec .ch-m.ch-swipe-ready{outline:2px solid #80baff;outline-offset:1px}
+.chat-sec .ch-m.ch-swipe-ready::after{content:'↩';position:absolute;right:-32px;top:50%;transform:translateY(-50%);font-size:23px;color:#80baff}
+@media(max-width:760px){
+  body.ch-aberto[data-aba="chat"] .chat-sec{height:var(--chat-viewport-height,100dvh);bottom:auto}
+  .chat-sec .ch-conv{min-height:0}
+  .chat-sec .ch-msgs{min-height:0}
+  .chat-sec .ch-form{flex-shrink:0}
+}
