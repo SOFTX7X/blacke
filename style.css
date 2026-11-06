@@ -2200,10 +2200,6 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 /* Estilo Telegram (fundo com textura, cabeçalho e barra flutuando sobre as mensagens) — só no mobile; no PC fica como sempre foi. */
 @media (max-width:899px){
  .chat-sec .ch-main{background:url("img/chat-fundo.jpg");background-size:cover;background-position:center;background-attachment:fixed}
- .chat-sec .ch-topo{position:absolute;top:0;left:0;right:0;z-index:5;background:transparent;border-bottom:0}
- .chat-sec .ch-topo #chVoltar{width:40px!important;height:40px!important;min-width:40px;border-radius:50%;background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;color:#fff!important}
- .chat-sec .ch-topo .ch-acoes{background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;border-radius:999px;padding:4px 10px;gap:4px}
- .chat-sec .ch-topo .ch-acoes .icon-btn{background:none!important}
  .chat-sec .ch-msgs{padding:98px max(18px,calc((100% - 750px)/2)) 104px}
  .chat-sec .ch-form{position:absolute;bottom:0;left:0;right:0;z-index:5;margin:0 auto;padding:14px 18px max(14px,env(safe-area-inset-bottom));background:#111321a6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 }
@@ -2254,29 +2250,63 @@ html,body{background-image:none!important}
 .ch-pessoas-b{display:none!important}
 
 
-/* Cabeçalho em três cápsulas sólidas, conforme imagem de referência. */
-@media(min-width:0px){
- .chat-sec .ch-topo{position:absolute!important;top:0;left:0;right:0;z-index:5;display:flex!important;align-items:center!important;gap:9px!important;padding:0 12px!important;background:transparent!important;border:0!important;height:76px!important;min-height:76px!important;overflow:visible}
- .chat-sec .ch-topo #chVoltar{display:grid!important;place-items:center!important;flex:0 0 56px!important;width:56px!important;height:56px!important;min-width:56px!important;margin:0!important;border:0!important;border-radius:50%!important;background:#1b1b1b!important;color:#fff!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
- .chat-sec .ch-topo #chVoltar i{font-size:24px!important}
- .chat-sec .ch-topo .ch-quem{display:flex!important;align-items:center!important;flex:1 1 0!important;min-width:0!important;height:56px!important;padding:0 10px 0 3px!important;border-radius:999px!important;background:#1b1b1b!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:hidden}
- .chat-sec .ch-topo .ch-quem h3{width:100%;min-width:0;gap:9px!important;overflow:hidden}
- .chat-sec .ch-topo .ch-quem .ch-av{flex:none!important}
- .chat-sec .ch-topo .ch-quem .ch-av .amini{width:50px!important;height:50px!important;border:2px solid #56515f!important;border-radius:50%!important;overflow:hidden}
- .chat-sec .ch-topo .ch-quem .ch-nm{min-width:0;overflow:hidden}
- .chat-sec .ch-topo .ch-quem .ch-n1{font-size:16px!important;font-weight:700!important;color:#fff!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .chat-sec .ch-topo .ch-quem .ch-st{font-size:12px!important;color:#8f8f8f!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .chat-sec .ch-topo .ch-acoes{display:flex!important;align-items:center!important;justify-content:space-around!important;flex:0 0 94px!important;width:94px!important;height:56px!important;padding:0 6px!important;gap:0!important;border:0!important;border-radius:999px!important;background:#1b1b1b!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
- .chat-sec .ch-topo .ch-call-visual{display:grid;place-items:center;width:36px;height:44px;color:#fff;font-size:21px}
- .chat-sec .ch-topo #chMais{display:grid!important;place-items:center!important;width:36px!important;height:44px!important;min-width:36px!important;padding:0!important;background:transparent!important;color:#fff!important;font-size:21px!important}
- .chat-sec .ch-topo .ch-menu{top:calc(100% + 5px)}
- .chat-sec .ch-msgs{padding-top:90px!important}
+
+/* Cabeçalho da conversa: três cápsulas opacas, sem alterar a lista de chats. */
+.chat-sec .ch-conv>.ch-topo{
+ position:absolute;inset:0 0 auto;z-index:5;display:flex;align-items:center;
+ gap:9px;height:82px;min-height:82px;padding:0 12px;
+ background:transparent;border:0;overflow:visible;
 }
-@media(min-width:900px){.chat-sec .ch-topo{height:82px!important;min-height:82px!important}.chat-sec .ch-msgs{padding-top:100px!important}}
+.chat-sec .ch-conv>.ch-topo #chVoltar{
+ display:grid;place-items:center;flex:0 0 56px;width:56px;height:56px;
+ min-width:56px;margin:0;padding:0;border:0;border-radius:50%;
+ background:#1b1b1b;color:#fff;box-shadow:none;
+ backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.chat-sec .ch-conv>.ch-topo #chVoltar i{font-size:24px}
+.chat-sec .ch-conv>.ch-topo .ch-quem{
+ display:flex;align-items:center;flex:1 1 0;min-width:0;height:56px;
+ padding:0 10px 0 3px;border-radius:999px;background:#1b1b1b;
+ box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+ overflow:hidden;
+}
+.chat-sec .ch-conv>.ch-topo .ch-quem h3{width:100%;min-width:0;gap:9px;overflow:hidden}
+.chat-sec .ch-conv>.ch-topo .ch-quem .ch-av{flex:none}
+.chat-sec .ch-conv>.ch-topo .ch-quem .ch-av .amini{
+ width:50px;height:50px;border:2px solid #56515f;border-radius:50%;overflow:hidden;
+}
+.chat-sec .ch-conv>.ch-topo .ch-quem .ch-nm{min-width:0;overflow:hidden}
+.chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
+ font-size:16px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{
+ font-size:12px;color:#8f8f8f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.chat-sec .ch-conv>.ch-topo .ch-acoes{
+ display:flex;align-items:center;justify-content:space-around;
+ flex:0 0 94px;width:94px;height:56px;padding:0 6px;gap:0;
+ border:0;border-radius:999px;background:#1b1b1b;
+ box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.chat-sec .ch-conv>.ch-topo .ch-call-visual{
+ display:grid;place-items:center;width:36px;height:44px;color:#fff;font-size:21px;
+}
+.chat-sec .ch-conv>.ch-topo #chMais{
+ display:grid;place-items:center;width:36px;height:44px;min-width:36px;
+ padding:0;background:transparent;color:#fff;font-size:21px;
+}
+.chat-sec .ch-conv>.ch-topo .ch-menu{top:calc(100% + 5px)}
+.chat-sec .ch-conv>.ch-msgs{padding-top:100px}
+@media(max-width:899px){
+ .chat-sec .ch-conv>.ch-topo{height:76px;min-height:76px}
+ .chat-sec .ch-conv>.ch-msgs{padding-top:90px}
+}
 @media(max-width:390px){
- .chat-sec .ch-topo{gap:6px!important;padding:0 7px!important}
- .chat-sec .ch-topo #chVoltar{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:48px!important}
- .chat-sec .ch-topo .ch-acoes{flex-basis:78px!important;width:78px!important}
- .chat-sec .ch-topo .ch-quem .ch-av .amini{width:42px!important;height:42px!important}
- .chat-sec .ch-topo .ch-quem .ch-n1{font-size:14px!important}
+ .chat-sec .ch-conv>.ch-topo{gap:6px;padding:0 7px}
+ .chat-sec .ch-conv>.ch-topo #chVoltar{
+  flex-basis:48px;width:48px;min-width:48px;height:48px;
+ }
+ .chat-sec .ch-conv>.ch-topo .ch-acoes{flex-basis:78px;width:78px}
+ .chat-sec .ch-conv>.ch-topo .ch-quem .ch-av .amini{width:42px;height:42px}
+ .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{font-size:14px}
 }
