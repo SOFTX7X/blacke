@@ -2246,3 +2246,9 @@ html,body,.chat-sec .ch-main{background-image:none!important}
   .ch-pessoas-b i{font-size:24px}
   .fab-pub{width:56px;height:56px;font-size:22px;right:16px;bottom:calc(86px + env(safe-area-inset-bottom))}
 }
+
+/* Ajuste de tamanho: bolha + menor; sem botão Pessoas */
+.ch-pessoas-b{display:none!important}
+@media (max-width:899px){
+  .fab-pub{width:44px;height:44px;font-size:17px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom))}
+}

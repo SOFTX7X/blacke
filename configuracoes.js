@@ -79,7 +79,7 @@
       window.scrollTo(0,0);
     };
     const navOff=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
-    if(true || !animate || navOff || !document.startViewTransition || document.visibilityState==='hidden'){update();return;}
+    if(!animate || navOff || !document.startViewTransition || document.visibilityState==='hidden'){update();return;}
     const root=document.documentElement;
     // Ajustes fica entre Publicar e Conta no menu: a direção segue a posição da aba atual.
     const ordem=['mural','usuarios','chat','publicar','ajustes','meus'];
