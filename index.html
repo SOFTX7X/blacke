@@ -125,6 +125,19 @@
     html body .chat-sec #chConversa > .ch-topo .ch-quem h3 {
       position:relative;z-index:1;background:transparent!important;
     }
+    /* Sem telefone: menu compacto, cápsula de identificação mais comprida. */
+    html body .chat-sec #chConversa > .ch-topo .ch-acoes {
+      flex:0 0 56px!important;width:56px!important;min-width:56px!important;
+      padding:0!important;justify-content:center!important;
+    }
+    html body .chat-sec #chConversa > .ch-topo #chMais {
+      width:48px!important;min-width:48px!important;height:48px!important;
+    }
+    @media(max-width:430px){
+      html body .chat-sec #chConversa > .ch-topo .ch-acoes {
+        flex-basis:52px!important;width:52px!important;min-width:52px!important;
+      }
+    }
   </style>
 </head>
 <body class="carregando">
@@ -249,7 +262,7 @@
             <button class="icon-btn" id="chVoltar" type="button" aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></button>
             <div class="ch-quem"><h3 id="chTitulo">Mensagens</h3></div>
             <div class="ch-acoes">
-              <span class="ch-call-visual" aria-hidden="true"><i class="fa-solid fa-phone"></i></span>
+              
               <button class="icon-btn" id="chMais" type="button" aria-label="Mais opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis-vertical"></i></button>
               <div class="ch-menu" id="chMenu" hidden role="menu">
                 <button type="button" role="menuitem" id="chBuscarMsg">Buscar na conversa</button>
