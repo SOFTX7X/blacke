@@ -2252,3 +2252,31 @@ html,body{background-image:none!important}
   .ch-lado-h{gap:10px;padding:12px 14px 8px}
 }
 .ch-pessoas-b{display:none!important}
+
+
+/* Cabeçalho em três cápsulas sólidas, conforme imagem de referência. */
+@media(max-width:899px){
+ .chat-sec .ch-topo{display:flex!important;align-items:center!important;gap:9px!important;padding:0 12px!important;background:transparent!important;border:0!important;height:76px!important;min-height:76px!important;overflow:visible}
+ .chat-sec .ch-topo #chVoltar{display:grid!important;place-items:center!important;flex:0 0 56px!important;width:56px!important;height:56px!important;min-width:56px!important;margin:0!important;border:0!important;border-radius:50%!important;background:#1b1b1b!important;color:#fff!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .chat-sec .ch-topo #chVoltar i{font-size:24px!important}
+ .chat-sec .ch-topo .ch-quem{display:flex!important;align-items:center!important;flex:1 1 0!important;min-width:0!important;height:56px!important;padding:0 10px 0 3px!important;border-radius:999px!important;background:#1b1b1b!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:hidden}
+ .chat-sec .ch-topo .ch-quem h3{width:100%;min-width:0;gap:9px!important;overflow:hidden}
+ .chat-sec .ch-topo .ch-quem .ch-av{flex:none!important}
+ .chat-sec .ch-topo .ch-quem .ch-av .amini{width:50px!important;height:50px!important;border:2px solid #56515f!important;border-radius:50%!important;overflow:hidden}
+ .chat-sec .ch-topo .ch-quem .ch-nm{min-width:0;overflow:hidden}
+ .chat-sec .ch-topo .ch-quem .ch-n1{font-size:16px!important;font-weight:700!important;color:#fff!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .chat-sec .ch-topo .ch-quem .ch-st{font-size:12px!important;color:#8f8f8f!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .chat-sec .ch-topo .ch-acoes{display:flex!important;align-items:center!important;justify-content:space-around!important;flex:0 0 94px!important;width:94px!important;height:56px!important;padding:0 6px!important;gap:0!important;border:0!important;border-radius:999px!important;background:#1b1b1b!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .chat-sec .ch-topo .ch-call-visual{display:grid;place-items:center;width:36px;height:44px;color:#fff;font-size:21px}
+ .chat-sec .ch-topo #chMais{display:grid!important;place-items:center!important;width:36px!important;height:44px!important;min-width:36px!important;padding:0!important;background:transparent!important;color:#fff!important;font-size:21px!important}
+ .chat-sec .ch-topo .ch-menu{top:calc(100% + 5px)}
+ .chat-sec .ch-msgs{padding-top:90px!important}
+}
+@media(min-width:900px){.chat-sec .ch-call-visual{display:none}}
+@media(max-width:390px){
+ .chat-sec .ch-topo{gap:6px!important;padding:0 7px!important}
+ .chat-sec .ch-topo #chVoltar{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:48px!important}
+ .chat-sec .ch-topo .ch-acoes{flex-basis:78px!important;width:78px!important}
+ .chat-sec .ch-topo .ch-quem .ch-av .amini{width:42px!important;height:42px!important}
+ .chat-sec .ch-topo .ch-quem .ch-n1{font-size:14px!important}
+}
