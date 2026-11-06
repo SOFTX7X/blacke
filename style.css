@@ -2177,15 +2177,12 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 *,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 
 
-/* Apenas o interior da conversa — referência testeblacke. */
-.chat-sec .ch-main{background:url("img/chat-fundo.jpg");background-size:cover;background-position:center;background-attachment:fixed;color:#f7f6ff}
-.chat-sec .ch-topo{position:absolute;top:0;left:0;right:0;z-index:5;height:74px;min-height:74px;padding:0 22px;gap:11px;background:transparent;border-bottom:0}
-.chat-sec .ch-topo #chVoltar{width:40px!important;height:40px!important;min-width:40px;border-radius:50%;background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;color:#fff!important}
-.chat-sec .ch-topo .ch-acoes{background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;border-radius:999px;padding:4px 10px;gap:4px}
-.chat-sec .ch-topo .ch-acoes .icon-btn{background:none!important}
+/* Apenas o interior da conversa — referência testeblacke. PC (telas largas) mantém o visual simples de sempre; o estilo Telegram (fundo com textura, cabeçalho/barra flutuando) é só no mobile, mais abaixo. */
+.chat-sec .ch-main{background:radial-gradient(ellipse at 50% 30%,#2c24453a,transparent 60%),#111321;color:#f7f6ff}
+.chat-sec .ch-topo{height:74px;min-height:74px;padding:0 22px;gap:11px;background:#1b1c2a;border-bottom:1px solid #ffffff12}
 .chat-sec .ch-quem h3 .ch-av .amini{width:43px;height:43px}
 .chat-sec .ch-st{color:#a59bd2;font-size:12px}
-.chat-sec .ch-msgs{background:transparent;gap:11px;padding:98px max(18px,calc((100% - 750px)/2)) 104px;overscroll-behavior:contain}
+.chat-sec .ch-msgs{background:transparent;gap:11px;padding:24px max(18px,calc((100% - 750px)/2)) 6px;overscroll-behavior:contain}
 .chat-sec .ch-m{display:flow-root;max-width:min(78%,520px);margin-top:0!important;padding:10px 12px 7px;border-radius:15px 15px 15px 4px;font-size:14px;line-height:1.5;box-shadow:0 2px 10px #0001;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y}
 .chat-sec .ch-m.eu{background:#473a83;color:#fff;border-radius:15px 15px 4px 15px}
 .chat-sec .ch-m.ele{background:#25273b;color:#f7f6ff;border-radius:15px 15px 15px 4px}
@@ -2193,12 +2190,23 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 .chat-sec .ch-h{font-size:10px;margin-top:3px;color:#c6bddf;opacity:1}
 .chat-sec .ch-dia{margin:6px 0 14px}
 .chat-sec .ch-dia b{background:#302b43;color:#d4caee;padding:6px 14px;font-size:11px}
-.chat-sec .ch-form{position:absolute;bottom:0;left:0;right:0;z-index:5;gap:10px;margin:0 auto;padding:14px 18px max(14px,env(safe-area-inset-bottom));width:min(100%,800px);background:#111321a6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.chat-sec .ch-form{gap:10px;margin:0 auto 18px;padding:0 18px;width:min(100%,800px);background:transparent}
 .chat-sec .ch-form input{height:52px;border-radius:16px;background:#25273a;color:#fff;padding:0 16px;font-size:14px}
 .chat-sec .ch-form input::placeholder{color:#9b9bb6}
 .chat-sec .ch-ebtn{margin-right:-6px;color:#a49bbd}
 .chat-sec .ch-env{width:42px;height:42px;border-radius:13px;background:#8673ff}
 .chat-sec .ch-m.ch-swipe-ready{filter:brightness(1.08)}
+
+/* Estilo Telegram (fundo com textura, cabeçalho e barra flutuando sobre as mensagens) — só no mobile; no PC fica como sempre foi. */
+@media (max-width:899px){
+ .chat-sec .ch-main{background:url("img/chat-fundo.jpg");background-size:cover;background-position:center;background-attachment:fixed}
+ .chat-sec .ch-topo{position:absolute;top:0;left:0;right:0;z-index:5;background:transparent;border-bottom:0}
+ .chat-sec .ch-topo #chVoltar{width:40px!important;height:40px!important;min-width:40px;border-radius:50%;background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;color:#fff!important}
+ .chat-sec .ch-topo .ch-acoes{background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;border-radius:999px;padding:4px 10px;gap:4px}
+ .chat-sec .ch-topo .ch-acoes .icon-btn{background:none!important}
+ .chat-sec .ch-msgs{padding:98px max(18px,calc((100% - 750px)/2)) 104px}
+ .chat-sec .ch-form{position:absolute;bottom:0;left:0;right:0;z-index:5;margin:0 auto;padding:14px 18px max(14px,env(safe-area-inset-bottom));background:#111321a6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+}
 
 @media(max-width:760px){
  body.ch-aberto[data-aba="chat"] .chat-sec{height:var(--chat-viewport-height,100dvh);bottom:auto}
