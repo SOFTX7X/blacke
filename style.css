@@ -2204,3 +2204,17 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
  .chat-sec .ch-m{max-width:86%}
  .chat-sec .ch-form{flex-shrink:0;width:100%;margin:0;padding:0 10px max(9px,env(safe-area-inset-bottom));gap:7px}
 }
+
+/* ===== Menu do celular: Mural, Chats, Configurações, Conta (Publicar vira botão +) ===== */
+.fab-pub,.bn-chat{display:none}
+.ch-pessoas-b{display:none}
+@media (max-width:899px){
+  #bnav [data-nav="usuarios"],#bnav .bn-pub{display:none!important}
+  #bnav .bn-chat:not([hidden]){display:flex;position:relative}
+  .ch-pessoas-b{display:inline-flex}
+  .fab-pub{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:34;width:56px;height:56px;border:0;border-radius:50%;display:grid;place-items:center;background:#9b5df0;color:#fff;cursor:pointer;box-shadow:0 6px 16px -6px rgba(0,0,0,.55)}
+  body[data-aba]:not([data-aba="mural"]) .fab-pub{display:none}
+  body[data-aba="mural"] .fab-pub,body:not([data-aba]) .fab-pub{display:grid}
+  body.cfg-open .fab-pub{display:none!important}
+  #bnav .bn-n{position:absolute;top:4px;left:calc(50% + 6px)}
+}

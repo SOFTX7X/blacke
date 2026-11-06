@@ -1279,7 +1279,7 @@ function desenharNotif(){
   const b = $('ntN'); b.textContent = NT.n > 9 ? '9+' : String(NT.n); b.hidden = !NT.n;
   $('ntTodas').hidden = !NT.n; atualizarTitulo(); ntPerm();
   $('ntBtn').hidden = !(NT.itens.length || (S.perfil && S.perfil.handle));
-  const tinha = !$('msgBtn').hidden; $('msgBtn').hidden = !chAtivo(); if (!tinha && !$('msgBtn').hidden){ chNaoLidas(); chPing(); }
+  const tinha = !$('msgBtn').hidden; $('msgBtn').hidden = !chAtivo(); { const bc = document.querySelector('#bnav .bn-chat'); if (bc) bc.hidden = !chAtivo(); } if (!tinha && !$('msgBtn').hidden){ chNaoLidas(); chPing(); }
 }
 async function carregarNotif(){
   if (!S.token) return;
@@ -1743,8 +1743,10 @@ document.addEventListener('click', e => {
 });
 const _pubAberto = () => !$('modalCadastro').hidden;
 $('bnav').addEventListener('click', e => { if (_pubAberto() && e.target.closest('.bn-pub')) e.stopPropagation(); }, true);
-document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('click', () => {
+document.querySelectorAll('#bnav [data-nav]:not(.bn-chat)').forEach(b => b.addEventListener('click', () => {
   if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil') || document.body.classList.contains('cfg-open') || location.pathname === '/configuracoes') trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
+document.querySelector('#bnav .bn-chat')?.addEventListener('click', () => { if (_pubAberto()) fecharModal(); chAbrir(); });
+document.querySelectorAll('.ch-pessoas-b').forEach(b => b.addEventListener('click', () => trocarAba('usuarios')));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
 $('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', 'Verificados', 'Selo Faccliky', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c === 'Verificados' ? '✓ Verificados' : c}</button>`).join('');
@@ -1838,7 +1840,7 @@ async function abrirLinkDireto(){
 const chAtivo = () => !!(S.token && S.perfil && S.perfil.handle);
 const chErro = r => (r && r.error && r.error.message) || 'Não foi possível agora.';
 const chHora = d => { try{ return new Date(d).toLocaleTimeString(LOC(), { hour:'2-digit', minute:'2-digit' }); }catch(_){ return ''; } };
-function chBadge(n){ const el = $('msgN'); el.textContent = n > 99 ? '99+' : String(n); el.hidden = !n; }
+function chBadge(n){ const t = n > 99 ? '99+' : String(n); [$('msgN'), $('bnChatN')].forEach(el => { if (!el) return; el.textContent = t; el.hidden = !n; }); }
 async function chNaoLidas(){
   if (!chAtivo() || document.hidden) return;
   try{ const { data, error } = await _supabase.rpc('chat_nao_lidas', { p_token:S.token }); if (!error && typeof data === 'number') chBadge(data); }catch(_){}

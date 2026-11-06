@@ -236,6 +236,16 @@ html.claro #telaBan p{color:#232846!important}
 html.claro #telaBan .tb-m{color:#111a52!important}
 @media (max-width:899px){html.claro .brand-name{color:#171717!important}}
 @media (max-width:899px){html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar,html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar[hidden]{background:rgba(23,23,23,0.07)!important}html.claro .chip,html.claro .chips .chip,html.claro .toolbar select,html.claro .toolbar .sel{background:rgba(23,23,23,0.06)!important}html.claro .chip.on{color:#12008b!important}html.claro .card .sq{background:rgba(23,23,23,0.06)!important}}
+html.claro .chat-sec .ch-main{background:radial-gradient(ellipse at 50% 30%,rgba(44,36,69,0.227),transparent 60%),#edeef6!important;color:#090055!important}
+html.claro .chat-sec .ch-topo{background:#e8e8f0!important;border-bottom:1px solid rgba(242,242,242,0.071)!important}
+html.claro .chat-sec .ch-st{color:#382f62!important}
+html.claro .chat-sec .ch-m.eu{background:#8b7fc2!important;color:#171717!important}
+html.claro .chat-sec .ch-m.ele{background:#dfe0eb!important;color:#090055!important}
+html.claro .chat-sec .ch-h{color:#292042!important}
+html.claro .chat-sec .ch-dia b{background:#c1bcd4!important;color:#39246f!important}
+html.claro .chat-sec .ch-form input{background:#dfe0eb!important;color:#171717!important}
+html.claro .chat-sec .ch-form input::placeholder{color:#494964!important}
+html.claro .chat-sec .ch-ebtn{color:#4b4264!important}
 @media (max-width:899px){html.claro .topbar{background:none!important;border:0!important;box-shadow:none!important}html.claro .tb-busca,html.claro .topbar .nt-btn{background:none!important;border:0!important}}
 html.claro .brand-ninja{filter:none!important}
 @media (max-width:899px){html.claro .brand-name{color:#9254e3!important}}

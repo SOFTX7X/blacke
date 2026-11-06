@@ -27,8 +27,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>try{var d=document.documentElement,L=localStorage;if(L.getItem('bl_tema')==='claro')d.classList.add('claro');var f=L.getItem('bl_fonte_n');if(f){d.style.setProperty('--display',"'"+f+"',system-ui,sans-serif");d.style.setProperty('--fonte-chat',"'"+f+"',system-ui,'Noto Color Emoji',sans-serif");if(L.getItem('bl_fonte_q')){var k=document.createElement('link');k.rel='stylesheet';k.href='https://fonts.googleapis.com/css2?family='+L.getItem('bl_fonte_q')+'&display=swap';document.head.appendChild(k)}}}catch(e){}</script>
-  <link rel="stylesheet" href="/style.css?v=1793949533">
-  <link rel="stylesheet" href="/tema-claro.css?v=1793949533">
+  <link rel="stylesheet" href="/style.css?v=1793950450">
+  <link rel="stylesheet" href="/tema-claro.css?v=1793950450">
   <link rel="stylesheet" href="/configuracoes.css?v=21">
 </head>
 <body class="carregando">
@@ -140,7 +140,7 @@
       <aside class="ch-lado" id="chListaBox">
         <div class="ch-selb" id="chSelL"><button class="icon-btn" id="chSelLX" type="button" aria-label="Cancelar"><i class="fa-solid fa-xmark"></i></button><span class="ch-selt"><b id="chSelLN">0</b> <span>selecionadas</span></span><span class="ch-selacs"><button class="icon-btn" type="button" data-lsel="fixar" aria-label="Fixar" title="Fixar"><i class="fa-solid fa-thumbtack"></i></button><button class="icon-btn" type="button" data-lsel="silenciar" aria-label="Silenciar" title="Silenciar"><i class="fa-solid fa-bell-slash"></i></button><button class="icon-btn" type="button" data-lsel="arquivar" aria-label="Arquivar" title="Arquivar"><i class="fa-solid fa-box-archive"></i></button><button class="icon-btn perigo" type="button" data-lsel="apagar" aria-label="Apagar" title="Apagar"><i class="fa-regular fa-trash-can"></i></button></span></div>
         <div class="ch-lado-h"><label class="ch-busca"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="chBusca" type="search" placeholder="Buscar" aria-label="Buscar conversa" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-          <div class="ch-acoes"><button class="icon-btn" id="chOpc" type="button" aria-label="Opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+          <div class="ch-acoes"><button class="icon-btn ch-pessoas-b" type="button" data-nav="usuarios" aria-label="Pessoas" title="Pessoas"><i class="fa-solid fa-user-plus" aria-hidden="true"></i></button><button class="icon-btn" id="chOpc" type="button" aria-label="Opções" aria-haspopup="true"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             <div class="ch-menu" id="chOpcM" hidden role="menu"><button type="button" role="menuitem" id="chOpcSel"><i class="fa-regular fa-square-check" aria-hidden="true"></i> Selecionar conversas</button><button type="button" role="menuitem" id="chOpcAp"><i class="fa-solid fa-palette" aria-hidden="true"></i> Aparência</button><button type="button" role="menuitem" id="chOpcBloq"><i class="fa-solid fa-ban" aria-hidden="true"></i> Usuários bloqueados</button><label class="ch-vis"><input type="checkbox" id="chVis" checked><span>Aparecer online</span></label></div></div></div>
         <ul id="chConv" class="ch-pess"></ul>
         <div class="ch-menu ch-rowm" id="chRowM" hidden role="menu"></div>
@@ -510,17 +510,20 @@
 
   <nav class="bnav" id="bnav" aria-label="Navegação">
     <button type="button" data-nav="mural" class="on"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Mural</span></button>
+    <button type="button" data-nav="chat" class="bn-chat" hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.8L3 21l1.9-5.1A8.4 8.4 0 1 1 21 11.5z"/></svg><span>Chats</span><span class="bn-n" id="bnChatN" hidden></span></button>
     <button type="button" data-nav="usuarios"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="5"/><path d="M2 21a8 8 0 0 1 10.434-7.62"/><circle cx="18" cy="18" r="3"/><path d="m22 22-1.9-1.9"/></svg><span>Usuários</span></button>
 
     <button type="button" data-act="novo" class="bn-pub"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg><span>Publicar</span></button>
-    <button type="button" id="cfgOpen" class="bn-config" aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="var(--nav-bg, #141525)"/><circle cx="15" cy="17" r="2.5" fill="var(--nav-bg, #141525)"/></svg><span>Ajustes</span></button>
+    <button type="button" id="cfgOpen" class="bn-config" aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="var(--nav-bg, #141525)"/><circle cx="15" cy="17" r="2.5" fill="var(--nav-bg, #141525)"/></svg><span>Configurações</span></button>
     <button type="button" data-nav="meus" class="bn-conta"><span class="bn-av" id="bnAv" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>Conta</span></button>
   </nav>
 
+  <button type="button" class="fab-pub" data-act="novo" aria-label="Publicar link" title="Publicar link"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+
   <div id="toast" class="toast" role="status"></div>
-  <script src="/i18n.js?v=1793947863"></script>
+  <script src="/i18n.js?v=1793950351"></script>
   <script src="/paginas.js?v=2"></script>
-  <script src="/app.js?v=1793949533"></script>
+  <script src="/app.js?v=1793950344"></script>
   <script src="/configuracoes.js?v=16"></script>
 </body>
 </html>
