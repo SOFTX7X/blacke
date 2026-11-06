@@ -2219,11 +2219,9 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
   #bnav .bn-n{position:absolute;top:4px;left:calc(50% + 6px)}
 }
 
-/* Bolha Publicar: canto direito, logo acima da bolha Conta */
+/* Bolha Publicar: só no Mural, canto direito acima do menu */
 @media (max-width:899px){
-  .fab-pub{right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:18px}
-  body[data-aba]:not([data-aba="mural"]) .fab-pub{display:grid}
-  body[data-aba="publicar"] .fab-pub,body.cfg-open .fab-pub{display:none!important}
+  .fab-pub{right:16px;bottom:calc(84px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:18px;box-shadow:none!important}
 }
 
 /* Menu 4 itens distribuídos por igual */
@@ -2235,22 +2233,10 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 /* Otimização: sem neon, sem brilho/glow, sem aurora de fundo (sem custo de desempenho) */
 .aurora,.pn-aurora,.pc::before,.pc::after,.card::before,.card::after,.ig-fundo::before,#splash::before{display:none!important}
 html,body,.chat-sec .ch-main{background-image:none!important}
-.fab-pub{box-shadow:none!important}
 .bnav{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#181924!important;box-shadow:none!important}
 
-/* Chats: topo limpo, Pessoas maior */
+/* Chats: topo limpo */
 @media (max-width:899px){
   .ch-lado-h{gap:10px;padding:12px 14px 8px}
-  .ch-pessoas-b{width:46px;height:46px;font-size:24px;color:#a99bff;background:none;border:0}
-  .ch-pessoas-b i{font-size:24px}
-  .fab-pub{width:56px;height:56px;font-size:22px;right:16px;bottom:calc(86px + env(safe-area-inset-bottom))}
 }
-
-/* Ajuste de tamanho: bolha + menor; sem botão Pessoas */
 .ch-pessoas-b{display:none!important}
-@media (max-width:899px){
-  .fab-pub{width:44px;height:44px;font-size:17px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom))}
-}
-
-/* O botão de publicar não aparece dentro de uma conversa aberta */
-body.ch-aberto .fab-pub{display:none!important}

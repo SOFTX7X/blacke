@@ -819,6 +819,9 @@ function desenharMeus(){
 }
 
 function trocarAba(aba, semHistorico, manterPerfil){
+  // Sem animação de deslize: a captura de tela inteira do View Transition travava a troca em aparelhos mais fracos.
+  return trocarAbaCore(aba,semHistorico,manterPerfil);
+  /* eslint-disable no-unreachable */
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
   const order=['mural','usuarios','chat','publicar','ajustes','meus'];
   const oldIndex=order.indexOf(document.body.classList.contains('cfg-open')?'ajustes':S.aba), newIndex=order.indexOf(aba);

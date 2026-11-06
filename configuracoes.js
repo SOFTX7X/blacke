@@ -78,6 +78,7 @@
       if(show)showPage('home',false);
       window.scrollTo(0,0);
     };
+    update();return;   // sem deslize: a captura de tela inteira travava em aparelhos mais fracos
     const navOff=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
     if(!animate || navOff || !document.startViewTransition || document.visibilityState==='hidden'){update();return;}
     const root=document.documentElement;
