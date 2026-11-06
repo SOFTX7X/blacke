@@ -112,6 +112,19 @@
       html body .chat-sec #chConversa > .ch-topo .ch-call-visual,
       html body .chat-sec #chConversa > .ch-topo #chMais {width:35px!important;font-size:19px!important}
     }
+    /* Cápsula central: fundo arredondado separado do conteúdo e do avatar. */
+    html body .chat-sec #chConversa > .ch-topo .ch-quem {
+      position:relative!important;isolation:isolate!important;
+      background:transparent!important;border-radius:999px!important;
+    }
+    html body .chat-sec #chConversa > .ch-topo .ch-quem::before {
+      content:"";position:absolute;inset:0;z-index:-1;display:block;
+      background:#1c1c1c!important;border-radius:999px!important;
+      pointer-events:none;
+    }
+    html body .chat-sec #chConversa > .ch-topo .ch-quem h3 {
+      position:relative;z-index:1;background:transparent!important;
+    }
   </style>
 </head>
 <body class="carregando">
