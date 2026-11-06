@@ -2166,4 +2166,4 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 @media (max-width:899px){ body::before{display:none!important} }
 
 /* Ninja da marca: mais vivo no escuro (mesmo roxo do Telegram) */
-@media (max-width:899px){ html:not(.claro) .brand-ninja{filter:brightness(1.7) saturate(1.25)} }
+@media (max-width:899px){ html:not(.claro) .brand-ninja{filter:brightness(1.22) saturate(1.05)} }
