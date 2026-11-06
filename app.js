@@ -375,14 +375,7 @@ async function salvarSite(){
 }
 
 /* ---------- cards ---------- */
-function efeitoCard(card){
-  card.addEventListener('pointermove', e => {
-    const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    card.style.setProperty('--mx', x+'px'); card.style.setProperty('--my', y+'px');
-
-  });
-  card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-}
+function efeitoCard(){ /* efeito de brilho que seguia o mouse removido: mais leve */ }
 
 
 const posSegura = s => /^(100|\d{1,2})% (100|\d{1,2})%$/.test(s || '') ? s : '50% 50%';
@@ -423,7 +416,7 @@ const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verif
 const selo = it => it && it.verificado ? SELO : '';
 const META_V = 1000;     // acessos somados nos sites do perfil para ganhar o selo azul (verificado)
 const META_SELO = 10000; // ... e o Selo Faccliky (ninja). O admin também pode dar os dois à mão.
-const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo Faccliky" title="Selo Faccliky"><img class="sb-ninja" src="/selo-blacke.svg?v=1" alt="" aria-hidden="true" width="24" height="24" loading="lazy"></span>';
+const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo Faccliky" title="Selo Faccliky"><img class="sb-ninja" src="/ninja-marca.png?v=1" alt="" aria-hidden="true" width="24" height="24" loading="lazy"></span>';
 const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
