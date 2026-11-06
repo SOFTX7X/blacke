@@ -269,3 +269,24 @@ html.claro .ch-selb{background:#ffffff!important}
 html.claro .chp{background:#ffffff!important}
 html.claro .vistas,html.claro .cv-leg,html.claro .cv-leg p{color:#d9dcf0}
 html.claro .logo-ring img,html.claro .brand img,html.claro img[src^="/logo"]{filter:invert(1)}
+
+
+/* O cabeçalho flutuante da conversa mantém cápsulas escuras nos dois temas. */
+html.claro .chat-sec .ch-conv>.ch-topo{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+html.claro .chat-sec .ch-conv>.ch-topo #chVoltar,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-quem,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-acoes{
+ background:#1b1b1b!important;border-color:transparent!important;
+ color:#fff!important;box-shadow:none!important;
+ opacity:1!important;
+}
+html.claro .chat-sec .ch-conv>.ch-topo #chVoltar i,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-call-visual,
+html.claro .chat-sec .ch-conv>.ch-topo #chMais,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
+ color:#fff!important;
+}
+html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{color:#9b9b9b!important}
+html.claro .chat-sec .ch-conv>.ch-topo .ch-quem h3{color:#fff!important}
