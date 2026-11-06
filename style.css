@@ -2099,12 +2099,12 @@ html.claro #telaBan p{color:#4b5075}
 .selo-b .sb-ninja{display:block;width:100%;height:100%;object-fit:contain;filter:none;background:transparent}
 .selo-b{background:transparent!important}
 
-/* Selo BLACKE: mesmo alinhamento e escala do verificado ao lado do nome. */
+/* Ninja no tamanho original, apenas próximo ao verificado. */
 .ig-nome{gap:4px}
-.ig-nome>.selo-b{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:0;vertical-align:middle;flex:none}
+.ig-nome>.selo-b{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0;vertical-align:middle;flex:none}
 .ig-nome>.selo-b .sb-ninja{width:100%;height:100%;object-fit:contain}
 .ig-nome>.selo+.selo-b{margin-left:0}
 @media(max-width:600px){
   .ig-nome{gap:4px}
-  .ig-nome>.selo-b{width:17px;height:17px;margin:0}
+  .ig-nome>.selo-b{width:38px;height:38px;margin:0}
 }
