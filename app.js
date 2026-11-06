@@ -423,7 +423,7 @@ const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verif
 const selo = it => it && it.verificado ? SELO : '';
 const META_V = 1000;     // acessos somados nos sites do perfil para ganhar o selo azul (verificado)
 const META_SELO = 10000; // ... e o Selo BLACKE (ninja). O admin também pode dar os dois à mão.
-const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo BLACKE" title="Selo BLACKE"><svg class="sb-hex" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="#4a3fd6"/><path d="M12 .9L2.4 6.4V12L12 6.4z" fill="#8d7fff" opacity=".75"/><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="none" stroke="#6fd6ff" stroke-width=".9" stroke-linejoin="round" opacity=".9"/><path d="M17.9 8.3l3.1-1.7-.9 2.6 1.5 1.8-3.3-.4z" fill="#000"/><circle cx="12" cy="12.6" r="6.9" fill="#000"/><path d="M6.38 8.6H17.62A6.9 6.9 0 0 1 18.35 9.9H5.65A6.9 6.9 0 0 1 6.38 8.6Z" fill="#7b6cff"/><path d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/><path transform="matrix(-1 0 0 1 24 0)" d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/></svg></span>';
+const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo BLACKE" title="Selo BLACKE"><img class="sb-ninja" src="/selo-blacke.svg?v=1" alt="" aria-hidden="true" width="24" height="24" loading="lazy"></span>';
 const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
