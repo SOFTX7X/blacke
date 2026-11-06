@@ -2218,3 +2218,10 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
   body.cfg-open .fab-pub{display:none!important}
   #bnav .bn-n{position:absolute;top:4px;left:calc(50% + 6px)}
 }
+
+/* Bolha Publicar: canto direito, logo acima da bolha Conta */
+@media (max-width:899px){
+  .fab-pub{right:18px;bottom:calc(84px + env(safe-area-inset-bottom));width:48px;height:48px;font-size:18px}
+  body[data-aba]:not([data-aba="mural"]) .fab-pub{display:grid}
+  body[data-aba="publicar"] .fab-pub,body.cfg-open .fab-pub{display:none!important}
+}
