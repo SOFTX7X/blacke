@@ -2255,8 +2255,8 @@ html,body{background-image:none!important}
 
 
 /* Cabeçalho em três cápsulas sólidas, conforme imagem de referência. */
-@media(max-width:899px){
- .chat-sec .ch-topo{display:flex!important;align-items:center!important;gap:9px!important;padding:0 12px!important;background:transparent!important;border:0!important;height:76px!important;min-height:76px!important;overflow:visible}
+@media(min-width:0px){
+ .chat-sec .ch-topo{position:absolute!important;top:0;left:0;right:0;z-index:5;display:flex!important;align-items:center!important;gap:9px!important;padding:0 12px!important;background:transparent!important;border:0!important;height:76px!important;min-height:76px!important;overflow:visible}
  .chat-sec .ch-topo #chVoltar{display:grid!important;place-items:center!important;flex:0 0 56px!important;width:56px!important;height:56px!important;min-width:56px!important;margin:0!important;border:0!important;border-radius:50%!important;background:#1b1b1b!important;color:#fff!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
  .chat-sec .ch-topo #chVoltar i{font-size:24px!important}
  .chat-sec .ch-topo .ch-quem{display:flex!important;align-items:center!important;flex:1 1 0!important;min-width:0!important;height:56px!important;padding:0 10px 0 3px!important;border-radius:999px!important;background:#1b1b1b!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:hidden}
@@ -2272,7 +2272,7 @@ html,body{background-image:none!important}
  .chat-sec .ch-topo .ch-menu{top:calc(100% + 5px)}
  .chat-sec .ch-msgs{padding-top:90px!important}
 }
-@media(min-width:900px){.chat-sec .ch-call-visual{display:none}}
+@media(min-width:900px){.chat-sec .ch-topo{height:82px!important;min-height:82px!important}.chat-sec .ch-msgs{padding-top:100px!important}}
 @media(max-width:390px){
  .chat-sec .ch-topo{gap:6px!important;padding:0 7px!important}
  .chat-sec .ch-topo #chVoltar{flex-basis:48px!important;width:48px!important;min-width:48px!important;height:48px!important}
