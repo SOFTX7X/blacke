@@ -49,16 +49,15 @@ body[data-aba="meus"] .cfg-entry{display:block}
 /* Configurações integra a navegação principal, sem botão no perfil */
 .cfg-entry{display:none!important}
 @media(max-width:899px){
-  .bnav{grid-template-columns:repeat(5,minmax(0,1fr))}
   .bnav .bn-config span{font-size:clamp(7px,1.9vw,10px)}
   .bnav .bn-config svg{flex:none}
 }
 .bnav .bn-config.on{background:rgba(123,108,255,.22);color:#a99bff}
 
-/* Barra inferior: cinco itens com a mesma escala visual */
+/* Barra inferior: quatro itens com a mesma escala visual */
 @media(max-width:899px){
-  .bnav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-flow:row;gap:2px;padding:5px 6px}
-  .bnav button,.bnav a{min-width:0;width:100%;padding:4px 1px;gap:4px;overflow:hidden}
+  .bnav{display:flex;gap:2px;padding:5px 6px}
+  .bnav button,.bnav a{min-width:0;flex:1 1 0;padding:4px 1px;gap:4px;overflow:hidden}
   .bnav button>svg,.bnav a>svg,.bnav .bn-config svg{width:23px;height:23px;flex:none;stroke-width:2}
   .bnav button>span:not(.bn-av):not(.bn-n),.bnav .bn-config span{font-size:10px;line-height:1.15;letter-spacing:0;font-weight:600;white-space:nowrap}
   .bnav .bn-config{--nav-bg:#171826}
