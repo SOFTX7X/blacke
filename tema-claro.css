@@ -237,7 +237,8 @@ html.claro #telaBan .tb-m{color:#111a52!important}
 @media (max-width:899px){html.claro .brand-name{color:#171717!important}}
 @media (max-width:899px){html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar,html.claro body:not([data-aba="usuarios"]):not([data-aba="publicar"]):not([data-aba="meus"]):not([data-aba="chat"]) .topbar #searchbar[hidden]{background:rgba(23,23,23,0.07)!important}html.claro .chip,html.claro .chips .chip,html.claro .toolbar select,html.claro .toolbar .sel{background:rgba(23,23,23,0.06)!important}html.claro .chip.on{color:#12008b!important}html.claro .card .sq{background:rgba(23,23,23,0.06)!important}}
 html.claro .chat-sec .ch-main{color:#090055!important}
-html.claro .chat-sec .ch-topo{background:rgba(15,17,31,0.651)!important}
+html.claro .chat-sec .ch-topo #chVoltar{background:rgba(17,18,29,0.702)!important;color:#171717!important}
+html.claro .chat-sec .ch-topo .ch-acoes{background:rgba(17,18,29,0.702)!important}
 html.claro .chat-sec .ch-st{color:#382f62!important}
 html.claro .chat-sec .ch-m.eu{background:#8b7fc2!important;color:#171717!important}
 html.claro .chat-sec .ch-m.ele{background:#dfe0eb!important;color:#090055!important}

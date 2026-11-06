@@ -2179,7 +2179,10 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 
 /* Apenas o interior da conversa — referência testeblacke. */
 .chat-sec .ch-main{background:url("img/chat-fundo.jpg");background-size:cover;background-position:center;background-attachment:fixed;color:#f7f6ff}
-.chat-sec .ch-topo{position:absolute;top:0;left:0;right:0;z-index:5;height:74px;min-height:74px;padding:0 22px;gap:11px;background:#111321a6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:0}
+.chat-sec .ch-topo{position:absolute;top:0;left:0;right:0;z-index:5;height:74px;min-height:74px;padding:0 22px;gap:11px;background:transparent;border-bottom:0}
+.chat-sec .ch-topo #chVoltar{width:40px!important;height:40px!important;min-width:40px;border-radius:50%;background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;color:#fff!important}
+.chat-sec .ch-topo .ch-acoes{background:#1b1c2fb3!important;-webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;border-radius:999px;padding:4px 10px;gap:4px}
+.chat-sec .ch-topo .ch-acoes .icon-btn{background:none!important}
 .chat-sec .ch-quem h3 .ch-av .amini{width:43px;height:43px}
 .chat-sec .ch-st{color:#a59bd2;font-size:12px}
 .chat-sec .ch-msgs{background:transparent;gap:11px;padding:98px max(18px,calc((100% - 750px)/2)) 104px;overscroll-behavior:contain}
