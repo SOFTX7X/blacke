@@ -2122,7 +2122,7 @@ html.claro #telaBan p{color:#4b5075}
   .tb-busca,.top-actions .nt-btn{background:none!important;border:0!important;box-shadow:none!important}
   .top-actions .btn-ghost:not(.btn-primary){background:none!important;border:0!important;box-shadow:none!important;color:var(--text)}
 }
-html.claro .brand-name{color:#7c6bd6}
+html.claro .brand-name{color:#9254e3}
 
 /* ===== Mobile estilo Telegram: limpo, busca esticada e grade 2x2 ===== */
 @media (max-width:899px){
@@ -2164,3 +2164,6 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
   body[data-aba="usuarios"] .usr-screen-head{padding-top:8px}
 }
 @media (max-width:899px){ body::before{display:none!important} }
+
+/* Ninja da marca: mais vivo no escuro (mesmo roxo do Telegram) */
+@media (max-width:899px){ html:not(.claro) .brand-ninja{filter:brightness(1.7) saturate(1.25)} }
