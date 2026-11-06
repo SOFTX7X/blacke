@@ -1849,7 +1849,8 @@ body[data-aba="chat"]::before{display:none}
 }
 @media (max-width:899px){
   body[data-aba="chat"]{padding-left:0}
-  body[data-aba="chat"] .chat-sec{inset:0 0 78px 0}
+  body[data-aba="chat"] .chat-sec{inset:0}   /* fundo até embaixo; o menu flutua por cima */
+  body[data-aba="chat"] .ch-pess{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
   body.ch-aberto[data-aba="chat"] .bnav{display:none}
   body.ch-aberto[data-aba="chat"] .chat-sec{inset:0}
 }
