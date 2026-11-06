@@ -2225,3 +2225,9 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
   body[data-aba]:not([data-aba="mural"]) .fab-pub{display:grid}
   body[data-aba="publicar"] .fab-pub,body.cfg-open .fab-pub{display:none!important}
 }
+
+/* Menu 4 itens distribuídos por igual */
+@media (max-width:899px){
+  .bnav{display:flex!important;grid-template-columns:none}
+  .bnav>*{flex:1 1 0;min-width:0}
+}
