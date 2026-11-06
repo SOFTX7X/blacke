@@ -412,7 +412,7 @@ function acoesDe(item){
     { act:'copiar',   ic:'fa-regular fa-copy',           txt:'Copiar link' },
     { act:'fav',      ic: ehFav(item.id) ? 'fa-solid fa-heart' : 'fa-regular fa-heart', txt: ehFav(item.id) ? 'Remover dos salvos' : 'Salvar' }
   ];
-  l.push({ act:'linkmural', ic:'fa-solid fa-link', txt:'Link no BLACKE' });
+  l.push({ act:'linkmural', ic:'fa-solid fa-link', txt:'Link no Faccliky' });
   if (navigator.share) l.push({ act:'compartilhar', ic:'fa-solid fa-share-nodes', txt:'Compartilhar' });
   if (ehDono(item)){
     if (S.aba === 'meus') l.push({ act:'editar', ic:'fa-solid fa-pen', txt:'Editar' }, { act:'excluir', ic:'fa-solid fa-trash', txt:'Excluir', danger:true });
@@ -422,8 +422,8 @@ function acoesDe(item){
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const selo = it => it && it.verificado ? SELO : '';
 const META_V = 1000;     // acessos somados nos sites do perfil para ganhar o selo azul (verificado)
-const META_SELO = 10000; // ... e o Selo BLACKE (ninja). O admin também pode dar os dois à mão.
-const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo BLACKE" title="Selo BLACKE"><img class="sb-ninja" src="/selo-blacke.svg?v=1" alt="" aria-hidden="true" width="24" height="24" loading="lazy"></span>';
+const META_SELO = 10000; // ... e o Selo Faccliky (ninja). O admin também pode dar os dois à mão.
+const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo Faccliky" title="Selo Faccliky"><img class="sb-ninja" src="/selo-blacke.svg?v=1" alt="" aria-hidden="true" width="24" height="24" loading="lazy"></span>';
 const temVerif = p => !!p && (!!p.verificado || (+p.acessos || 0) >= META_V);
 const temSeloB = p => !!p && (!!p.selo || (+p.acessos || 0) >= META_SELO);
 const seloElite = p => temSeloB(p) ? SELO_BLACKE : '';
@@ -609,7 +609,7 @@ async function copiarLink(id){
 }
 async function compartilhar(id){
   const it = acharItem(id); if (!it) return;
-  try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — BLACKE LAVEX', url:it.link_url }); }catch(_){}
+  try{ await navigator.share({ title:it.brand_name, text:it.brand_name + ' — Faccliky', url:it.link_url }); }catch(_){}
 }
 
 /* Links próprios do mural: /s/ID (site) e /@nome (perfil), com prévia no WhatsApp/Telegram */
@@ -619,8 +619,8 @@ async function enviarLink(url, titulo, texto){
   catch(_){ const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
   aviso('Link copiado');
 }
-function linkMural(id){ const it = acharItem(id); if (it) enviarLink(`${location.origin}/s/${it.id}`, it.brand_name, it.brand_name + ' — BLACKE LAVEX'); }
-function linkPerfil(h){ enviarLink(`${location.origin}/@${h}`, '@' + h, '@' + h + ' no BLACKE LAVEX'); }
+function linkMural(id){ const it = acharItem(id); if (it) enviarLink(`${location.origin}/s/${it.id}`, it.brand_name, it.brand_name + ' — Faccliky'); }
+function linkPerfil(h){ enviarLink(`${location.origin}/@${h}`, '@' + h, '@' + h + ' no Faccliky'); }
 
 /* ---------- Painel completo do site ---------- */
 let fichaTimer = null, fichaFoco = null;
@@ -636,7 +636,7 @@ function recomecarAnimacao(){
   document.querySelectorAll('#ficha .rise').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
 }
 function atualizarTitulo(){
-  const B = 'BLACKE LAVEX';
+  const B = 'Faccliky';
   const f = $('ficha'), aberta = f && !f.hidden && f.classList.contains('on') && S.fichaId;
   const it = aberta && (acharItem(S.fichaId) || S.meus.find(s => String(s.id) === S.fichaId));
   if (it){ document.title = it.brand_name + ' — ' + B; return; }
@@ -677,7 +677,7 @@ function abrirFicha(id){
       <button class="btn-ghost" type="button" data-act="copiar" data-id="${esc(it.id)}"><i class="fa-regular fa-copy"></i><span>Copiar link</span></button>
       ${extras.map(a => `<button class="btn-ghost${a.danger ? ' btn-danger' : ''}" type="button" data-act="${a.act}" data-id="${esc(it.id)}" aria-label="${a.txt}"><i class="${a.ic}"></i><span>${a.txt}</span></button>`).join('')}
     </div>
-    <p class="pn-note">O site abre em uma nova aba. O BLACKE LAVEX não controla o conteúdo dos links publicados.</p>`;
+    <p class="pn-note">O site abre em uma nova aba. O Faccliky não controla o conteúdo dos links publicados.</p>`;
 
   const cardRel = s => `
     <button class="rel" type="button" data-act="detalhes" data-id="${esc(s.id)}">
@@ -758,7 +758,7 @@ async function buscarMural(reset){
     if (BLOQ.size) q = q.or('handle.is.null,handle.not.in.(' + [...BLOQ].join(',') + ')');
     if (S.cat === 'Salvos') q = q.in('id', FAVS.length ? FAVS.slice(0, 200) : [0]);
     else if (S.cat === 'Seguindo') q = q.in('handle', SEGUINDO.size ? [...SEGUINDO].slice(0, 200) : ['-']);
-    else if (S.cat === 'Verificados' || S.cat === 'Selo BLACKE'){
+    else if (S.cat === 'Verificados' || S.cat === 'Selo Faccliky'){
       if (!VERIF.size && !NINJA.size) await carregarVerificados();
       if (meu !== S.seq) return;
       const conj = S.cat === 'Verificados' ? VERIF : NINJA;
@@ -796,7 +796,7 @@ async function buscarMural(reset){
     vigiarFim();
     if (!S.itens.length){
       const filtrando = S.busca || S.cat !== 'Todas';
-      setEstado((S.cat === 'Verificados' || S.cat === 'Selo BLACKE') && !S.busca ? vazio('busca', 'Nenhum perfil com esse selo ainda', S.cat === 'Selo BLACKE' ? 'O Selo BLACKE é conquistado aos 10 mil acessos.' : 'O selo verificado é conquistado aos mil acessos.', ['mural'])
+      setEstado((S.cat === 'Verificados' || S.cat === 'Selo Faccliky') && !S.busca ? vazio('busca', 'Nenhum perfil com esse selo ainda', S.cat === 'Selo Faccliky' ? 'O Selo Faccliky é conquistado aos 10 mil acessos.' : 'O selo verificado é conquistado aos mil acessos.', ['mural'])
         : S.cat === 'Seguindo' && !S.busca ? vazio('coracao', 'Você ainda não segue ninguém', S.perfil && S.perfil.handle ? 'Abra um perfil e toque em Seguir para ver os sites dele aqui.' : 'Reserve seu @ e siga perfis para ver os sites deles aqui.', ['mural'])
         : S.cat === 'Salvos' && !S.busca ? vazio('coracao', 'Nenhum site salvo', 'Toque no ♥ de um card para guardar aqui.', ['mural'])
         : filtrando ? vazio('busca', 'Nada encontrado', 'Tente outra busca ou categoria.', ['limpar'])
@@ -1165,7 +1165,7 @@ function ntConteudo(x){
   } else {
     const nj = d.selo === 'blacke';
     ic = `<i class="nt-ic ${nj ? 'vi' : 'ci'}">${nj ? SELO_BLACKE : SELO}</i>`;
-    txt = nj ? '<span>Você conquistou o Selo BLACKE</span>' : '<span>Você conquistou o selo de Verificado</span>'; alvo = 'data-ntm="1"';
+    txt = nj ? '<span>Você conquistou o Selo Faccliky</span>' : '<span>Você conquistou o selo de Verificado</span>'; alvo = 'data-ntm="1"';
   }
   return { ic, txt, alvo };
 }
@@ -1214,9 +1214,9 @@ pintarSom();
 
 /* notificação do sistema (quando a aba está em segundo plano) */
 const NT_TXT = {
-  pt:{ seg:h => `@${h} começou a seguir você`, meta:(n, m) => `Seu site ${n} chegou a ${m} acessos`, ver:'Você conquistou o selo de Verificado', blk:'Você conquistou o Selo BLACKE', avs:'Aviso da moderação: você tem um prazo para corrigir' },
-  en:{ seg:h => `@${h} started following you`, meta:(n, m) => `Your site ${n} reached ${m} visits`, ver:'You earned the Verified badge', blk:'You earned the BLACKE Badge', avs:'Moderation notice: you have a deadline to fix' },
-  es:{ seg:h => `@${h} empezó a seguirte`, meta:(n, m) => `Tu sitio ${n} llegó a ${m} visitas`, ver:'Conseguiste el sello de Verificado', blk:'Conseguiste el Sello BLACKE', avs:'Aviso de moderación: tienes un plazo para corregir' }
+  pt:{ seg:h => `@${h} começou a seguir você`, meta:(n, m) => `Seu site ${n} chegou a ${m} acessos`, ver:'Você conquistou o selo de Verificado', blk:'Você conquistou o Selo Faccliky', avs:'Aviso da moderação: você tem um prazo para corrigir' },
+  en:{ seg:h => `@${h} started following you`, meta:(n, m) => `Your site ${n} reached ${m} visits`, ver:'You earned the Verified badge', blk:'You earned the Faccliky Badge', avs:'Moderation notice: you have a deadline to fix' },
+  es:{ seg:h => `@${h} empezó a seguirte`, meta:(n, m) => `Tu sitio ${n} llegó a ${m} visitas`, ver:'Conseguiste el sello de Verificado', blk:'Conseguiste el Sello Faccliky', avs:'Aviso de moderación: tienes un plazo para corregir' }
 };
 function ntPlano(x){
   const T = NT_TXT[window.blLang ? window.blLang() : 'pt'] || NT_TXT.pt, d = x.dados || {};
@@ -1229,7 +1229,7 @@ function ntSistema(novos, somDoSite){
   try{
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const x = novos[0], extra = novos.length > 1 ? ` (+${novos.length - 1})` : '';
-    const n = new Notification('BLACKE LAVEX', { body: ntPlano(x) + extra, icon:'/icon-192.png', tag:'bl-aviso', renotify:true, silent:!!somDoSite && somLigado() });
+    const n = new Notification('Faccliky', { body: ntPlano(x) + extra, icon:'/icon-192.png', tag:'bl-aviso', renotify:true, silent:!!somDoSite && somLigado() });
     n.onclick = () => {
       try{ window.focus(); n.close(); }catch(_){}
       if (x.tipo === 'seguidor') irParaPerfil((x.dados || {}).handle); else trocarAba('meus');
@@ -1274,7 +1274,7 @@ function ntBolha(novos){
   let b = $('ntBolha');
   if (!b){ b = document.createElement('div'); b.id = 'ntBolha'; b.className = 'nt-bolha'; b.setAttribute('role', 'status'); document.body.appendChild(b); }
   const mais = novos.length > 1 ? `<em class="nt-mais">+${novos.length - 1}</em>` : '';
-  b.innerHTML = `<button type="button" class="nt-bn" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><b class="nt-tt">BLACKE LAVEX</b><span class="nt-x">${txt}</span></span>${mais}</button>`;
+  b.innerHTML = `<button type="button" class="nt-bn" data-nti="${x.id}" ${alvo}>${ic}<span class="nt-t"><b class="nt-tt">Faccliky</b><span class="nt-x">${txt}</span></span>${mais}</button>`;
   b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
   clearTimeout(ntTimer); ntTimer = setTimeout(ntBolhaOff, 6500);
   ntSom();
@@ -1471,7 +1471,7 @@ function painelNumeros(){
   const base = Object.assign({}, S.perfil || {}, { acessos:vida });
   const tem = temSeloB(base), azul = temVerif(base), alvo = azul ? META_SELO : META_V;
   const pct = tem ? 100 : Math.min(100, Math.round(vida / alvo * 100));
-  const meta = `<div class="nm-meta${tem ? ' ok' : ''}"><div class="nm-meta-t">${tem ? SELO_BLACKE + '<b>Selo BLACKE conquistado</b>' : `<b>${azul ? 'Meta do Selo BLACKE' : 'Meta do selo verificado'}</b><span><b>${fmtN(vida)}</b> / ${fmtN(alvo)}</span>`}</div><span class="nm-br"><i style="--w:${tem ? 100 : Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
+  const meta = `<div class="nm-meta${tem ? ' ok' : ''}"><div class="nm-meta-t">${tem ? SELO_BLACKE + '<b>Selo Faccliky conquistado</b>' : `<b>${azul ? 'Meta do Selo Faccliky' : 'Meta do selo verificado'}</b><span><b>${fmtN(vida)}</b> / ${fmtN(alvo)}</span>`}</div><span class="nm-br"><i style="--w:${tem ? 100 : Math.max(vida ? 3 : 0, pct)}%"></i></span></div>`;
   return `<details class="nm" data-nm${S.nmAberto ? ' open' : ''} aria-label="Seus números">
     <summary class="nm-h"><div><h3>Seus números</h3><small class="nm-sub"><b>${fmtN(tot)}</b> <span>${tot === 1 ? 'acesso' : 'acessos'}</span> · <b>${fmtN(hoje)}</b> <span>hoje</span></small></div><div class="nm-ch">${chip}<i class="nm-cv" aria-hidden="true"></i></div></summary>
     <div class="nm-b">
@@ -1492,9 +1492,9 @@ function seloURL(h, t){ return `${location.origin}/selo/${h}${t === 'claro' ? '?
 function blocoSelo(p){
   const t = S.seloTema === 'claro' ? 'claro' : 'escuro';
   return `<details class="sl" data-sl${S.slAberto ? ' open' : ''}>
-    <summary class="sl-h"><span class="sl-ic"><i class="fa-solid fa-id-badge"></i></span><div class="sl-t"><b>Selo "Estou no BLACKE"</b><span>Para colocar no seu site ou loja</span></div><i class="nm-cv" aria-hidden="true"></i></summary>
+    <summary class="sl-h"><span class="sl-ic"><i class="fa-solid fa-id-badge"></i></span><div class="sl-t"><b>Selo "Estou no Faccliky"</b><span>Para colocar no seu site ou loja</span></div><i class="nm-cv" aria-hidden="true"></i></summary>
     <div class="sl-b">
-    <div class="sl-pv ${t}"><img src="${esc(seloURL(p.handle, t))}" alt="Estou no BLACKE LAVEX" width="292" loading="lazy" decoding="async"></div>
+    <div class="sl-pv ${t}"><img src="${esc(seloURL(p.handle, t))}" alt="Estou no Faccliky" width="292" loading="lazy" decoding="async"></div>
     <div class="sl-a">
       <div class="sl-seg" role="group" aria-label="Tema do selo"><button type="button" data-act="temaselo" data-t="escuro" class="${t === 'escuro' ? 'on' : ''}">Escuro</button><button type="button" data-act="temaselo" data-t="claro" class="${t === 'claro' ? 'on' : ''}">Claro</button></div>
       <button class="pc-btn" type="button" data-act="copiarselo" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar código</span></button>
@@ -1729,7 +1729,7 @@ document.addEventListener('click', e => {
     }
     case 'copiarselo': {
       const h = el.dataset.h, t = S.seloTema === 'claro' ? 'claro' : 'escuro';
-      const cod = `<a href="https://blackelavex.online/bio/${h}" target="_blank" rel="noopener"><img src="https://blackelavex.online/selo/${h}${t === 'claro' ? '?t=claro' : ''}" alt="Estou no BLACKE LAVEX" width="292" height="${/^[a-z0-9_]{3,20}$/.test(h) ? 84 : 72}"></a>`;
+      const cod = `<a href="https://blackelavex.online/bio/${h}" target="_blank" rel="noopener"><img src="https://blackelavex.online/selo/${h}${t === 'claro' ? '?t=claro' : ''}" alt="Estou no Faccliky" width="292" height="${/^[a-z0-9_]{3,20}$/.test(h) ? 84 : 72}"></a>`;
       (navigator.clipboard ? navigator.clipboard.writeText(cod) : Promise.reject()).then(() => aviso('Código copiado'), () => prompt('Copie o código:', cod)); break;
     }
     case 'copiarbio': { const u = `${location.origin}/bio/${el.dataset.h}`; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => aviso('Link copiado'), () => prompt('Copie o link:', u)); break; }
@@ -1754,7 +1754,7 @@ document.querySelectorAll('#bnav [data-nav]').forEach(b => b.addEventListener('c
   if (_pubAberto()){ fecharModal(); } if (S.aba !== b.dataset.nav || document.body.classList.contains('modo-perfil') || document.body.classList.contains('cfg-open') || location.pathname === '/configuracoes') trocarAba(b.dataset.nav); else window.scrollTo({top:0,behavior:'smooth'}); }));
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => { if (S.aba !== b.dataset.aba) trocarAba(b.dataset.aba); }));
 
-$('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', 'Verificados', 'Selo BLACKE', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c === 'Verificados' ? '✓ Verificados' : c}</button>`).join('');
+$('chips').innerHTML = ['Todas', 'Salvos', 'Seguindo', 'Verificados', 'Selo Faccliky', ...CATEGORIAS].map(c => `<button class="chip${c === 'Todas' ? ' on' : ''}" data-cat="${c}">${c === 'Salvos' ? '♥ Salvos' : c === 'Verificados' ? '✓ Verificados' : c}</button>`).join('');
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b));
@@ -2338,7 +2338,7 @@ $('chBMsgX').addEventListener('click', chBuscaFechar);
 
 /* ---------- Aparência: tema claro/escuro e 10 fontes para o site todo ---------- */
 const FONTES = [
-  { id:'padrao', nome:'Padrão BLACKE', q:null },
+  { id:'padrao', nome:'Padrão Faccliky', q:null },
   { id:'inter', nome:'Inter', q:'Inter:wght@400;500;600;700' },
   { id:'poppins', nome:'Poppins', q:'Poppins:wght@400;500;600;700' },
   { id:'montserrat', nome:'Montserrat', q:'Montserrat:wght@400;500;600;700' },
@@ -2587,7 +2587,7 @@ document.addEventListener('click', async e => {
   const l = e.target.closest('a[href^="https://t.me/BlackeLavex"]');
   if (!l) return;
   e.preventDefault();
-  if (await confirmar({ titulo:'Abrir a comunidade?', texto:'Você vai para o Telegram do BLACKE LAVEX, fora do site. O link abre em uma nova aba.', botao:'Abrir Telegram' })) window.open(l.href, '_blank', 'noopener');
+  if (await confirmar({ titulo:'Abrir a comunidade?', texto:'Você vai para o Telegram do Faccliky, fora do site. O link abre em uma nova aba.', botao:'Abrir Telegram' })) window.open(l.href, '_blank', 'noopener');
 });
 
 /* ---------- Conta banida: tela cheia que prende o usuário até o fim do prazo ---------- */
@@ -2600,6 +2600,6 @@ async function checarBan(){
   const quando = d.ate ? new Date(d.ate) : null;
   const txt = quando ? `Seu acesso está suspenso até ${quando.toLocaleDateString('pt-BR')} às ${quando.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}. Depois disso, tudo volta ao normal.` : 'Seu acesso está suspenso por tempo indeterminado.';
   if (!el){ el = document.createElement('div'); el.id = 'telaBan'; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true'); document.body.appendChild(el); }
-  el.innerHTML = `<div class="tb-c"><i class="fa-solid fa-ban"></i><h2>Conta suspensa</h2><p>${esc(txt)}</p>${d.motivo ? `<p class="tb-m">Motivo: ${esc(d.motivo)}</p>` : ''}<p class="tb-s">Você não pode usar o BLACKE LAVEX enquanto a suspensão durar.</p></div>`;
+  el.innerHTML = `<div class="tb-c"><i class="fa-solid fa-ban"></i><h2>Conta suspensa</h2><p>${esc(txt)}</p>${d.motivo ? `<p class="tb-m">Motivo: ${esc(d.motivo)}</p>` : ''}<p class="tb-s">Você não pode usar o Faccliky enquanto a suspensão durar.</p></div>`;
   document.body.classList.add('banido');
 }

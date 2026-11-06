@@ -8,7 +8,7 @@ const pos = s => { const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m ?
 const BASE = 'https://blackelavex.online';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
-const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo BLACKE" title="Selo BLACKE"><svg class="sb-hex" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="#4a3fd6"/><path d="M12 .9L2.4 6.4V12L12 6.4z" fill="#8d7fff" opacity=".75"/><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="none" stroke="#6fd6ff" stroke-width=".9" stroke-linejoin="round" opacity=".9"/><path d="M17.9 8.3l3.1-1.7-.9 2.6 1.5 1.8-3.3-.4z" fill="#000"/><circle cx="12" cy="12.6" r="6.9" fill="#000"/><path d="M6.38 8.6H17.62A6.9 6.9 0 0 1 18.35 9.9H5.65A6.9 6.9 0 0 1 6.38 8.6Z" fill="#7b6cff"/><path d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/><path transform="matrix(-1 0 0 1 24 0)" d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/></svg></span>';
+const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo Faccliky" title="Selo Faccliky"><svg class="sb-hex" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="#4a3fd6"/><path d="M12 .9L2.4 6.4V12L12 6.4z" fill="#8d7fff" opacity=".75"/><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="none" stroke="#6fd6ff" stroke-width=".9" stroke-linejoin="round" opacity=".9"/><path d="M17.9 8.3l3.1-1.7-.9 2.6 1.5 1.8-3.3-.4z" fill="#000"/><circle cx="12" cy="12.6" r="6.9" fill="#000"/><path d="M6.38 8.6H17.62A6.9 6.9 0 0 1 18.35 9.9H5.65A6.9 6.9 0 0 1 6.38 8.6Z" fill="#7b6cff"/><path d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/><path transform="matrix(-1 0 0 1 24 0)" d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/></svg></span>';
 const META_V = 1000, META_SELO = 10000;
 const SELO = '<svg class="selo" viewBox="0 0 24 24" role="img" aria-label="Verificado"><title>Verificado</title><path fill="currentColor" d="M12 1.6l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3-2.6 1.9-1 3.1-3.2-.1L12 22.4l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3-1-3.1 2.6-1.9 1-3 3.2.1z"/><path fill="none" stroke="#06070d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M7.8 12.3l2.8 2.8 5.6-5.8"/></svg>';
 const SETA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
@@ -34,7 +34,7 @@ function pagina({ titulo, desc, img, url, corpo, robots, fundo }){
 ${robots ? '<meta name="robots" content="noindex">' : ''}
 <meta name="theme-color" content="#06070d">
 <meta property="og:type" content="profile">
-<meta property="og:site_name" content="BLACKE LAVEX">
+<meta property="og:site_name" content="Faccliky">
 <meta property="og:title" content="${esc(titulo)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:image" content="${esc(img)}">
@@ -81,7 +81,7 @@ button{font:inherit;color:inherit}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .nome{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;font:600 clamp(22px,6vw,27px) var(--mono);letter-spacing:-.01em;word-break:break-all}
 .selo{flex:none;width:22px;height:22px;color:var(--ice)}
-/* Selo BLACKE: rótulo roxo com ninja preto */ .selo-b{display:inline-block;flex:none;width:34px;height:34px;margin-left:.35em;vertical-align:-.26em;overflow:visible!important}.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))} .selo-b{width:34px;height:34px} 
+/* Selo Faccliky: rótulo roxo com ninja preto */ .selo-b{display:inline-block;flex:none;width:34px;height:34px;margin-left:.35em;vertical-align:-.26em;overflow:visible!important}.selo-b .sb-hex{display:block;width:100%;height:100%;filter:drop-shadow(0 0 4px rgba(123,108,255,.6))} .selo-b{width:34px;height:34px} 
 .bio{max-width:460px;margin-top:10px;color:#cdd1ea;font-size:15.5px;white-space:pre-line;overflow-wrap:anywhere}
 .num{display:flex;justify-content:center;gap:10px 26px;margin-top:14px;color:var(--dim);font-size:13px}
 .num span{display:flex;flex-direction:column;align-items:center;line-height:1.3}
@@ -143,7 +143,7 @@ button{font:inherit;color:inherit}
 <div class="fundo" aria-hidden="true">${fundo ? `<img src="${esc(fundo)}" alt="">` : ''}</div>
 <main class="wrap">
   <header class="topo">
-    <a class="marca" href="/" title="Ir para o mural"><img src="/logo-mark.png" alt=""><span translate="no">BLACKE <b>LAVEX</b></span></a>
+    <a class="marca" href="/" title="Ir para o mural"><img src="/logo-mark.png" alt=""><span translate="no">Faccliky</span></a>
     <div class="lang">
       <button type="button" class="tb" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="Idioma / Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><b>PT</b></button>
       <div class="lang-menu" id="langMenu" hidden role="menu" translate="no">
@@ -157,7 +157,7 @@ button{font:inherit;color:inherit}
 ${corpo}
   <footer class="pe e" style="--i:7">
     <a class="cta" href="/publicar"><img src="/logo-mark.png" alt=""> Crie a sua página grátis</a>
-    <small><span>Feito no</span> <span translate="no">BLACKE LAVEX</span> <span>· sem cadastro</span></small>
+    <small><span>Feito no</span> <span translate="no">Faccliky</span> <span>· sem cadastro</span></small>
   </footer>
 </main>
 <div class="toast" id="toast" role="status"></div>
@@ -230,14 +230,14 @@ module.exports = async (req, res) => {
   if (!p || !p.handle){
     res.setHeader('Cache-Control', 'public, s-maxage=60');
     return res.status(404).send(pagina({
-      titulo:'Perfil não encontrado · BLACKE LAVEX', desc:'Este @ não existe ou foi removido.', img:BASE + '/api/og', url:BASE + '/', robots:true,
+      titulo:'Perfil não encontrado · Faccliky', desc:'Este @ não existe ou foi removido.', img:BASE + '/api/og', url:BASE + '/', robots:true,
       corpo:`<section class="cab"><div class="av e"><span>@</span></div><h1 class="nome e" style="--i:1">Perfil não encontrado</h1><p class="bio e" style="--i:2">Este @ não existe ou foi removido.</p></section>`
     }));
   }
   res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
   res.status(200).send(pagina({
-    titulo:`@${p.handle} · Links | BLACKE LAVEX`,
-    desc:cortar(p.bio, 160) || `Links de @${p.handle} no BLACKE LAVEX.`,
+    titulo:`@${p.handle} · Links | Faccliky`,
+    desc:cortar(p.bio, 160) || `Links de @${p.handle} no Faccliky.`,
     img:`${BASE}/api/og?p=${p.handle}`, url:`${BASE}/bio/${p.handle}`,
     fundo:p.foto || null,
     corpo:render(p, sites)

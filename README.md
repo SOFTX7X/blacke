@@ -1,4 +1,4 @@
-# BLACKE LAVEX — mural anônimo
+# Faccliky — mural anônimo
 
 Site estático (HTML + CSS + JS) com Supabase. A conexão (URL + chave pública) continua em `app.js`.
 

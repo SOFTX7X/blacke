@@ -10,7 +10,7 @@ try{ MODELO = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8'); }
 module.exports = async (req, res) => {
   const base = 'https://blackelavex.online';
   const q = req.query || {};
-  let titulo = 'BLACKE LAVEX — Mural anônimo', desc = 'Publique seu link com capa e legenda. Sem conta, sem cadastro.';
+  let titulo = 'Faccliky — Mural anônimo', desc = 'Publique seu link com capa e legenda. Sem conta, sem cadastro.';
   let img = base + '/api/og', url = base + '/', achou = false, destino = '/';
   try{
     if (q.s && /^\d{1,12}$/.test(q.s)){
@@ -18,8 +18,8 @@ module.exports = async (req, res) => {
       const it = await db.site(q.s);
       if (it){
         achou = true;
-        titulo = it.brand_name + ' — BLACKE LAVEX';
-        desc = cortar(it.caption, 180) || ('Site da categoria ' + (it.categoria || 'Outros') + ' no mural BLACKE LAVEX.');
+        titulo = it.brand_name + ' — Faccliky';
+        desc = cortar(it.caption, 180) || ('Site da categoria ' + (it.categoria || 'Outros') + ' no mural Faccliky.');
         img = base + '/api/og?s=' + it.id;
       }
     }else if (q.p){
@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
         const pf = await db.perfil(h);
         if (pf && pf.handle){
           achou = true;
-          titulo = '@' + pf.handle + ' — BLACKE LAVEX';
+          titulo = '@' + pf.handle + ' — Faccliky';
           desc = cortar(pf.bio, 160) || (pf.sites + (pf.sites === 1 ? ' site' : ' sites') + ' publicados no mural · ' + pf.acessos + (pf.acessos === 1 ? ' acesso' : ' acessos') + (+pf.seguidores > 0 ? ' · ' + pf.seguidores + (+pf.seguidores === 1 ? ' seguidor' : ' seguidores') : ''));
           img = base + '/api/og?p=' + pf.handle;
         }

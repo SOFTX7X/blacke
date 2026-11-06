@@ -1,4 +1,4 @@
-# BLACKE LAVEX — imagem de prévia (1200x630) para links de site (/s/ID), perfil (/@nome) e do mural.
+# Faccliky — imagem de prévia (1200x630) para links de site (/s/ID), perfil (/@nome) e do mural.
 # Usada pelo WhatsApp, Telegram, Instagram, X, Discord e Google quando alguém compartilha um link.
 import base64, io, json, os, re, urllib.request
 from http.server import BaseHTTPRequestHandler
@@ -163,12 +163,12 @@ def selo(base, x, y, d):
 
 META_V, META_SELO = 1000, 10000
 def regras(pf):
-    # mesmas regras do site: verificado manual ou 1000 acessos; Selo BLACKE manual ou 10000 acessos
+    # mesmas regras do site: verificado manual ou 1000 acessos; Selo Faccliky manual ou 10000 acessos
     ac = int((pf or {}).get('acessos') or 0)
     return bool((pf or {}).get('verificado')) or ac >= META_V, bool((pf or {}).get('selo')) or ac >= META_SELO
 
 def selo_ninja(base, x, y, d):
-    # Selo BLACKE: rótulo roxo com ninja preto e dois olhos roxos (mesmo desenho do site)
+    # Selo Faccliky: rótulo roxo com ninja preto e dois olhos roxos (mesmo desenho do site)
     S = 8; N = d * S; k = N / 24.0
     P = lambda pts: [(a * k, b * k) for a, b in pts]
     lay = Image.new('RGBA', (N, N), (0, 0, 0, 0)); g = ImageDraw.Draw(lay)
@@ -239,7 +239,7 @@ def marca(base, x, y, tam=30):
         lg2 = lg.resize((w, h), Image.LANCZOS)
         base.paste(lg2, (x, y - 4), lg2); dx = w + 14
     f = fonte('IBMPlexMono-SemiBold', round(tam * .72))
-    t1 = 'BLACKE '
+    t1 = 'Faccliky '
     esp = round(tam * .2)
     cx = x + dx
     for ch in t1:
@@ -371,7 +371,7 @@ def cartao_mural():
         hh = 150; ww = round(lg.width * hh / lg.height); l2 = lg.resize((ww, hh), Image.LANCZOS)
         im.paste(l2, ((W - ww) // 2, 120), l2)
     f = fonte('IBMPlexMono-SemiBold', 50); esp = 14
-    txt = 'BLACKE LAVEX'; tw = sum(f.getlength(c) + esp for c in txt) - esp; cx = (W - tw) / 2
+    txt = 'Faccliky'; tw = sum(f.getlength(c) + esp for c in txt) - esp; cx = (W - tw) / 2
     for i, c in enumerate(txt):
         d.text((cx, 310), c, font=f, fill=VIOLETA if i > 6 else TEXTO); cx += f.getlength(c) + esp
     d.text((W / 2, 410), 'Mural de sites e marcas', font=fonte('SpaceGrotesk-Bold', 46), fill=TEXTO, anchor='mm')
