@@ -2179,7 +2179,7 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 
 /* Apenas o interior da conversa — referência testeblacke. */
 .chat-sec .ch-main{background:radial-gradient(ellipse at 50% 30%,#2c24453a,transparent 60%),#111321;color:#f7f6ff}
-.chat-sec .ch-topo{height:74px;min-height:74px;padding:0 22px;gap:11px;background:#1b1c2a;border-bottom:1px solid #ffffff12}
+.chat-sec .ch-topo{height:74px;min-height:74px;padding:0 22px;gap:11px;background:transparent;border-bottom:0}
 .chat-sec .ch-quem h3 .ch-av .amini{width:43px;height:43px}
 .chat-sec .ch-st{color:#a59bd2;font-size:12px}
 .chat-sec .ch-msgs{background:transparent;gap:11px;padding:24px max(18px,calc((100% - 750px)/2));overscroll-behavior:contain}
