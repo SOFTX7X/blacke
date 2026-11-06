@@ -309,7 +309,7 @@ def cartao_site(s, foto, regra=(False, False)):
     d.text((x + fn.getlength(n) + 10, y + 18), 'acessos' if (s.get('cliques') or 0) != 1 else 'acesso', font=fonte('SpaceGrotesk-Medium', 21), fill=MUTED)
     # rodapé
     d.line((x, H - 96, W - 60, H - 96), fill=(30, 33, 64), width=2)
-    d.text((x, H - 70), f"blackelavex.online/s/{s.get('id')}", font=fonte('IBMPlexMono-Medium', 20), fill=DIM, anchor='lm')
+    d.text((x, H - 70), f"faccliky.com/s/{s.get('id')}", font=fonte('IBMPlexMono-Medium', 20), fill=DIM, anchor='lm')
     return im
 
 def cartao_perfil(p, sites):
@@ -361,7 +361,7 @@ def cartao_perfil(p, sites):
         for c in caps:
             caixa(im, (tx - 2, ty - 2), (148, 124), 18, (30, 33, 64))
             colar_arred(im, c, (tx, ty), (144, 120), 16); tx += 162
-    d.text((x, H - 44), f'blackelavex.online/@{h}', font=fonte('IBMPlexMono-Medium', 20), fill=DIM, anchor='lm')
+    d.text((x, H - 44), f'faccliky.com/@{h}', font=fonte('IBMPlexMono-Medium', 20), fill=DIM, anchor='lm')
     return im
 
 def cartao_mural():
@@ -376,7 +376,7 @@ def cartao_mural():
         d.text((cx, 310), c, font=f, fill=VIOLETA if i > 6 else TEXTO); cx += f.getlength(c) + esp
     d.text((W / 2, 410), 'Mural de sites e marcas', font=fonte('SpaceGrotesk-Bold', 46), fill=TEXTO, anchor='mm')
     d.text((W / 2, 466), 'Publique seu link com capa e legenda. Grátis, sem cadastro.', font=fonte('SpaceGrotesk-Regular', 27), fill=MUTED, anchor='mm')
-    d.text((W / 2, H - 56), 'blackelavex.online', font=fonte('IBMPlexMono-Medium', 22), fill=DIM, anchor='mm')
+    d.text((W / 2, H - 56), 'faccliky.com', font=fonte('IBMPlexMono-Medium', 22), fill=DIM, anchor='mm')
     return im
 
 def gerar(q):

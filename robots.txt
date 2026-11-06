@@ -6,4 +6,4 @@ Disallow: /meus-sites
 Disallow: /conta
 Disallow: /publicar
 
-Sitemap: https://blackelavex.online/sitemap.xml
+Sitemap: https://faccliky.com/sitemap.xml

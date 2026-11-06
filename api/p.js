@@ -8,7 +8,7 @@ let MODELO = null;
 try{ MODELO = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8'); }catch(_){}
 
 module.exports = async (req, res) => {
-  const base = 'https://blackelavex.online';
+  const base = 'https://faccliky.com';
   const q = req.query || {};
   let titulo = 'Faccliky — Mural anônimo', desc = 'Publique seu link com capa e legenda. Sem conta, sem cadastro.';
   let img = base + '/api/og', url = base + '/', achou = false, destino = '/';

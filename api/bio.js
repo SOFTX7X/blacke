@@ -5,7 +5,7 @@ const cortar = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); retu
 const fmt = n => (+n || 0).toLocaleString('pt-BR');
 const host = u => { try{ return new URL(u).hostname.replace(/^www\./, ''); }catch(_){ return ''; } };
 const pos = s => { const m = /^(\d{1,3})% (\d{1,3})%$/.exec(s || ''); return m ? `${Math.min(100, +m[1])}% ${Math.min(100, +m[2])}%` : '50% 50%'; };
-const BASE = 'https://blackelavex.online';
+const BASE = 'https://faccliky.com';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5anJqaW9pcHFmbHRkeXVwZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzc4MjIsImV4cCI6MjA5NDgxMzgyMn0.R913daESlpXfWeKuFOzn59kFPXgk7EZCONNTSd1w5NU';
 
 const SELO_BLACKE = '<span class="selo-b" role="img" aria-label="Selo Faccliky" title="Selo Faccliky"><svg class="sb-hex" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="#4a3fd6"/><path d="M12 .9L2.4 6.4V12L12 6.4z" fill="#8d7fff" opacity=".75"/><path d="M12 .9l9.6 5.5v11.2L12 23.1 2.4 17.6V6.4z" fill="none" stroke="#6fd6ff" stroke-width=".9" stroke-linejoin="round" opacity=".9"/><path d="M17.9 8.3l3.1-1.7-.9 2.6 1.5 1.8-3.3-.4z" fill="#000"/><circle cx="12" cy="12.6" r="6.9" fill="#000"/><path d="M6.38 8.6H17.62A6.9 6.9 0 0 1 18.35 9.9H5.65A6.9 6.9 0 0 1 6.38 8.6Z" fill="#7b6cff"/><path d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/><path transform="matrix(-1 0 0 1 24 0)" d="M6.8 12.3L10.4 13.3C10.9 13.5 10.9 14.1 10.4 14.3L8 14.9C7.2 15.1 6.5 14.6 6.6 13.9Z" fill="#a99bff"/></svg></span>';

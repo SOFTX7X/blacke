@@ -1,6 +1,6 @@
 // Sitemap para o Google: páginas fixas, perfis (@) e sites públicos.
 const db = require('./_db');
-const BASE = 'https://blackelavex.online';
+const BASE = 'https://faccliky.com';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&apos;' }[c]));
 const dia = d => (d ? new Date(d) : new Date()).toISOString().slice(0, 10);
 

@@ -1428,7 +1428,7 @@ function cartaoPerfil(p, dono){
     </div>
     ${dono ? `<div class="ig-lk">
       <span class="ig-lk-ic"><i class="fa-solid fa-link"></i></span>
-      <div class="ig-lk-t"><b>Sua página de links</b><small translate="no">blackelavex.online/bio/${esc(p.handle)}</small><span>Coloque na bio do Instagram, TikTok ou onde quiser.</span></div>
+      <div class="ig-lk-t"><b>Sua página de links</b><small translate="no">faccliky.com/bio/${esc(p.handle)}</small><span>Coloque na bio do Instagram, TikTok ou onde quiser.</span></div>
       <div class="ig-lk-a"><button class="pc-btn" type="button" data-act="copiarbio" data-h="${esc(p.handle)}"><i class="fa-regular fa-copy"></i> <span>Copiar</span></button><a class="pc-btn pri" href="/bio/${esc(p.handle)}" target="_blank" rel="noopener"><span>Abrir</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
     </div>` : ''}
   </div>${dono ? painelNumeros() + blocoSelo(p) : ''}
@@ -1729,7 +1729,7 @@ document.addEventListener('click', e => {
     }
     case 'copiarselo': {
       const h = el.dataset.h, t = S.seloTema === 'claro' ? 'claro' : 'escuro';
-      const cod = `<a href="https://blackelavex.online/bio/${h}" target="_blank" rel="noopener"><img src="https://blackelavex.online/selo/${h}${t === 'claro' ? '?t=claro' : ''}" alt="Estou no Faccliky" width="292" height="${/^[a-z0-9_]{3,20}$/.test(h) ? 84 : 72}"></a>`;
+      const cod = `<a href="https://faccliky.com/bio/${h}" target="_blank" rel="noopener"><img src="https://faccliky.com/selo/${h}${t === 'claro' ? '?t=claro' : ''}" alt="Estou no Faccliky" width="292" height="${/^[a-z0-9_]{3,20}$/.test(h) ? 84 : 72}"></a>`;
       (navigator.clipboard ? navigator.clipboard.writeText(cod) : Promise.reject()).then(() => aviso('Código copiado'), () => prompt('Copie o código:', cod)); break;
     }
     case 'copiarbio': { const u = `${location.origin}/bio/${el.dataset.h}`; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => aviso('Link copiado'), () => prompt('Copie o link:', u)); break; }
