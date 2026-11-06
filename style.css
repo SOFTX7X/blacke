@@ -2231,3 +2231,18 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
   .bnav{display:flex!important;grid-template-columns:none}
   .bnav>*{flex:1 1 0;min-width:0}
 }
+
+/* Otimização total: sem sombras, brilhos, gradientes de fundo, aurora ou transições */
+*,*::before,*::after{box-shadow:none!important;text-shadow:none!important;transition:none!important;animation:none!important}
+.aurora,.pn-aurora,.pc::before,.pc::after,.card::before,.card::after,.ig-fundo::before,#splash::before{display:none!important}
+html,body,.chat-sec .ch-main{background-image:none!important}
+.fab-pub{box-shadow:none!important}
+.bnav{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#181924!important}
+
+/* Chats: topo limpo, Pessoas maior */
+@media (max-width:899px){
+  .ch-lado-h{gap:10px;padding:12px 14px 8px}
+  .ch-pessoas-b{width:46px;height:46px;font-size:24px;color:#a99bff;background:none;border:0}
+  .ch-pessoas-b i{font-size:24px}
+  .fab-pub{width:56px;height:56px;font-size:22px;right:16px;bottom:calc(86px + env(safe-area-inset-bottom))}
+}

@@ -246,6 +246,8 @@ html.claro .chat-sec .ch-dia b{background:#c1bcd4!important;color:#39246f!import
 html.claro .chat-sec .ch-form input{background:#dfe0eb!important;color:#171717!important}
 html.claro .chat-sec .ch-form input::placeholder{color:#494964!important}
 html.claro .chat-sec .ch-ebtn{color:#4b4264!important}
+html.claro .bnav{background:#ebecf2!important}
+@media (max-width:899px){html.claro .ch-pessoas-b{color:#1900b1!important}}
 @media (max-width:899px){html.claro .topbar{background:none!important;border:0!important;box-shadow:none!important}html.claro .tb-busca,html.claro .topbar .nt-btn{background:none!important;border:0!important}}
 html.claro .brand-ninja{filter:none!important}
 @media (max-width:899px){html.claro .brand-name{color:#9254e3!important}}

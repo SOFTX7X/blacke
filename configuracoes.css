@@ -153,7 +153,7 @@ html.claro .cfg-screen{background:#f4f5fa}
 @media(min-width:900px){.cfg-screen{padding-left:84px}}
 /* Cinco posições estáveis: Mural, Usuários, Publicar, Ajustes, Conta */
 @media(max-width:899px){
- .bnav{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+ .bnav{grid-template-columns:none!important}
 }
 .usr-screen-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
 .usr-screen-head h1{font-size:21px;margin:0}

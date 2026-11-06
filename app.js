@@ -823,7 +823,7 @@ function trocarAba(aba, semHistorico, manterPerfil){
   const order=['mural','usuarios','chat','publicar','ajustes','meus'];
   const oldIndex=order.indexOf(document.body.classList.contains('cfg-open')?'ajustes':S.aba), newIndex=order.indexOf(aba);
   const changing=oldIndex!==newIndex && oldIndex>=0 && newIndex>=0;
-  if(!changing || reduced || !document.startViewTransition || document.visibilityState==='hidden' || document.body.classList.contains('modo-perfil'))
+  if(!changing || reduced || aba==='meus' || aba==='ajustes' || S.aba==='meus' || document.body.classList.contains('cfg-open') || !document.startViewTransition || document.visibilityState==='hidden' || document.body.classList.contains('modo-perfil'))
     return trocarAbaCore(aba,semHistorico,manterPerfil);
   document.documentElement.dataset.navDirection=newIndex>oldIndex?'forward':'back';
   try {
@@ -1924,8 +1924,7 @@ function chDesenharLista(){
     : `<li class="sg-vz">${q ? 'Ninguém encontrado.' : (lista.length ? 'Nenhuma conversa. Procure o @ de alguém acima.' : 'Você só conversa com quem se segue mutuamente. Siga alguém e peça para seguir você de volta.')}</li>`;
 }
 $('chBusca').addEventListener('input', chDesenharLista);
-$('chOpc').addEventListener('click', e => { e.stopPropagation(); $('chOpcM').hidden = !$('chOpcM').hidden; });
-document.addEventListener('click', e => { if (!e.target.closest('#chOpc,#chOpcM')) $('chOpcM').hidden = true; });
+document.addEventListener('click', e => { if (!e.target.closest('#chOpcM')) $('chOpcM').hidden = true; });
 /* ---------- Emojis (fonte Noto Color Emoji, via Google Fonts) ---------- */
 const EMOJIS = [
  ['😀','Carinhas','😀 😃 😄 😁 😆 😅 😂 🤣 🥲 ☺️ 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🫣 🤭 🫢 🫡 🤫 🫠 🤥 😶 😐 😑 😬 🫨 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃'],
