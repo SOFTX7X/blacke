@@ -2228,7 +2228,7 @@ html.claro .chip,html.claro .toolbar select{background:rgba(23,23,23,.06)!import
 
 /* Menu 4 itens distribuídos por igual */
 @media (max-width:899px){
-  .bnav{display:flex!important;grid-template-columns:none}
+  .bnav{display:flex;grid-template-columns:none}
   .bnav>*{flex:1 1 0;min-width:0}
 }
 
@@ -2251,3 +2251,6 @@ html,body,.chat-sec .ch-main{background-image:none!important}
 @media (max-width:899px){
   .fab-pub{width:44px;height:44px;font-size:17px;right:14px;bottom:calc(80px + env(safe-area-inset-bottom))}
 }
+
+/* O botão de publicar não aparece dentro de uma conversa aberta */
+body.ch-aberto .fab-pub{display:none!important}
