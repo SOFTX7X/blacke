@@ -2094,3 +2094,7 @@ html.claro #telaBan p{color:#4b5075}
 @media (max-width:899px){
   .chips{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);padding-right:28px}
 }
+
+/* Selo BLACKE aprovado: apenas o ninja, sem hexágono nem fundo. */
+.selo-b .sb-ninja{display:block;width:100%;height:100%;object-fit:contain;filter:none;background:transparent}
+.selo-b{background:transparent!important}
