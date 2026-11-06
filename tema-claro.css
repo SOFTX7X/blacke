@@ -234,6 +234,8 @@ html.claro .ch-m.eu .ch-h i:not(.lido){color:#0c0073!important}
 html.claro #telaBan{background:#f8f8fc!important;color:#111a52!important}
 html.claro #telaBan p{color:#232846!important}
 html.claro #telaBan .tb-m{color:#111a52!important}
+@media (max-width:899px){html.claro .topbar{background:none!important;border:0!important;box-shadow:none!important}html.claro .tb-busca,html.claro .topbar .nt-btn{background:none!important;border:0!important}}
+html.claro .brand-ninja{filter:none!important}
 html.claro *,html.claro *::before,html.claro *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.claro .ig-fundo,html.claro .pn-aurora{display:none!important}
 html.claro .nt-pn,html.claro .nt-bn,html.claro .nm,html.claro .sug{box-shadow:0 8px 24px -12px rgba(20,22,43,.25)!important}

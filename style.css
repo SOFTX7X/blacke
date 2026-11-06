@@ -2108,3 +2108,18 @@ html.claro #telaBan p{color:#4b5075}
   .ig-nome{gap:4px}
   .ig-nome>.selo-b{width:38px;height:38px;margin:0}
 }
+
+/* Cabeçalho mobile (estilo Telegram): só a marca (ninja + BLACKE em roxo) e ícones sem fundo */
+.brand-ninja{display:none}
+@media (max-width:899px){
+  .topbar{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding-left:16px!important;padding-right:10px!important}
+  .brand{gap:8px}
+  .brand .logo-ring{display:none!important}
+  .brand-ninja{display:block;width:34px;height:34px;object-fit:contain}
+  .brand-name{font-size:22px!important;font-weight:700;letter-spacing:.02em!important;color:#8d7fff;text-transform:none}
+  .brand-name b{display:none}
+  #btnAparencia,.top-actions .lang{display:none!important}
+  .tb-busca,.top-actions .nt-btn{background:none!important;border:0!important;box-shadow:none!important}
+  .top-actions .btn-ghost:not(.btn-primary){background:none!important;border:0!important;box-shadow:none!important;color:var(--text)}
+}
+html.claro .brand-name{color:#5b4fe0}
