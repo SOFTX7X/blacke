@@ -2310,3 +2310,29 @@ html,body{background-image:none!important}
  .chat-sec .ch-conv>.ch-topo .ch-quem .ch-av .amini{width:42px;height:42px}
  .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{font-size:14px}
 }
+
+
+/* Correção definitiva: cápsulas opacas no tema escuro E claro. */
+html:not(.claro) .chat-sec .ch-conv>.ch-topo,
+html.claro .chat-sec .ch-conv>.ch-topo{
+ background:transparent!important;border:0!important;
+}
+html:not(.claro) .chat-sec .ch-conv>.ch-topo #chVoltar,
+html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem,
+html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-acoes,
+html.claro .chat-sec .ch-conv>.ch-topo #chVoltar,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-quem,
+html.claro .chat-sec .ch-conv>.ch-topo .ch-acoes{
+ background-color:#1b1b1b!important;
+ background-image:none!important;
+ opacity:1!important;
+ -webkit-backdrop-filter:none!important;
+ backdrop-filter:none!important;
+ box-shadow:none!important;
+}
+html:not(.claro) .chat-sec .ch-conv>.ch-topo #chVoltar,
+html:not(.claro) .chat-sec .ch-conv>.ch-topo #chMais,
+html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-call-visual,
+html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
+ color:#fff!important;
+}
