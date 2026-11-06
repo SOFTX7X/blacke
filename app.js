@@ -2296,6 +2296,56 @@ document.addEventListener('contextmenu', e => {
   document.addEventListener('touchend', limpa, { passive:true }); document.addEventListener('touchcancel', limpa, { passive:true });
 })();
 
+/* Gestos do chat mobile aprovados no testeblacke; sem modificar o backend. */
+(()=>{
+  const box = $('chMsgs');
+  let swipe = null;
+  box.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1 || CH.selOn) return;
+    const m = e.target.closest('.ch-m[id^="chm-"]');
+    if (!m || e.target.closest('button')) return;
+    const p = e.touches[0];
+    swipe = { m, x:p.clientX, y:p.clientY, axis:null, dx:0 };
+  }, {passive:true});
+  box.addEventListener('touchmove', e => {
+    if (!swipe || e.touches.length !== 1) return;
+    const p = e.touches[0], dx = p.clientX-swipe.x, dy = p.clientY-swipe.y;
+    if (!swipe.axis && Math.max(Math.abs(dx),Math.abs(dy))>10)
+      swipe.axis = Math.abs(dx)>Math.abs(dy)*1.4 ? 'horizontal':'vertical';
+    if (swipe.axis !== 'horizontal') return;
+    swipe.dx = Math.max(-80,Math.min(0,dx));
+    swipe.m.style.transition = 'none';
+    swipe.m.style.transform = 'translateX('+swipe.dx+'px)';
+    swipe.m.classList.toggle('ch-swipe-ready',swipe.dx<=-55);
+  }, {passive:true});
+  const finish = cancelled => {
+    if (!swipe) return;
+    const {m,axis,dx}=swipe; swipe=null;
+    m.style.transition='transform 180ms ease-out';
+    m.style.transform='';
+    m.classList.remove('ch-swipe-ready');
+    setTimeout(()=>{if(m.isConnected){m.style.transition='';m.style.transform=''}},200);
+    if (!cancelled && axis==='horizontal' && dx<=-55) {
+      const id=Number(m.id.slice(4));
+      if(Number.isSafeInteger(id)){if(navigator.vibrate)try{navigator.vibrate(10)}catch(_){};chResponder(id)}
+    }
+  };
+  box.addEventListener('touchend',()=>finish(false),{passive:true});
+  box.addEventListener('touchcancel',()=>finish(true),{passive:true});
+  box.addEventListener('selectstart',e=>{if(e.target.closest('.ch-m'))e.preventDefault()});
+  function syncChatViewport(){
+    const vv=window.visualViewport;
+    const h=vv ? vv.height : window.innerHeight;
+    if(h>0)document.documentElement.style.setProperty('--chat-viewport-height',h+'px');
+  }
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',syncChatViewport);
+    window.visualViewport.addEventListener('scroll',syncChatViewport);
+  }
+  window.addEventListener('resize',syncChatViewport);
+  syncChatViewport();
+})();
+
 /* ---------- Buscar dentro da conversa (nas últimas 100 mensagens) ---------- */
 CH.bmOn = false; CH.bmRes = []; CH.bmI = 0;
 function chBuscaAbrir(){
