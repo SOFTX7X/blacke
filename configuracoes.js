@@ -78,9 +78,13 @@
       if(show)showPage('home',false);
       window.scrollTo(0,0);
     };
-    if(!animate || motionOff() || !document.startViewTransition){update();return;}
+    const navOff=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
+    if(!animate || navOff || !document.startViewTransition || document.visibilityState==='hidden'){update();return;}
     const root=document.documentElement;
-    root.dataset.navDirection=show?'forward':'back';
+    // Ajustes fica entre Publicar e Conta no menu: a direção segue a posição da aba atual.
+    const ordem=['mural','usuarios','chat','publicar','ajustes','meus'];
+    const atual=ordem.indexOf(typeof S!=='undefined'?S.aba:'mural');
+    root.dataset.navDirection=show?(atual<4?'forward':'back'):'back';
     try{
       const transition=document.startViewTransition(update);
       transition.finished.finally(()=>{delete root.dataset.navDirection;}).catch(()=>{});

@@ -827,8 +827,8 @@ function desenharMeus(){
 
 function trocarAba(aba, semHistorico, manterPerfil){
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce), (min-width: 900px)').matches;
-  const order=['mural','usuarios','chat','publicar','meus'];
-  const oldIndex=order.indexOf(S.aba), newIndex=order.indexOf(aba);
+  const order=['mural','usuarios','chat','publicar','ajustes','meus'];
+  const oldIndex=order.indexOf(document.body.classList.contains('cfg-open')?'ajustes':S.aba), newIndex=order.indexOf(aba);
   const changing=oldIndex!==newIndex && oldIndex>=0 && newIndex>=0;
   if(!changing || reduced || !document.startViewTransition || document.visibilityState==='hidden' || document.body.classList.contains('modo-perfil'))
     return trocarAbaCore(aba,semHistorico,manterPerfil);
