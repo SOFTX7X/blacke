@@ -138,6 +138,32 @@
         flex-basis:52px!important;width:52px!important;min-width:52px!important;
       }
     }
+    /* Barra de digitação Telegram: mesma altura e largura da barra anterior. */
+    html body .chat-sec #chForm .ch-compose-pill {
+      display:flex;align-items:center;gap:0;width:100%;min-width:0;
+      height:52px;min-height:52px;padding:0 5px 0 4px;
+      border-radius:999px;background:#25273a;
+    }
+    html body .chat-sec #chForm .ch-compose-pill .ch-ebtn {
+      flex:0 0 42px;width:42px;height:42px;min-width:42px;
+      margin:0!important;padding:0;border:0;border-radius:50%;
+      color:#a49bbd;background:transparent!important;
+    }
+    html body .chat-sec #chForm .ch-compose-pill #chTexto {
+      flex:1 1 auto;min-width:0;width:100%;height:48px;
+      margin:0;padding:0 7px;border:0;border-radius:0;
+      background:transparent!important;box-shadow:none!important;
+      outline:0;color:#fff;font-size:14px;
+    }
+    html body .chat-sec #chForm .ch-compose-pill #chTexto::placeholder {color:#a6a3b8}
+    html body .chat-sec #chForm .ch-compose-pill .ch-env {
+      flex:0 0 42px;width:42px;height:42px;min-width:42px;
+      margin:0;border:0;border-radius:50%;background:#8673ff!important;
+      color:#fff;display:grid;place-items:center;
+    }
+    html.claro body .chat-sec #chForm .ch-compose-pill {background:#e8e8ef}
+    html.claro body .chat-sec #chForm .ch-compose-pill #chTexto {color:#222433}
+    html.claro body .chat-sec #chForm .ch-compose-pill #chTexto::placeholder {color:#777887}
   </style>
 </head>
 <body class="carregando">
@@ -281,9 +307,11 @@
           <div class="ch-resp" id="chRespBar" hidden><i class="fa-solid fa-reply" aria-hidden="true"></i><div class="ch-resp-t"><b id="chRespQ"></b><span id="chRespT"></span></div><button type="button" id="chRespX" class="icon-btn" aria-label="Cancelar resposta"><i class="fa-solid fa-xmark"></i></button></div>
           <div class="ch-emj" id="chEmj" hidden><div class="ch-emj-g" id="chEmjG"></div><div class="ch-emj-t" id="chEmjT"></div></div>
           <form class="ch-form" id="chForm" autocomplete="off">
-            <button type="button" class="ch-ebtn" id="chEBtn" aria-label="Emojis" aria-expanded="false"><i class="fa-regular fa-face-smile"></i></button>
-            <input id="chTexto" type="text" maxlength="500" placeholder="Escrever mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
-            <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="ch-compose-pill">
+              <button type="button" class="ch-ebtn" id="chEBtn" aria-label="Emojis" aria-expanded="false"><i class="fa-regular fa-face-smile"></i></button>
+              <input id="chTexto" type="text" maxlength="500" placeholder="Mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
+              <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
           </form>
         </div>
       </div>
