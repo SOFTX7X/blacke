@@ -246,7 +246,7 @@ html.claro .chat-sec .ch-dia b{background:#c1bcd4!important;color:#39246f!import
 html.claro .chat-sec .ch-form input{background:#dfe0eb!important;color:#171717!important}
 html.claro .chat-sec .ch-form input::placeholder{color:#494964!important}
 html.claro .chat-sec .ch-ebtn{color:#4b4264!important}
-@media (max-width:899px){html.claro .chat-sec .ch-topo #chVoltar{background:rgba(17,18,29,0.702)!important;color:#171717!important}html.claro .chat-sec .ch-topo .ch-acoes{background:rgba(17,18,29,0.702)!important}html.claro .chat-sec .ch-form{background:rgba(15,17,31,0.651)!important}}
+@media (max-width:899px){html.claro .chat-sec .ch-topo #chVoltar,html.claro .chat-sec .ch-topo .ch-acoes{background:var(--chat-glass-bg)!important;color:var(--chat-glass-ink)!important}html.claro .chat-sec .ch-form{background:transparent!important}}
 html.claro .bnav{background:#ebecf2!important}
 @media (max-width:899px){html.claro .topbar{background:none!important;border:0!important;box-shadow:none!important}html.claro .tb-busca,html.claro .topbar .nt-btn{background:none!important;border:0!important}}
 html.claro .brand-ninja{filter:none!important}
@@ -271,22 +271,48 @@ html.claro .vistas,html.claro .cv-leg,html.claro .cv-leg p{color:#d9dcf0}
 html.claro .logo-ring img,html.claro .brand img,html.claro img[src^="/logo"]{filter:invert(1)}
 
 
-/* O cabeçalho flutuante da conversa mantém cápsulas escuras nos dois temas. */
-html.claro .chat-sec .ch-conv>.ch-topo{
- background:transparent!important;border:0!important;box-shadow:none!important;
+/* Mantém a aparência clara do cabeçalho desktop. */
+@media (min-width:900px){
+  html.claro .chat-sec .ch-conv>.ch-topo{background:transparent!important;border:0!important;box-shadow:none!important}
+  html.claro .chat-sec .ch-conv>.ch-topo #chVoltar,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-acoes{
+    background:#1b1b1b!important;border-color:transparent!important;color:#fff!important;
+    box-shadow:none!important;opacity:1!important;
+  }
+  html.claro .chat-sec .ch-conv>.ch-topo #chVoltar i,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-call-visual,
+  html.claro .chat-sec .ch-conv>.ch-topo #chMais,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem h3{color:#fff!important}
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{color:#9b9b9b!important}
 }
-html.claro .chat-sec .ch-conv>.ch-topo #chVoltar,
-html.claro .chat-sec .ch-conv>.ch-topo .ch-quem,
-html.claro .chat-sec .ch-conv>.ch-topo .ch-acoes{
- background:#1b1b1b!important;border-color:transparent!important;
- color:#fff!important;box-shadow:none!important;
- opacity:1!important;
+
+/* Superfícies translúcidas do cabeçalho claro, somente no chat mobile. */
+@media (max-width:899px){
+  html.claro{
+    --chat-glass-bg:rgba(250,251,255,.76);
+    --chat-glass-border:rgba(65,71,104,.17);
+    --chat-glass-shadow:0 8px 24px rgba(31,35,65,.14),inset 0 1px 0 rgba(255,255,255,.82);
+    --chat-glass-filter:blur(16px) saturate(1.18);
+    --chat-glass-ink:#25263a;
+    --chat-glass-muted:#686e86;
+  }
+  html.claro .chat-sec .ch-conv>.ch-topo{background:transparent!important;border:0!important;box-shadow:none!important}
+  html.claro .chat-sec .ch-conv>.ch-topo #chVoltar,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-acoes{
+    background:var(--chat-glass-bg)!important;
+    border:1px solid var(--chat-glass-border)!important;
+    color:var(--chat-glass-ink)!important;
+    box-shadow:var(--chat-glass-shadow)!important;
+    -webkit-backdrop-filter:var(--chat-glass-filter)!important;
+    backdrop-filter:var(--chat-glass-filter)!important;
+  }
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem::before{display:none!important}
+  html.claro .chat-sec .ch-conv>.ch-topo #chVoltar i,
+  html.claro .chat-sec .ch-conv>.ch-topo #chMais,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1,
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem h3{color:var(--chat-glass-ink)!important}
+  html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{color:var(--chat-glass-muted)!important}
 }
-html.claro .chat-sec .ch-conv>.ch-topo #chVoltar i,
-html.claro .chat-sec .ch-conv>.ch-topo .ch-call-visual,
-html.claro .chat-sec .ch-conv>.ch-topo #chMais,
-html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
- color:#fff!important;
-}
-html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{color:#9b9b9b!important}
-html.claro .chat-sec .ch-conv>.ch-topo .ch-quem h3{color:#fff!important}

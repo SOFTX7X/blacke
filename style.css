@@ -2339,8 +2339,16 @@ html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
 
 /* Barra de digitação flutuante: vidro fosco somente na conversa mobile. */
 @media (max-width:899px){
+  :root{
+    --chat-glass-bg:rgba(20,22,34,.68);
+    --chat-glass-border:rgba(255,255,255,.14);
+    --chat-glass-shadow:0 8px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07);
+    --chat-glass-filter:blur(16px) saturate(1.22);
+    --chat-glass-ink:#f6f5ff;
+    --chat-glass-muted:#c1bfd1;
+  }
   .chat-sec .ch-form{
-    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    padding:10px 8px calc(10px + env(safe-area-inset-bottom));
     background:transparent;
   }
   .chat-sec .ch-msgs{
@@ -2348,11 +2356,11 @@ html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
   }
   .chat-sec #chForm .ch-compose-pill{
     min-height:52px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(20,21,31,.78)!important;
-    box-shadow:0 8px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
-    -webkit-backdrop-filter:blur(18px) saturate(1.35)!important;
-    backdrop-filter:blur(18px) saturate(1.35)!important;
+    border:1px solid var(--chat-glass-border);
+    background:var(--chat-glass-bg)!important;
+    box-shadow:var(--chat-glass-shadow);
+    -webkit-backdrop-filter:var(--chat-glass-filter)!important;
+    backdrop-filter:var(--chat-glass-filter)!important;
   }
 }
 
@@ -2362,11 +2370,11 @@ html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
     background:transparent!important;
   }
   html.claro body .chat-sec #chForm .ch-compose-pill{
-    background:rgba(244,246,255,.76)!important;
-    border-color:rgba(76,82,116,.18)!important;
-    box-shadow:0 8px 24px rgba(31,35,65,.14),inset 0 1px 0 rgba(255,255,255,.82)!important;
-    -webkit-backdrop-filter:blur(18px) saturate(1.2)!important;
-    backdrop-filter:blur(18px) saturate(1.2)!important;
+    background:var(--chat-glass-bg)!important;
+    border-color:var(--chat-glass-border)!important;
+    box-shadow:var(--chat-glass-shadow)!important;
+    -webkit-backdrop-filter:var(--chat-glass-filter)!important;
+    backdrop-filter:var(--chat-glass-filter)!important;
   }
   html.claro body .chat-sec #chForm .ch-ebtn{
     color:#514873!important;
