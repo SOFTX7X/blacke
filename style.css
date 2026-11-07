@@ -2355,3 +2355,26 @@ html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
     backdrop-filter:blur(18px) saturate(1.35)!important;
   }
 }
+
+/* Vidro claro na barra do chat mobile; o tema escuro mantém as regras acima. */
+@media (max-width:899px){
+  html.claro body .chat-sec #chForm{
+    background:transparent!important;
+  }
+  html.claro body .chat-sec #chForm .ch-compose-pill{
+    background:rgba(244,246,255,.76)!important;
+    border-color:rgba(76,82,116,.18)!important;
+    box-shadow:0 8px 24px rgba(31,35,65,.14),inset 0 1px 0 rgba(255,255,255,.82)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.2)!important;
+    backdrop-filter:blur(18px) saturate(1.2)!important;
+  }
+  html.claro body .chat-sec #chForm .ch-ebtn{
+    color:#514873!important;
+  }
+  html.claro body .chat-sec #chForm #chTexto{
+    color:#24283f!important;
+  }
+  html.claro body .chat-sec #chForm #chTexto::placeholder{
+    color:#626884!important;
+  }
+}
