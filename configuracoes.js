@@ -5,8 +5,80 @@
   if (!screen) return;
   const $cfg = id => document.getElementById(id);
   const safeText = (el, value) => { el.textContent = String(value || ''); };
-  const pages = {home:'cfgHome',aparencia:'cfgAppearance',fontes:'cfgFontPage',idioma:'cfgLanguage'};
-  const titles = {home:'Configurações',aparencia:'Aparência',fontes:'Fontes',idioma:'Idioma'};
+  const pages = {home:'cfgHome',aparencia:'cfgAppearance',chats:'cfgChatSettings',fontes:'cfgFontPage',idioma:'cfgLanguage'};
+  const titles = {home:'Configurações',aparencia:'Aparência',chats:'Configurações de Chats',fontes:'Fontes',idioma:'Idioma'};
+  const chatPrefKey='fc_chat_prefs';
+  const wallpaperImages={
+    atual:null,
+    foto:'url("/img/chat-fundo.jpg")',
+    noite:'radial-gradient(ellipse at 20% 15%,#454656 0,transparent 48%),linear-gradient(145deg,#171820,#30313b)',
+    lavanda:'radial-gradient(ellipse at 18% 12%,#b99be7 0,transparent 52%),linear-gradient(145deg,#dcd1ef,#a99ac5)',
+    aurora:'radial-gradient(ellipse at 18% 12%,#80d4ca 0,transparent 46%),radial-gradient(ellipse at 82% 85%,#9c79cd 0,transparent 52%),linear-gradient(145deg,#172b39,#39465a)'
+  };
+  const bubblePalettes={
+    faccliky:{dark:['#473a83','#25273b'],light:['#8b7fc2','#b5b9d8']},
+    lavanda:{dark:['#7547a3','#30243c'],light:['#d8c5f5','#eee8f6']},
+    oceano:{dark:['#156f97','#203544'],light:['#acdced','#e0f0f5']},
+    rosa:{dark:['#923f72','#382433'],light:['#f3c4dd','#f4e8ee']},
+    verde:{dark:['#267652','#243a30'],light:['#b8e2ca','#e5f0e8']}
+  };
+  const nameColors=['default','lilas','azul','verde','rosa'];
+  const namePalette={lilas:{dark:'#c9a9ff',light:'#50357d'},azul:{dark:'#62d6f1',light:'#006586'},verde:{dark:'#69d4a2',light:'#186941'},rosa:{dark:'#ff9cc5',light:'#9b355f'}};
+  const readChatPrefs=()=>{
+    try{const p=JSON.parse(localStorage.getItem(chatPrefKey)||'{}');return {
+      fontSize:Math.max(12,Math.min(22,Number(p.fontSize)||14)),radius:Math.max(8,Math.min(28,Number(p.radius)||15)),
+      wallpaper:Object.prototype.hasOwnProperty.call(wallpaperImages,p.wallpaper)?p.wallpaper:'atual',nameColor:nameColors.includes(p.nameColor)?p.nameColor:'default',
+      bubbleTheme:Object.prototype.hasOwnProperty.call(bubblePalettes,p.bubbleTheme)||p.bubbleTheme==='custom'?p.bubbleTheme:'faccliky',
+      bubbleMine:/^#[0-9a-f]{6}$/i.test(p.bubbleMine||'')?p.bubbleMine:'#5b4fe0',
+      bubbleThem:/^#[0-9a-f]{6}$/i.test(p.bubbleThem||'')?p.bubbleThem:'#25273b',
+      lines:p.lines===3?3:2,animations:p.animations!==false,enterSend:p.enterSend!==false,swipeReply:p.swipeReply!==false,autoTheme:p.autoTheme===true||localStorage.getItem('bl_tema_auto')==='1'
+    }}catch(_){return {fontSize:14,radius:15,wallpaper:'atual',nameColor:'default',bubbleTheme:'faccliky',bubbleMine:'#5b4fe0',bubbleThem:'#25273b',lines:2,animations:true,enterSend:true,swipeReply:true,autoTheme:false}}
+  };
+  const chatPrefs=readChatPrefs();
+  function saveChatPrefs(){try{localStorage.setItem(chatPrefKey,JSON.stringify(chatPrefs))}catch(_){}}
+  function colorInk(hex){
+    const s=hex.replace('#',''),rgb=[0,2,4].map(i=>parseInt(s.slice(i,i+2),16)/255).map(c=>c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2));
+    return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]>.42?'#171522':'#ffffff';
+  }
+  function applyChatPrefs(){
+    const root=document.documentElement,light=root.classList.contains('claro');
+    root.style.setProperty('--chat-message-size',chatPrefs.fontSize+'px');
+    root.style.setProperty('--chat-bubble-radius',chatPrefs.radius+'px');
+    if(chatPrefs.wallpaper==='atual'){
+      delete root.dataset.chatWallpaper;root.style.removeProperty('--chat-wallpaper-image');
+    }else{
+      root.dataset.chatWallpaper=chatPrefs.wallpaper;
+      root.style.setProperty('--chat-wallpaper-image',wallpaperImages[chatPrefs.wallpaper]);
+    }
+    root.dataset.chatListLines=String(chatPrefs.lines);
+    root.dataset.chatAnimations=chatPrefs.animations?'on':'off';
+    root.dataset.chatSwipeReply=chatPrefs.swipeReply?'on':'off';
+    if(chatPrefs.nameColor==='default'){delete root.dataset.chatNameColor;root.style.removeProperty('--chat-name-color')}
+    else{root.dataset.chatNameColor='custom';root.style.setProperty('--chat-name-color',namePalette[chatPrefs.nameColor][light?'light':'dark'])}
+    root.dataset.chatBubbles=chatPrefs.bubbleTheme;
+    if(chatPrefs.bubbleTheme==='faccliky'){
+      ['--chat-bubble-out','--chat-bubble-in','--chat-bubble-out-ink','--chat-bubble-in-ink'].forEach(k=>root.style.removeProperty(k));
+    }else{
+      const pair=chatPrefs.bubbleTheme==='custom'?[chatPrefs.bubbleMine,chatPrefs.bubbleThem]:bubblePalettes[chatPrefs.bubbleTheme][light?'light':'dark'];
+      root.style.setProperty('--chat-bubble-out',pair[0]);root.style.setProperty('--chat-bubble-in',pair[1]);
+      root.style.setProperty('--chat-bubble-out-ink',colorInk(pair[0]));root.style.setProperty('--chat-bubble-in-ink',colorInk(pair[1]));
+    }
+    refreshChatSettings();
+  }
+  function refreshChatSettings(){
+    const set=(id,value)=>{const el=$cfg(id);if(el)el.value=String(value)};
+    set('chatFontSize',chatPrefs.fontSize);set('chatRadius',chatPrefs.radius);
+    safeText($cfg('chatFontSizeValue'),chatPrefs.fontSize);safeText($cfg('chatRadiusValue'),chatPrefs.radius);
+    const light=document.documentElement.classList.contains('claro'),palette=bubblePalettes[chatPrefs.bubbleTheme==='custom'?'faccliky':chatPrefs.bubbleTheme][light?'light':'dark'];
+    set('chatBubbleMine',chatPrefs.bubbleTheme==='custom'?chatPrefs.bubbleMine:palette[0]);
+    set('chatBubbleThem',chatPrefs.bubbleTheme==='custom'?chatPrefs.bubbleThem:palette[1]);
+    const check=(id,value)=>{const el=$cfg(id);if(el)el.checked=!!value};
+    check('chatAnimations',chatPrefs.animations);check('chatEnterSend',chatPrefs.enterSend);check('chatSwipeReply',chatPrefs.swipeReply);check('chatAutoTheme',chatPrefs.autoTheme);
+    document.querySelectorAll('#cfgChatSettings [data-chat-wallpaper]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chatWallpaper===chatPrefs.wallpaper)));
+    document.querySelectorAll('#cfgChatSettings [data-chat-name]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chatName===chatPrefs.nameColor)));
+    document.querySelectorAll('#cfgChatSettings [data-chat-bubble-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.chatBubbleTheme===chatPrefs.bubbleTheme)));
+    document.querySelectorAll('#cfgChatSettings [data-chat-lines]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.chatLines)===chatPrefs.lines)));
+  }
   let page='home';
   const motionOff=() => true; // Subpáginas de Ajustes sem animações.
   function stopAnimations(){
@@ -66,6 +138,7 @@
       const f = FONTES.find(x => x.id === b.dataset.cfgFonte);
       b.setAttribute('aria-pressed', String(!!f && (fam ? (f.fam || f.nome) === fam : f.id === 'padrao')));
     });
+    refreshChatSettings();
   }
   window.addEventListener('bl:perfil-atualizado',refresh);
   // Ajustes é uma tela real do fluxo do documento, não uma camada fixa.
@@ -131,6 +204,77 @@
     const b=e.target.closest('[data-cfg-fonte]'); if (!b) return;
     aplicarFonte(b.dataset.cfgFonte); refresh();
   });
+  function saveAndApplyChatPrefs(){saveChatPrefs();applyChatPrefs()}
+  const chatPage=$cfg('cfgChatSettings');
+  chatPage.addEventListener('input',e=>{
+    if(e.target.id==='chatFontSize'){chatPrefs.fontSize=Number(e.target.value);saveAndApplyChatPrefs()}
+    if(e.target.id==='chatRadius'){chatPrefs.radius=Number(e.target.value);saveAndApplyChatPrefs()}
+  });
+  chatPage.addEventListener('click',e=>{
+    const wallpaper=e.target.closest('[data-chat-wallpaper]');
+    const name=e.target.closest('[data-chat-name]');
+    const theme=e.target.closest('[data-chat-bubble-theme]');
+    const lines=e.target.closest('[data-chat-lines]');
+    if(wallpaper)chatPrefs.wallpaper=wallpaper.dataset.chatWallpaper;
+    if(name)chatPrefs.nameColor=name.dataset.chatName;
+    if(theme)chatPrefs.bubbleTheme=theme.dataset.chatBubbleTheme;
+    if(lines)chatPrefs.lines=Number(lines.dataset.chatLines)===3?3:2;
+    if(wallpaper||name||theme||lines)saveAndApplyChatPrefs();
+  });
+  ['chatAnimations','chatEnterSend','chatSwipeReply'].forEach(id=>$cfg(id).addEventListener('change',e=>{
+    chatPrefs[id==='chatAnimations'?'animations':id==='chatEnterSend'?'enterSend':'swipeReply']=e.target.checked;saveAndApplyChatPrefs();
+  }));
+  function syncDeviceTheme(){
+    if(!chatPrefs.autoTheme)return;
+    window.__blTemaAutomatico=true;
+    aplicarTema(window.matchMedia('(prefers-color-scheme: light)').matches?'claro':'escuro');
+    window.__blTemaAutomatico=false;
+  }
+  $cfg('chatAutoTheme').addEventListener('change',e=>{
+    chatPrefs.autoTheme=e.target.checked;
+    try{chatPrefs.autoTheme?localStorage.setItem('bl_tema_auto','1'):localStorage.removeItem('bl_tema_auto')}catch(_){}
+    saveChatPrefs();
+    if(chatPrefs.autoTheme)syncDeviceTheme();
+    else refreshChatSettings();
+  });
+  const systemTheme=window.matchMedia('(prefers-color-scheme: light)');
+  if(systemTheme.addEventListener)systemTheme.addEventListener('change',syncDeviceTheme);
+  else if(systemTheme.addListener)systemTheme.addListener(syncDeviceTheme);
+  document.addEventListener('bl:tema-atualizado',()=>{
+    if(!window.__blTemaAutomatico&&chatPrefs.autoTheme){chatPrefs.autoTheme=false;try{localStorage.removeItem('bl_tema_auto')}catch(_){};saveChatPrefs()}
+    applyChatPrefs();
+  });
+  ['chatBubbleMine','chatBubbleThem'].forEach(id=>$cfg(id).addEventListener('input',e=>{
+    if(chatPrefs.bubbleTheme!=='custom'){
+      chatPrefs.bubbleMine=$cfg('chatBubbleMine').value;chatPrefs.bubbleThem=$cfg('chatBubbleThem').value;
+    }
+    chatPrefs.bubbleTheme='custom';chatPrefs[id==='chatBubbleMine'?'bubbleMine':'bubbleThem']=e.target.value;saveAndApplyChatPrefs();
+  }));
+  const composer=$cfg('chTexto');
+  function resizeComposer(){
+    if(!composer)return;
+    composer.style.height='auto';
+    const max=120,base=window.matchMedia('(min-width: 900px)').matches?52:44,height=Math.max(base,Math.min(composer.scrollHeight,max));composer.style.height=height+'px';
+    document.documentElement.style.setProperty('--chat-composer-extra',Math.max(0,height-44)+'px');
+    composer.style.overflowY=composer.scrollHeight>max?'auto':'hidden';
+  }
+  if(composer){
+    composer.addEventListener('keydown',e=>{
+      if(e.key!=='Enter'||e.shiftKey||e.isComposing||e.keyCode===229||!chatPrefs.enterSend)return;
+      e.preventDefault();
+      if(composer.form.requestSubmit)composer.form.requestSubmit();
+      else composer.form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+      requestAnimationFrame(resizeComposer);
+    });
+    composer.addEventListener('input',resizeComposer);
+    $cfg('chForm').addEventListener('submit',()=>requestAnimationFrame(resizeComposer));
+    resizeComposer();
+  }
+  if(chatPrefs.autoTheme){
+    try{localStorage.setItem('bl_tema_auto','1')}catch(_){}
+    syncDeviceTheme();
+  }
+  applyChatPrefs();
   window.addEventListener('popstate', () => {
     if (location.pathname === '/configuracoes') open(false);
     else close();

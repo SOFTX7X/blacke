@@ -26,10 +26,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>try{var d=document.documentElement,L=localStorage;if(L.getItem('bl_tema')==='claro')d.classList.add('claro');var f=L.getItem('bl_fonte_n');if(f){d.style.setProperty('--display',"'"+f+"',system-ui,sans-serif");d.style.setProperty('--fonte-chat',"'"+f+"',system-ui,'Noto Color Emoji',sans-serif");if(L.getItem('bl_fonte_q')){var k=document.createElement('link');k.rel='stylesheet';k.href='https://fonts.googleapis.com/css2?family='+L.getItem('bl_fonte_q')+'&display=swap';document.head.appendChild(k)}}}catch(e){}</script>
-  <link rel="stylesheet" href="/style.css?v=f87aa791">
-  <link rel="stylesheet" href="/tema-claro.css?v=42b9b154">
-  <link rel="stylesheet" href="/configuracoes.css?v=23">
+  <script>try{var d=document.documentElement,L=localStorage,auto=L.getItem('bl_tema_auto')==='1',claro=auto?!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches):L.getItem('bl_tema')==='claro';if(claro)d.classList.add('claro');var f=L.getItem('bl_fonte_n');if(f){d.style.setProperty('--display',"'"+f+"',system-ui,sans-serif");d.style.setProperty('--fonte-chat',"'"+f+"',system-ui,'Noto Color Emoji',sans-serif");if(L.getItem('bl_fonte_q')){var k=document.createElement('link');k.rel='stylesheet';k.href='https://fonts.googleapis.com/css2?family='+L.getItem('bl_fonte_q')+'&display=swap';document.head.appendChild(k)}}}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css?v=20261107-chat-prefs">
+  <link rel="stylesheet" href="/tema-claro.css?v=20261107-chat-prefs">
+  <link rel="stylesheet" href="/configuracoes.css?v=20261107-chat-prefs">
   <!-- Cabeçalho Telegram: CSS local ao HTML para não depender de cache de folhas antigas -->
   <style id="faccliky-chat-header">
     html body .chat-sec #chConversa > .ch-topo {
@@ -141,7 +141,7 @@
     /* Barra de digitação Telegram: mesma altura e largura da barra anterior. */
     html body .chat-sec #chForm .ch-compose-pill {
       display:flex;align-items:center;gap:0;width:100%;min-width:0;
-      height:52px;min-height:52px;padding:0 5px 0 4px;
+      height:auto;min-height:52px;max-height:132px;padding:0 5px 0 4px;
       border-radius:999px;background:#25273a;
     }
     html body .chat-sec #chForm .ch-compose-pill .ch-ebtn {
@@ -150,8 +150,8 @@
       color:#a49bbd;background:transparent!important;
     }
     html body .chat-sec #chForm .ch-compose-pill #chTexto {
-      flex:1 1 auto;min-width:0;width:100%;height:48px;
-      margin:0;padding:0 7px;border:0;border-radius:0;
+      flex:1 1 auto;min-width:0;width:100%;height:44px;min-height:44px;max-height:120px;
+      margin:0;padding:0 7px;border:0;border-radius:0;line-height:20px;resize:none;overflow-y:hidden;
       background:transparent!important;box-shadow:none!important;
       outline:0;color:#fff;font-size:14px;
     }
@@ -240,6 +240,10 @@
       html body .chat-sec #chConversa > .ch-topo .ch-quem .ch-st{font-size:10px!important}
       html body .chat-sec #chConversa > .ch-topo .ch-acoes{flex-basis:50px!important;width:50px!important;min-width:50px!important;height:46px!important}
       html body .chat-sec #chConversa > .ch-topo #chMais{width:42px!important;min-width:42px!important;height:42px!important}
+    }
+    @media(min-width:900px){
+      html body .chat-sec #chForm .ch-compose-pill{height:auto!important;min-height:52px!important;max-height:132px!important}
+      html body .chat-sec #chForm .ch-compose-pill #chTexto{height:52px;min-height:52px;max-height:120px;padding:0 16px}
     }
   </style>
 </head>
@@ -386,7 +390,7 @@
           <form class="ch-form" id="chForm" autocomplete="off">
             <div class="ch-compose-pill">
               <button type="button" class="ch-ebtn" id="chEBtn" aria-label="Emojis" aria-expanded="false"><i class="fa-regular fa-face-smile"></i></button>
-              <input id="chTexto" type="text" maxlength="500" placeholder="Mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send">
+              <textarea id="chTexto" rows="1" maxlength="500" placeholder="Mensagem" aria-label="Mensagem" autocomplete="off" enterkeyhint="send"></textarea>
               <button type="submit" class="ch-env" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
           </form>
@@ -490,6 +494,7 @@
         <div class="cfg-profile"><div id="cfgAvatar" class="cfg-avatar" aria-hidden="true">B</div><div><strong id="cfgName">Minha conta</strong><small id="cfgHandle">Sem @ reservado</small></div></div>
         <div class="cfg-list">
           <button type="button" data-cfg-page="aparencia"><i class="fa-solid fa-palette"></i><span><strong>Aparência</strong><small>Temas e fontes</small></span><i class="fa-solid fa-chevron-right"></i></button>
+          <button type="button" data-cfg-page="chats"><i class="fa-regular fa-comments"></i><span><strong>Configurações de Chats</strong><small>Mensagens, cores e listas</small></span><i class="fa-solid fa-chevron-right"></i></button>
           <button type="button" data-cfg-page="idioma"><i class="fa-solid fa-language"></i><span><strong>Idioma</strong><small id="cfgLangSummary">Português</small></span><i class="fa-solid fa-chevron-right"></i></button>
           <a class="cfg-link" href="/termos"><i class="fa-solid fa-file-lines"></i><span><strong>Termos de uso</strong><small>Regras e condições</small></span><i class="fa-solid fa-chevron-right"></i></a>
           <a class="cfg-link" href="/privacidade"><i class="fa-solid fa-shield-halved"></i><span><strong>Privacidade</strong><small>Como seus dados são tratados</small></span><i class="fa-solid fa-chevron-right"></i></a>
@@ -500,6 +505,67 @@
           <div id="cfgTemas" class="cfg-list cfg-select"><button type="button" data-cfg-tema="escuro"><i class="fa-solid fa-moon"></i><span>Escuro</span><i class="fa-solid fa-check cfg-check"></i></button><button type="button" data-cfg-tema="claro"><i class="fa-solid fa-sun"></i><span>Claro</span><i class="fa-solid fa-check cfg-check"></i></button></div>
         </div>
         <div class="cfg-section"><h2>Fonte do site</h2><button type="button" id="cfgFontOpen" class="cfg-subrow"><i class="fa-solid fa-font"></i><span>Escolher fonte</span><small id="cfgFontSummary">Padrão Faccliky</small><i class="fa-solid fa-chevron-right"></i></button><p class="cfg-note">As preferências ficam salvas neste navegador.</p></div>
+      </div>
+      <div id="cfgChatSettings" class="cfg-page cfg-chat-settings" hidden>
+        <section class="cfg-section cfg-chat-card">
+          <h2>Tamanho do texto das mensagens <output id="chatFontSizeValue" for="chatFontSize">14</output></h2>
+          <input id="chatFontSize" class="cfg-chat-range" type="range" min="12" max="22" step="1" value="14" aria-label="Tamanho do texto das mensagens">
+          <div id="chatSettingsPreview" class="chat-settings-preview" aria-label="Prévia da conversa">
+            <div class="chat-settings-sample ch-m ele"><span class="chat-preview-name">Blacke</span><span class="ch-t">Bom dia! 👋</span></div>
+            <div class="chat-settings-sample ch-m eu"><span class="ch-t">É manhã em Tóquio 😎</span><span class="ch-h">03:21 ✓✓</span></div>
+          </div>
+          <h3>Papel de parede</h3>
+          <div class="chat-wallpaper-options" role="group" aria-label="Papel de parede da conversa">
+            <button type="button" data-chat-wallpaper="atual" aria-pressed="true"><span class="wallpaper-thumb wallpaper-atual"></span><span>Atual</span></button>
+            <button type="button" data-chat-wallpaper="foto" aria-pressed="false"><span class="wallpaper-thumb wallpaper-foto"></span><span>Foto</span></button>
+            <button type="button" data-chat-wallpaper="noite" aria-pressed="false"><span class="wallpaper-thumb wallpaper-noite"></span><span>Noite</span></button>
+            <button type="button" data-chat-wallpaper="lavanda" aria-pressed="false"><span class="wallpaper-thumb wallpaper-lavanda"></span><span>Lavanda</span></button>
+            <button type="button" data-chat-wallpaper="aurora" aria-pressed="false"><span class="wallpaper-thumb wallpaper-aurora"></span><span>Aurora</span></button>
+          </div>
+          <p class="cfg-note">Fundos predefinidos ficam salvos neste navegador. Imagens próprias não estão disponíveis nesta versão.</p>
+          <h3>Cor do nome</h3>
+          <div class="chat-name-options" role="group" aria-label="Cor dos nomes nas conversas">
+            <button type="button" data-chat-name="default" aria-label="Cor padrão" aria-pressed="true"><i></i></button>
+            <button type="button" data-chat-name="lilas" aria-label="Lilás" aria-pressed="false"><i></i></button>
+            <button type="button" data-chat-name="azul" aria-label="Azul" aria-pressed="false"><i></i></button>
+            <button type="button" data-chat-name="verde" aria-label="Verde" aria-pressed="false"><i></i></button>
+            <button type="button" data-chat-name="rosa" aria-label="Rosa" aria-pressed="false"><i></i></button>
+          </div>
+        </section>
+        <section class="cfg-section cfg-chat-card">
+          <h2>Tema de cores</h2>
+          <div class="chat-bubble-themes" role="group" aria-label="Tema de cores das mensagens">
+            <button type="button" data-chat-bubble-theme="faccliky" aria-pressed="true"><span class="bubble-theme-mini" data-mini="faccliky"><i></i><b></b></span><span>Faccliky</span></button>
+            <button type="button" data-chat-bubble-theme="lavanda" aria-pressed="false"><span class="bubble-theme-mini" data-mini="lavanda"><i></i><b></b></span><span>Lavanda</span></button>
+            <button type="button" data-chat-bubble-theme="oceano" aria-pressed="false"><span class="bubble-theme-mini" data-mini="oceano"><i></i><b></b></span><span>Oceano</span></button>
+            <button type="button" data-chat-bubble-theme="rosa" aria-pressed="false"><span class="bubble-theme-mini" data-mini="rosa"><i></i><b></b></span><span>Rosé</span></button>
+            <button type="button" data-chat-bubble-theme="verde" aria-pressed="false"><span class="bubble-theme-mini" data-mini="verde"><i></i><b></b></span><span>Verde</span></button>
+          </div>
+          <div class="chat-custom-colors">
+            <label>Balão enviado <input id="chatBubbleMine" type="color" value="#5b4fe0"></label>
+            <label>Balão recebido <input id="chatBubbleThem" type="color" value="#25273b"></label>
+          </div>
+          <p class="cfg-note">As cores escolhidas se adaptam ao tema claro ou escuro.</p>
+        </section>
+        <section class="cfg-section cfg-chat-card">
+          <h2>Arredondamento dos balões <output id="chatRadiusValue" for="chatRadius">15</output></h2>
+          <input id="chatRadius" class="cfg-chat-range" type="range" min="8" max="28" step="1" value="15" aria-label="Arredondamento dos balões">
+        </section>
+        <section class="cfg-section cfg-chat-card">
+          <h2>Visão da lista de chats</h2>
+          <div class="chat-list-options" role="group" aria-label="Linhas da lista de chats">
+            <button type="button" data-chat-lines="2" aria-pressed="true"><span class="chat-list-mini two" aria-hidden="true"><span class="chat-list-mini-row"><i></i><span class="chat-list-mini-lines"><b></b><b></b></span></span><span class="chat-list-mini-row"><i></i><span class="chat-list-mini-lines"><b></b><b></b></span></span></span><span>Duas linhas</span></button>
+            <button type="button" data-chat-lines="3" aria-pressed="false"><span class="chat-list-mini three" aria-hidden="true"><span class="chat-list-mini-row"><i></i><span class="chat-list-mini-lines"><b></b><b></b><b></b></span></span><span class="chat-list-mini-row"><i></i><span class="chat-list-mini-lines"><b></b><b></b><b></b></span></span></span><span>Três linhas</span></button>
+          </div>
+        </section>
+        <section class="cfg-section cfg-chat-card cfg-chat-toggles">
+          <h2>Outras configurações</h2>
+          <label class="chat-setting-toggle"><span><strong>Animações do chat</strong><small>Reduz efeitos visuais da conversa.</small></span><input id="chatAnimations" type="checkbox" checked></label>
+          <label class="chat-setting-toggle"><span><strong>Enviar com Enter</strong><small>Desative para escrever em várias linhas.</small></span><input id="chatEnterSend" type="checkbox" checked></label>
+          <label class="chat-setting-toggle"><span><strong>Deslizar para responder</strong><small>Deslize uma mensagem para a esquerda.</small></span><input id="chatSwipeReply" type="checkbox" checked></label>
+          <label class="chat-setting-toggle"><span><strong>Seguir tema do dispositivo</strong><small>Usa o modo claro ou escuro do sistema.</small></span><input id="chatAutoTheme" type="checkbox"></label>
+          <div class="chat-setting-info"><i class="fa-regular fa-face-smile" aria-hidden="true"></i><span><strong>Emojis e reações</strong><small>Continuam disponíveis no seletor e nas mensagens.</small></span></div>
+        </section>
       </div>
       <div id="cfgFontPage" class="cfg-page" hidden><div class="cfg-section"><h2>Escolha uma fonte</h2><div id="cfgFontes" class="cfg-list cfg-select cfg-fonts"></div></div></div>
       <div id="cfgLanguage" class="cfg-page" hidden><div class="cfg-section"><h2>Idioma do site</h2><div id="cfgIdiomas" class="cfg-list cfg-select"><button type="button" data-cfg-lang="pt"><i class="fa-solid fa-globe"></i><span>Português</span><i class="fa-solid fa-check cfg-check"></i></button><button type="button" data-cfg-lang="en"><i class="fa-solid fa-globe"></i><span>English</span><i class="fa-solid fa-check cfg-check"></i></button><button type="button" data-cfg-lang="es"><i class="fa-solid fa-globe"></i><span>Español</span><i class="fa-solid fa-check cfg-check"></i></button></div></div></div>
@@ -738,7 +804,7 @@
   <div id="toast" class="toast" role="status"></div>
   <script src="/i18n.js?v=1793950351"></script>
   <script src="/paginas.js?v=2"></script>
-  <script src="/app.js?v=1793951971"></script>
-  <script src="/configuracoes.js?v=1793951971"></script>
+  <script src="/app.js?v=20261107-chat-prefs"></script>
+  <script src="/configuracoes.js?v=20261107-chat-prefs"></script>
 </body>
 </html>

@@ -2089,9 +2089,9 @@ $('chForm').addEventListener('submit', async e => {
   CH.enviando = true;
   try{
     const r = await _supabase.rpc('chat_enviar', { p_handle:h, p_token:S.token, p_texto:t, ...(resp ? { p_resp:resp.id } : {}) });
-    if (r.error){ tmp.remove(); aviso(chErro(r)); if (!inp.value) inp.value = t; }
+    if (r.error){ tmp.remove(); aviso(chErro(r)); if (!inp.value){inp.value = t;inp.dispatchEvent(new Event('input',{bubbles:true}))} }
     else if (CH.h === h){ CH.sig = ''; chCarregar(true); chPessoas(false); }
-  }catch(_){ tmp.remove(); aviso('Não foi possível enviar agora.'); if (!inp.value) inp.value = t; }
+  }catch(_){ tmp.remove(); aviso('Não foi possível enviar agora.'); if (!inp.value){inp.value = t;inp.dispatchEvent(new Event('input',{bubbles:true}))} }
   CH.enviando = false;
 });
 
@@ -2306,7 +2306,7 @@ document.addEventListener('contextmenu', e => {
   const box = $('chMsgs');
   let swipe = null;
   box.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1 || CH.selOn) return;
+    if (e.touches.length !== 1 || CH.selOn || document.documentElement.dataset.chatSwipeReply === 'off') return;
     const m = e.target.closest('.ch-m[id^="chm-"]');
     if (!m || e.target.closest('button')) return;
     const p = e.touches[0];
@@ -2330,7 +2330,7 @@ document.addEventListener('contextmenu', e => {
     m.style.transform='';
     m.classList.remove('ch-swipe-ready');
     setTimeout(()=>{if(m.isConnected){m.style.transition='';m.style.transform=''}},200);
-    if (!cancelled && axis==='horizontal' && dx<=-55) {
+    if (!cancelled && axis==='horizontal' && dx<=-55 && document.documentElement.dataset.chatSwipeReply !== 'off') {
       const id=Number(m.id.slice(4));
       if(Number.isSafeInteger(id)){if(navigator.vibrate)try{navigator.vibrate(10)}catch(_){};chResponder(id)}
     }
@@ -2404,8 +2404,10 @@ const FONTES = [
 const apLS = { get:k => { try{ return localStorage.getItem(k); }catch(_){ return null; } }, set:(k, v) => { try{ v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); }catch(_){} } };
 function aplicarTema(t){
   const claro = t === 'claro'; document.documentElement.classList.toggle('claro', claro); apLS.set('bl_tema', claro ? 'claro' : null);
+  if(!window.__blTemaAutomatico)apLS.set('bl_tema_auto',null);
   const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', claro ? '#f4f5fb' : '#06070d');
   document.querySelectorAll('#modalAparencia [data-tema]').forEach(b => b.classList.toggle('on', b.dataset.tema === (claro ? 'claro' : 'escuro')));
+  document.dispatchEvent(new Event('bl:tema-atualizado'));
 }
 function aplicarFonte(id){
   const f = FONTES.find(x => x.id === id) || FONTES[0], d = document.documentElement.style;
@@ -2436,7 +2438,11 @@ $('modalAparencia').addEventListener('click', e => {
   const t = e.target.closest('[data-tema]'); if (t){ aplicarTema(t.dataset.tema); return; }
   const f = e.target.closest('[data-fonte]'); if (f) aplicarFonte(f.dataset.fonte);
 });
-aplicarTema(apLS.get('bl_tema') === 'claro' ? 'claro' : 'escuro');
+if(apLS.get('bl_tema_auto')==='1'){
+  window.__blTemaAutomatico=true;
+  aplicarTema(window.matchMedia('(prefers-color-scheme: light)').matches?'claro':'escuro');
+  window.__blTemaAutomatico=false;
+}else aplicarTema(apLS.get('bl_tema') === 'claro' ? 'claro' : 'escuro');
 
 /* ---------- Usuários: procurar pessoas pelo @ ---------- */
 const USR = { sug:null, n:0, t:0 };

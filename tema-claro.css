@@ -316,3 +316,20 @@ html.claro .logo-ring img,html.claro .brand img,html.claro img[src^="/logo"]{fil
   html.claro .chat-sec .ch-conv>.ch-topo .ch-quem h3{color:var(--chat-glass-ink)!important}
   html.claro .chat-sec .ch-conv>.ch-topo .ch-quem .ch-st{color:var(--chat-glass-muted)!important}
 }
+
+/* Preferências de chat do tema claro: alteram somente as mensagens e a conversa. */
+html.claro .chat-sec .ch-form textarea{background:rgba(23,23,23,.07)!important;color:#171717!important}
+html.claro .chat-sec .ch-form textarea::placeholder{color:#494964!important}
+html.claro[data-chat-bubbles]:not([data-chat-bubbles="faccliky"]) .chat-sec #chMsgs .ch-m.eu{background:var(--chat-bubble-out)!important;color:var(--chat-bubble-out-ink)!important}
+html.claro[data-chat-bubbles]:not([data-chat-bubbles="faccliky"]) .chat-sec #chMsgs .ch-m.ele{background:var(--chat-bubble-in)!important;color:var(--chat-bubble-in-ink)!important}
+html.claro[data-chat-bubbles]:not([data-chat-bubbles="faccliky"]) .chat-sec #chMsgs .ch-m.eu .ch-h,
+html.claro[data-chat-bubbles]:not([data-chat-bubbles="faccliky"]) .chat-sec #chMsgs .ch-m.eu .ch-h i{color:var(--chat-bubble-out-ink)!important}
+html.claro[data-chat-bubbles]:not([data-chat-bubbles="faccliky"]) .chat-sec #chMsgs .ch-m.ele .ch-h{color:var(--chat-bubble-in-ink)!important}
+html.claro .chat-settings-preview .chat-settings-sample.eu{background:var(--chat-bubble-out,#8b7fc2);color:var(--chat-bubble-out-ink,#171522)}
+html.claro .chat-settings-preview .chat-settings-sample.ele{background:var(--chat-bubble-in,#b5b9d8);color:var(--chat-bubble-in-ink,#171522)}
+html.claro:not([data-chat-wallpaper]) .chat-settings-preview{background-image:radial-gradient(ellipse at 50% 30%,rgba(44,36,69,.23),transparent 60%);background-color:#edeef6}
+html.claro .wallpaper-atual{background-image:radial-gradient(ellipse at 50% 30%,rgba(44,36,69,.23),transparent 60%),linear-gradient(145deg,#edeef6,#c7cada)}
+html.claro[data-chat-name-color="custom"] .chat-sec #chConv .ch-n1,
+html.claro[data-chat-name-color="custom"] .chat-sec #chConversa .ch-n1,
+html.claro[data-chat-name-color="custom"] .chat-sec #chConv .ch-n1 .sg-n{color:var(--chat-name-color)!important}
+html.claro[data-chat-wallpaper] .chat-sec .ch-main{background-image:var(--chat-wallpaper-image)!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important}
