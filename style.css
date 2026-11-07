@@ -2336,3 +2336,22 @@ html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-call-visual,
 html:not(.claro) .chat-sec .ch-conv>.ch-topo .ch-quem .ch-n1{
  color:#fff!important;
 }
+
+/* Barra de digitação flutuante: vidro fosco somente na conversa mobile. */
+@media (max-width:899px){
+  .chat-sec .ch-form{
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:transparent;
+  }
+  .chat-sec .ch-msgs{
+    padding-bottom:calc(98px + env(safe-area-inset-bottom));
+  }
+  .chat-sec #chForm .ch-compose-pill{
+    min-height:52px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(20,21,31,.78)!important;
+    box-shadow:0 8px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
+    -webkit-backdrop-filter:blur(18px) saturate(1.35)!important;
+    backdrop-filter:blur(18px) saturate(1.35)!important;
+  }
+}
