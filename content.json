@@ -27,7 +27,7 @@
   "projects": [
     {
       "category": "APLICATIVO",
-      "name": "BLACKE IPTV",
+      "name": "BLACKE  IPTV",
       "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
       "status": {
         "label": "Ajustando o player",
