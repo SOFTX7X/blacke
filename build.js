@@ -76,7 +76,9 @@ function project(p, i) {
 
   const img = safeAsset(p.image);
   const body = img
-    ? `<div class="win-body"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`
+    ? (p.fit === 'contain'
+      ? `<div class="win-body contain"><img class="bk" src="${esc(img)}" alt="" aria-hidden="true" loading="lazy"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`
+      : `<div class="win-body"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`)
     : `<div class="win-body soon"><img class="mark" src="assets/logo.png" alt=""><span class="ph">${esc(p.soonLabel || 'EM BREVE')}</span><span class="bar"></span></div>`;
 
   return `      <article class="proj reveal">
