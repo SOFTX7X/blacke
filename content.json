@@ -84,6 +84,26 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
+    },
+    {
+      "id": "pqyw2kn",
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
+      },
+      "image": "",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
