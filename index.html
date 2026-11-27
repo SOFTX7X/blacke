@@ -3,37 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05050a">
+<meta name="theme-color" content="#0b0b10">
 <meta name="description" content="BLACKE — criações digitais de PlayBoy. Projetos e contato.">
 <title>BLACKE — PlayBoy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="script.js" defer></script>
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
-<div class="scanlines" aria-hidden="true"></div>
-<div class="cursor" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="spot" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"></div>
 
 <header>
   <a class="logo" href="#inicio">BLACKE<span>_</span></a>
   <nav aria-label="Navegação">
     <a href="#projetos">Projetos</a>
-    <a href="#contato" class="nav-cta">Contato</a>
+    <a href="#contato" class="nav-cta magnetic">Contato</a>
   </nav>
 </header>
 
 <main id="inicio">
+  <!-- HERO -->
   <section class="hero">
-    <p class="tag"><i></i> ONLINE · BR / 2026</p>
-    <h1 class="glitch" data-text="BLACKE">BLACKE</h1>
+    <p class="tag"><i></i> PORTFÓLIO · BR / 2026</p>
+    <h1 class="glitch" data-text="BLACKE" aria-label="BLACKE"></h1>
     <p class="typing"><span id="typed"></span><b class="caret"></b></p>
     <div class="hero-actions">
-      <a class="btn" href="#projetos">Ver projetos</a>
-      <a class="btn ghost" href="#contato">Falar comigo</a>
+      <a class="btn magnetic" href="#projetos">Ver projetos</a>
+      <a class="btn ghost magnetic" href="#contato">Falar comigo</a>
     </div>
     <a class="scroll-hint" href="#projetos" aria-label="Rolar para projetos"><span></span></a>
   </section>
@@ -42,27 +43,33 @@
     <div><span>CRIAÇÕES DIGITAIS ✦ PLAYBOY ✦ BLACKE ✦ DESIGN ✦ TECNOLOGIA ✦ </span><span>CRIAÇÕES DIGITAIS ✦ PLAYBOY ✦ BLACKE ✦ DESIGN ✦ TECNOLOGIA ✦ </span></div>
   </div>
 
+  <!-- PROJETOS -->
   <section id="projetos" class="projects">
-    <h2 class="title reveal"><small>01 /</small> Projetos</h2>
+    <header class="sec-head reveal">
+      <span class="num">01</span>
+      <h2>Projetos</h2>
+      <span class="count">03 criações</span>
+    </header>
+
     <div class="grid">
-      <article class="card reveal" style="--c:#00f0ff">
-        <span class="idx">01 · SOFTWARE</span>
-        <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><path d="M120 30v116m-48-48 48 48 48-48M48 156v40h144v-40" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <article class="card reveal">
+        <div class="card-top"><span class="idx">01 · SOFTWARE</span><span class="chip live"><i></i>Online</span></div>
+        <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><path d="M120 30v116m-48-48 48 48 48-48M48 156v40h144v-40" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <h3>SOFT DOWNLOADER</h3>
         <p>Seu espaço para downloads.</p>
         <a class="link" href="https://softdownloader.site/#midias" target="_blank" rel="noopener noreferrer">Acessar projeto <span>↗</span></a>
       </article>
 
-      <article class="card reveal" style="--c:#ff2bd6">
-        <span class="idx">02 · APLICATIVO</span>
+      <article class="card reveal">
+        <div class="card-top"><span class="idx">02 · APLICATIVO</span><span class="chip wip"><i></i>Em andamento</span></div>
         <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><rect x="30" y="50" width="180" height="126" rx="24" fill="none" stroke="currentColor" stroke-width="12"/><path d="m103 83 52 30-52 30z" fill="currentColor"/><path d="M80 200h80" stroke="currentColor" stroke-width="12" stroke-linecap="round"/></svg>
         <h3>BLACKE IPTV</h3>
-        <p>Player de reprodução em desenvolvimento.</p>
-        <span class="status"><i></i> APK em preparação</span>
+        <p>Player de reprodução. APK em preparação.</p>
+        <span class="link off">Em breve</span>
       </article>
 
-      <article class="card reveal" style="--c:#39ff88">
-        <span class="idx">03 · WEBIPTV</span>
+      <article class="card reveal">
+        <div class="card-top"><span class="idx">03 · WEBIPTV</span><span class="chip live"><i></i>Online</span></div>
         <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><circle cx="120" cy="120" r="90" fill="none" stroke="currentColor" stroke-width="12"/><path d="m98 70 76 50-76 50z" fill="currentColor"/></svg>
         <h3>ASSISTA PLAYER</h3>
         <p>Player de reprodução para a web.</p>
@@ -71,8 +78,12 @@
     </div>
   </section>
 
+  <!-- CONTATO -->
   <section id="contato" class="contact">
-    <h2 class="title reveal"><small>02 /</small> Vamos conversar<span class="q">?</span></h2>
+    <header class="sec-head reveal">
+      <span class="num">02</span>
+      <h2>Vamos conversar<span class="q">?</span></h2>
+    </header>
     <p class="lead reveal">Tem um projeto, ideia ou parceria? Me chama.</p>
 
     <div class="contact-wrap">
@@ -80,24 +91,16 @@
         <label>Seu nome
           <input name="nome" type="text" autocomplete="name" required maxlength="60" placeholder="Como posso te chamar?">
         </label>
-        <label>Assunto
-          <select name="assunto">
-            <option>Quero um projeto</option>
-            <option>Parceria</option>
-            <option>Dúvida</option>
-            <option>Outro</option>
-          </select>
-        </label>
         <label>Mensagem
-          <textarea name="msg" rows="4" required maxlength="600" placeholder="Conta sobre sua ideia..."></textarea>
+          <textarea name="msg" rows="5" required maxlength="600" placeholder="Conta sobre sua ideia..."></textarea>
         </label>
-        <button class="btn" type="submit">Enviar pelo Telegram <span>↗</span></button>
+        <button class="btn magnetic" type="submit">Enviar pelo Telegram <span>↗</span></button>
         <p class="hint" id="hint" role="status" aria-live="polite"></p>
       </form>
 
       <div class="socials reveal">
-        <a href="https://t.me/pbhubxx" target="_blank" rel="noopener noreferrer" style="--c:#00f0ff"><span>Telegram<small>@pbhubxx</small></span><b>↗</b></a>
-        <a href="https://instagram.com/pbhubxx" target="_blank" rel="noopener noreferrer" style="--c:#ff2bd6"><span>Instagram<small>@pbhubxx</small></span><b>↗</b></a>
+        <a href="https://t.me/pbhubxx" target="_blank" rel="noopener noreferrer"><span>Telegram<small>@pbhubxx</small></span><b>↗</b></a>
+        <a href="https://instagram.com/pbhubxx" target="_blank" rel="noopener noreferrer"><span>Instagram<small>@pbhubxx</small></span><b>↗</b></a>
       </div>
     </div>
   </section>
