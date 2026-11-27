@@ -336,3 +336,6 @@ footer{justify-content:center}
   .socials{gap:14px}
   .soc{width:calc((100vw - 36px - 42px) / 4)}
 }
+
+/* painel: até 6 itens no bloco de texto do projeto */
+.proj-info>:nth-child(6){--s:5}.proj-info>:nth-child(7){--s:6}

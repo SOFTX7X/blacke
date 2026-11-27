@@ -1,0 +1,70 @@
+{
+  "site": {
+    "brand": "BLACKE",
+    "title": "BLACKE — @pbhubxx",
+    "description": "BLACKE — criações digitais de @pbhubxx. Projetos e contato."
+  },
+  "intro": {
+    "line": "@PBHUBXX · PORTFÓLIO"
+  },
+  "hero": {
+    "tag": "PORTFÓLIO · BR / 2026",
+    "phrases": [
+      "Meu site de criações.",
+      "Design + tecnologia.",
+      "Projetos que saem do papel."
+    ],
+    "primary": "Ver projetos",
+    "secondary": "Falar comigo"
+  },
+  "marquee": [
+    "CRIAÇÕES DIGITAIS",
+    "@PBHUBXX",
+    "BLACKE",
+    "DESIGN",
+    "TECNOLOGIA"
+  ],
+  "projects": [
+    {
+      "category": "SOFTWARE",
+      "name": "SOFT\nDOWNLOADER",
+      "description": "Seu espaço para downloads.",
+      "status": { "label": "Online", "type": "live" },
+      "progress": { "value": 100, "note": "Concluído · no ar" },
+      "link": { "url": "https://softdownloader.site/#midias", "label": "Acessar projeto" },
+      "image": "assets/soft-downloader.png",
+      "soonLabel": ""
+    },
+    {
+      "category": "APLICATIVO",
+      "name": "BLACKE\nIPTV",
+      "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
+      "status": { "label": "Ajustando o player", "type": "wip" },
+      "progress": { "value": 90, "note": "Ajustando o player · APK ainda não está pronto" },
+      "link": { "url": "", "label": "APK em breve" },
+      "image": "",
+      "soonLabel": "APK EM PREPARAÇÃO"
+    },
+    {
+      "category": "WEBIPTV",
+      "name": "ASSISTA\nPLAYER",
+      "description": "Player de reprodução para a web.",
+      "status": { "label": "Fase de teste", "type": "wip" },
+      "progress": { "value": 95, "note": "Fase de teste · a lista depende do provedor" },
+      "link": { "url": "https://assista-player.vercel.app/", "label": "Acessar projeto" },
+      "image": "assets/assista-player.png",
+      "soonLabel": ""
+    }
+  ],
+  "contact": {
+    "title": "Vamos conversar?",
+    "lead": "Tem um projeto, ideia ou parceria? Me chama.",
+    "links": [
+      { "type": "whatsapp", "label": "WhatsApp", "value": "5592981083928" },
+      { "type": "telegram", "label": "Telegram", "value": "pbhubxx" },
+      { "type": "instagram", "label": "Instagram", "value": "pbhubxx" },
+      { "type": "email", "label": "E-mail", "value": "blackelavex@gmail.com" }
+    ]
+  },
+  "footer": "© 2026 / @pbhubxx"
+}

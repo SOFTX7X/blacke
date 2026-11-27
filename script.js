@@ -165,7 +165,8 @@
 
   /* ---------- digitação ---------- */
   const typed = $('#typed');
-  const phrases = ['Meu site de criações.', 'Design + tecnologia.', 'Projetos que saem do papel.'];
+  const SITE = window.__SITE || {};
+  const phrases = SITE.phrases && SITE.phrases.length ? SITE.phrases : ['Meu site de criações.', 'Design + tecnologia.', 'Projetos que saem do papel.'];
   if (reduce) typed.textContent = phrases[0];
   else {
     let pi = 0, ci = 0, del = false;
@@ -199,7 +200,7 @@
 
   /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
   const logoSep = '<span class="sep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z"/></svg></span>';
-  const row1 = ['CRIAÇÕES DIGITAIS', '@PBHUBXX', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
+  const row1 = SITE.marquee && SITE.marquee.length ? SITE.marquee : ['BLACKE'];
   function buildMarquee() {
     $$('.marquee .track').forEach((track, n) => {
       const items = row1, sep = logoSep;
