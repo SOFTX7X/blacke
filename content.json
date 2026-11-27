@@ -81,6 +81,25 @@
       },
       "image": "assets/assista-player.png",
       "soonLabel": ""
+    },
+    {
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
+      "status": {
+        "label": "Em andamento",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Acessar projeto"
+      },
+      "image": "",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
