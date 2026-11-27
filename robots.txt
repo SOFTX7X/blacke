@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /api/img
-Disallow: /api/
-Disallow: /meus-sites
-Disallow: /conta
-Disallow: /publicar
-
-Sitemap: https://faccliky.com/sitemap.xml
