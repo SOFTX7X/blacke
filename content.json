@@ -103,7 +103,7 @@
         "label": "Em breve"
       },
       "image": "assets/uploads/82f527fec2908d19642fa772df9933ac-1ec2a7.webp",
-      "fit": "contain",
+      "fit": "fill",
       "soonLabel": "EM BREVE"
     }
   ],
