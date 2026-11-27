@@ -1,2 +1,3 @@
 # BLACKE
-Portfólio pessoal de PlayBoy. Site estático para Vercel. Fontes Google e GSAP via CDN, com fallback sem JavaScript. BLACKE IPTV aguarda APK. Os símbolos dos projetos são gráficos decorativos, não screenshots.
+Portfólio pessoal de PlayBoy. Site estático (HTML + CSS + JS puros, sem dependências) para Vercel/GitHub Pages.
+Tema neon com partículas animadas, título glitch, cards 3D e formulário que abre o Telegram com a mensagem pronta.
