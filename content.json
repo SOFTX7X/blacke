@@ -84,6 +84,26 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
+    },
+    {
+      "id": "pi4pcbr",
+      "category": "+18",
+      "name": "VIP VIDEOS",
+      "description": "VENDO SITE +18 e junto vai automoção de pagamentos.\nINCLUSO : 83 VIDEOS DE FAMILIA SACANA + FEED com publicação de ",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
+      },
+      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-6f7a5a.webp",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
