@@ -1,5 +1,6 @@
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let startTyping = () => {};
   const fine = matchMedia('(hover:hover)').matches;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -91,8 +92,8 @@
     const el = $(s); if (el) { el.dataset.sec = n; spy.observe(el); }
   });
 
-  /* ---------- abertura: cortina + contador ---------- */
-  const body = document.body, curtain = $('.curtain'), pct = $('#pct');
+  /* ---------- abertura: abre direto, sem tela de carregamento ---------- */
+  const body = document.body, curtain = $('.curtain');
   let started = false;
   const start = () => {
     if (started) return; started = true;
@@ -101,16 +102,6 @@
     body.classList.add('ready');
     startTyping();
   };
-  if (reduce) start();
-  else {
-    const t0 = performance.now(), D = 1100;
-    (function count(t) {
-      const k = Math.min(1, (t - t0) / D);
-      pct.textContent = Math.round((1 - Math.pow(1 - k, 3)) * 100);
-      if (k < 1) requestAnimationFrame(count); else setTimeout(start, 280);
-    })(t0);
-    setTimeout(start, 4000);
-  }
 
   /* ---------- transição entre seções (cortina) ---------- */
   let jumping = false;
@@ -169,7 +160,6 @@
 
   /* ---------- digitação ---------- */
   const typed = $('#typed');
-  let startTyping = () => {};
   const phrases = ['Meu site de criações.', 'Design + tecnologia.', 'Projetos que saem do papel.'];
   if (reduce) typed.textContent = phrases[0];
   else {
@@ -212,4 +202,6 @@
     });
 
   }
+  /* ---------- abre direto, sem tela de carregamento ---------- */
+  start();
 })();

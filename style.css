@@ -212,11 +212,6 @@ nav a:not(.nav-cta):hover::after,nav a.active:not(.nav-cta)::after{transform:sca
 .curtain[data-s="in"]{pointer-events:all}
 .curtain[data-s="in"] i{transform:scaleY(1);transform-origin:top}
 .curtain[data-s="out"] i{transform:scaleY(0);transform-origin:bottom}
-.cur-logo{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:16px;opacity:0;transition:opacity .35s .15s}
-.curtain[data-s="in"] .cur-logo{opacity:1}
-.curtain[data-s="out"] .cur-logo{opacity:0;transition-delay:0s}
-.cur-logo img{width:86px;height:auto;animation:float 3s ease-in-out infinite}
-.cur-logo b{font-family:var(--display);font-weight:700;letter-spacing:.3em;font-size:.8rem;color:var(--lav)}
 
 /* hero só anima depois que a cortina abre */
 .loading .tag,.loading .glitch .ch,.loading .typing,.loading .hero-actions,.loading .hero-logo,.loading .scroll-hint{animation-play-state:paused}
