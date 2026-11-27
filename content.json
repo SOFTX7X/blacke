@@ -144,6 +144,26 @@
       },
       "image": "",
       "soonLabel": "EM BREVE"
+    },
+    {
+      "id": "pkq92r5",
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
+      },
+      "image": "",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
