@@ -84,26 +84,6 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
-    },
-    {
-      "id": "pom0uhb",
-      "category": "+18",
-      "name": "",
-      "description": "",
-      "status": {
-        "label": "Em breve",
-        "type": "wip"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Em breve"
-      },
-      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-db3bb1.webp",
-      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
