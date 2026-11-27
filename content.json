@@ -26,26 +26,6 @@
   ],
   "projects": [
     {
-      "category": "APLICATIVO",
-      "name": "BLACKE  IPTV",
-      "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
-      "status": {
-        "label": "Ajustando o player",
-        "type": "wip"
-      },
-      "progress": {
-        "value": 95,
-        "note": "Ajustando o player · APK ainda não está pronto"
-      },
-      "link": {
-        "url": "",
-        "label": "APK em breve"
-      },
-      "image": "",
-      "soonLabel": "APK EM PREPARAÇÃO",
-      "id": "p1"
-    },
-    {
       "category": "SOFTWARE",
       "name": "SOFT\nDOWNLOADER",
       "description": "Seu espaço para downloads.",
@@ -84,6 +64,26 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
+    },
+    {
+      "category": "APLICATIVO",
+      "name": "BLACKE  IPTV",
+      "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
+      "status": {
+        "label": "Ajustando o player",
+        "type": "wip"
+      },
+      "progress": {
+        "value": 95,
+        "note": "Ajustando o player · APK ainda não está pronto"
+      },
+      "link": {
+        "url": "",
+        "label": "APK em breve"
+      },
+      "image": "",
+      "soonLabel": "APK EM PREPARAÇÃO",
+      "id": "p1"
     },
     {
       "id": "pjms86q",
