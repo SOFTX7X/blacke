@@ -136,6 +136,7 @@ footer a:hover{color:var(--lav)}
 .win-body>img:not(.mark){position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;clip-path:inset(0 100% 0 0);transition:clip-path 1.3s .35s var(--ease),transform 1s var(--ease)}
 .proj.in .win-body>img:not(.mark){clip-path:inset(0 0 0 0)}
 .proj:hover .win-body>img:not(.mark){transform:scale(1.035)}
+.win-body.fill>img:not(.mark){object-fit:fill}
 .win-body.contain>img:not(.mark):not(.bk){object-fit:contain;object-position:center}
 .win-body.contain>img.bk{inset:-12%;width:124%;height:124%;object-position:center;filter:blur(26px) brightness(.45);transform:none!important}
 .proj:hover .win-body.contain>img.bk{transform:none}
