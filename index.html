@@ -12,8 +12,11 @@
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="stylesheet" href="style.css">
 <script src="script.js" defer></script>
+<noscript><style>.curtain{display:none}.loading *,.loading{animation-play-state:running!important}</style></noscript>
 </head>
-<body>
+<body class="loading">
+<div class="curtain" data-s="in" aria-hidden="true"><i style="--k:0"></i><i style="--k:1"></i><i style="--k:2"></i><i style="--k:3"></i><i style="--k:4"></i><i style="--k:5"></i><i style="--k:6"></i>
+  <div class="cur-logo"><img src="assets/logo.png" alt=""><b><span id="pct">0</span>%</b></div></div>
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
 <div class="spot" aria-hidden="true"></div>
@@ -31,6 +34,7 @@
 <main id="inicio">
   <!-- HERO -->
   <section class="hero">
+    <div class="hero-in">
     <img class="hero-logo" src="assets/logo.png" alt="Logo BLACKE" width="564" height="427">
     <p class="tag"><i></i> PORTFÓLIO · BR / 2026</p>
     <h1 class="glitch" data-text="BLACKE" aria-label="BLACKE"></h1>
@@ -40,6 +44,7 @@
       <a class="btn ghost magnetic" href="#contato">Falar comigo</a>
     </div>
     <a class="scroll-hint" href="#projetos" aria-label="Rolar para projetos"><span></span></a>
+    </div>
   </section>
 
   <div class="marquee" aria-hidden="true">

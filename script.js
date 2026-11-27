@@ -91,6 +91,74 @@
     const el = $(s); if (el) { el.dataset.sec = n; spy.observe(el); }
   });
 
+  /* ---------- abertura: cortina + contador ---------- */
+  const body = document.body, curtain = $('.curtain'), pct = $('#pct');
+  let started = false;
+  const start = () => {
+    if (started) return; started = true;
+    curtain.dataset.s = 'out';
+    body.classList.remove('loading');
+    body.classList.add('ready');
+    startTyping();
+  };
+  if (reduce) start();
+  else {
+    const t0 = performance.now(), D = 1100;
+    (function count(t) {
+      const k = Math.min(1, (t - t0) / D);
+      pct.textContent = Math.round((1 - Math.pow(1 - k, 3)) * 100);
+      if (k < 1) requestAnimationFrame(count); else setTimeout(start, 280);
+    })(t0);
+    setTimeout(start, 4000);
+  }
+
+  /* ---------- transição entre seções (cortina) ---------- */
+  let jumping = false;
+  $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    const target = id === '#' ? null : $(id);
+    if (!target || reduce || jumping || !started) return;
+    e.preventDefault(); jumping = true;
+    curtain.dataset.s = 'in';
+    setTimeout(() => {
+      const top = id === '#inicio' ? 0 : target.getBoundingClientRect().top + scrollY - (id === '#projetos' || id === '#contato' ? 0 : 0);
+      document.documentElement.style.scrollBehavior = 'auto';
+      scrollTo(0, top);
+      document.documentElement.style.scrollBehavior = '';
+      history.replaceState(null, '', id);
+      lastY = scrollY; body.classList.remove('nav-hide'); updateHero();
+      setTimeout(() => { curtain.dataset.s = 'out'; setTimeout(() => { jumping = false; }, 650); }, 160);
+    }, 620);
+  }));
+
+  /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */
+  const heroIn = $('.hero-in');
+  const marq = $('.marquee div'), marqSpans = $$('.marquee span');
+  let lastY = scrollY, vel = 0;
+  function updateHero() {
+    const p = Math.max(0, Math.min(1, scrollY / (innerHeight * .85)));
+    heroIn.style.setProperty('--hp', p.toFixed(3));
+  }
+  addEventListener('scroll', () => {
+    const y = scrollY, dy = y - lastY; lastY = y;
+    if (!jumping) {
+      vel += dy;
+      if (y > 220 && dy > 3) body.classList.add('nav-hide');
+      else if (dy < -3 || y < 220) body.classList.remove('nav-hide');
+    }
+    if (!reduce) updateHero();
+  }, { passive: true });
+  if (!reduce) {
+    (function loop() {
+      vel *= .9;
+      const a = marq.getAnimations()[0];
+      if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .18, 7);
+      const sk = Math.max(-18, Math.min(18, -vel * .35));
+      marqSpans.forEach(s => { s.style.transform = `skewX(${sk.toFixed(2)}deg)`; });
+      requestAnimationFrame(loop);
+    })();
+  }
+
   /* ---------- barra de progresso ---------- */
   const bar = $('.progress');
   const onScroll = () => {
@@ -101,18 +169,19 @@
 
   /* ---------- digitação ---------- */
   const typed = $('#typed');
+  let startTyping = () => {};
   const phrases = ['Meu site de criações.', 'Design + tecnologia.', 'Projetos que saem do papel.'];
   if (reduce) typed.textContent = phrases[0];
   else {
     let pi = 0, ci = 0, del = false;
-    setTimeout(function tick() {
+    startTyping = () => setTimeout(function tick() {
       const t = phrases[pi];
       typed.textContent = t.slice(0, ci);
       if (!del && ci === t.length) { del = true; return setTimeout(tick, 1700); }
       if (del && ci === 0) { del = false; pi = (pi + 1) % phrases.length; }
       ci += del ? -1 : 1;
       setTimeout(tick, del ? 26 : 62);
-    }, 1100);
+    }, 650);
   }
 
   /* ---------- reveal ao rolar ---------- */
