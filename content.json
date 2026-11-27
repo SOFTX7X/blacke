@@ -87,8 +87,8 @@
     },
     {
       "id": "pom0uhb",
-      "category": "CATEGORIA",
-      "name": "NOVO\nPROJETO",
+      "category": "+18",
+      "name": "",
       "description": "",
       "status": {
         "label": "Em breve",
@@ -102,7 +102,7 @@
         "url": "",
         "label": "Em breve"
       },
-      "image": "",
+      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-db3bb1.webp",
       "soonLabel": "EM BREVE"
     }
   ],
