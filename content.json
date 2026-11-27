@@ -86,47 +86,7 @@
       "id": "p2"
     },
     {
-      "category": "CATEGORIA",
-      "name": "NOVO\nPROJETO",
-      "description": "",
-      "status": {
-        "label": "Em andamento",
-        "type": "wip"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Acessar projeto"
-      },
-      "image": "",
-      "soonLabel": "EM BREVE",
-      "id": "p3"
-    },
-    {
-      "id": "n4f7dns",
-      "category": "CATEGORIA",
-      "name": "NOVO\nPROJETO",
-      "description": "",
-      "status": {
-        "label": "Em andamento",
-        "type": "live"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Acessar projeto"
-      },
-      "image": "",
-      "soonLabel": "EM BREVE"
-    },
-    {
-      "id": "pjl9l3a",
+      "id": "prq2gi4",
       "category": "CATEGORIA",
       "name": "NOVO\nPROJETO",
       "description": "",
