@@ -26,26 +26,6 @@
   ],
   "projects": [
     {
-      "category": "SOFTWARE",
-      "name": "SOFT\nDOWNLOADER",
-      "description": "Seu espaço para downloads.",
-      "status": {
-        "label": "Online",
-        "type": "live"
-      },
-      "progress": {
-        "value": 100,
-        "note": "Concluído · no ar"
-      },
-      "link": {
-        "url": "https://softdownloader.site/#midias",
-        "label": "Acessar projeto"
-      },
-      "image": "assets/soft-downloader.png",
-      "soonLabel": "",
-      "id": "p0"
-    },
-    {
       "category": "APLICATIVO",
       "name": "BLACKE\nIPTV",
       "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
@@ -64,6 +44,26 @@
       "image": "",
       "soonLabel": "APK EM PREPARAÇÃO",
       "id": "p1"
+    },
+    {
+      "category": "SOFTWARE",
+      "name": "SOFT\nDOWNLOADER",
+      "description": "Seu espaço para downloads.",
+      "status": {
+        "label": "Online",
+        "type": "live"
+      },
+      "progress": {
+        "value": 100,
+        "note": "Concluído · no ar"
+      },
+      "link": {
+        "url": "https://softdownloader.site/#midias",
+        "label": "Acessar projeto"
+      },
+      "image": "assets/soft-downloader.png",
+      "soonLabel": "",
+      "id": "p0"
     },
     {
       "category": "WEBIPTV",
