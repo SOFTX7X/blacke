@@ -194,7 +194,7 @@
 
   /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
   const logoSep = '<span class="sep"><img src="assets/logo.png" alt=""></span>';
-  const row1 = ['CRIAÇÕES DIGITAIS', 'PLAYBOY', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
+  const row1 = ['CRIAÇÕES DIGITAIS', '@PBHUBXX', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
   function buildMarquee() {
     $$('.marquee .track').forEach((track, n) => {
       const items = row1, sep = logoSep;
