@@ -86,27 +86,7 @@
       "id": "p2"
     },
     {
-      "id": "pdkkroo",
-      "category": "CATEGORIA",
-      "name": "NOVO\nPROJETO",
-      "description": "",
-      "status": {
-        "label": "Em breve",
-        "type": "wip"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Em breve"
-      },
-      "image": "",
-      "soonLabel": "EM BREVE"
-    },
-    {
-      "id": "p2j17b7",
+      "id": "pom0uhb",
       "category": "CATEGORIA",
       "name": "NOVO\nPROJETO",
       "description": "",
