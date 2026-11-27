@@ -122,23 +122,4 @@
       if (scrollY < innerHeight) h1.style.transform = `translateY(${scrollY * .18}px)`;
     }, { passive: true });
   }
-
-  /* ---------- formulário: abre o Telegram com a mensagem pronta ---------- */
-  const form = $('#form'), hint = $('#hint');
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const { nome, msg } = form;
-    [nome, msg].forEach(f => f.classList.toggle('err', !f.value.trim()));
-    if (!nome.value.trim() || !msg.value.trim()) {
-      hint.className = 'hint bad';
-      hint.textContent = 'Preencha seu nome e a mensagem.';
-      return;
-    }
-    const texto = `Olá! Sou ${nome.value.trim()}.\n\n${msg.value.trim()}`;
-    navigator.clipboard?.writeText(texto).catch(() => {});
-    hint.className = 'hint';
-    hint.textContent = 'Abrindo o Telegram... (mensagem também copiada).';
-    open(`https://t.me/pbhubxx?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
-    form.reset();
-  });
 })();
