@@ -68,11 +68,11 @@
       "name": "ASSISTA\nPLAYER",
       "description": "Player de reprodução para a web.",
       "status": {
-        "label": "Fase de teste",
+        "label": "Online",
         "type": "wip"
       },
       "progress": {
-        "value": 95,
+        "value": 100,
         "note": "Fase de teste · a lista depende do provedor"
       },
       "link": {
