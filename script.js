@@ -124,7 +124,7 @@
 
   /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */
   const heroIn = $('.hero-in');
-  const marq = $('.marquee div'), marqSpans = $$('.marquee span');
+  const mTracks = $$('.marquee .track'), mRows = $$('.marquee .row');
   let lastY = scrollY, vel = 0;
   function updateHero() {
     const p = Math.max(0, Math.min(1, scrollY / (innerHeight * .85)));
@@ -142,10 +142,10 @@
   if (!reduce) {
     (function loop() {
       vel *= .9;
-      const a = marq.getAnimations()[0];
-      if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .18, 7);
-      const sk = Math.max(-18, Math.min(18, -vel * .35));
-      marqSpans.forEach(s => { s.style.transform = `skewX(${sk.toFixed(2)}deg)`; });
+      const rate = 1 + Math.min(Math.abs(vel) * .18, 7);
+      mTracks.forEach(t => { const a = t.getAnimations()[0]; if (a) a.playbackRate = rate; });
+      const sk = Math.max(-14, Math.min(14, -vel * .28));
+      mRows.forEach(r => { r.style.transform = `skewX(${sk.toFixed(2)}deg)`; });
       requestAnimationFrame(loop);
     })();
   }
@@ -191,6 +191,29 @@
     }, delay);
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
+
+  /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
+  const logoSep = '<span class="sep"><img src="assets/logo.png" alt=""></span>';
+  const dotSep = '<span class="sep"></span>';
+  const row1 = ['CRIAÇÕES DIGITAIS', 'PLAYBOY', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
+  const row2 = ['Portfólio', 'Br <b>/</b> 2026', 'Soft Downloader', 'Assista Player', 'Blacke IPTV', 'M3U', 'Xtream'];
+  function buildMarquee() {
+    $$('.marquee .track').forEach((track, n) => {
+      const items = n === 0 ? row1 : row2, sep = n === 0 ? logoSep : dotSep;
+      const unit = items.map((t, i) => `<span class="it${n === 0 && i % 2 ? ' out' : ''}">${t}</span>${sep}`).join('');
+      let reps = 1, grp;
+      track.innerHTML = '<div class="grp"></div><div class="grp"></div>';
+      const g = track.children;
+      do {
+        g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps);
+        grp = g[0].offsetWidth; reps++;
+      } while (grp < innerWidth * 1.15 && reps < 12);
+      track.style.setProperty('--dur', (grp / (n === 0 ? 60 : 42)).toFixed(1) + 's');
+    });
+  }
+  buildMarquee();
+  let mqW = innerWidth;
+  addEventListener('resize', () => { if (innerWidth > mqW * 1.1) { mqW = innerWidth; buildMarquee(); } });
 
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
