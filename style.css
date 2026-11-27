@@ -99,7 +99,7 @@ footer a:hover{color:var(--lav)}
 
 /* ---------- contato: linhas quadradas ---------- */
 .socials{display:grid;gap:16px}
-.socials a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:18px;padding:22px 26px;background:var(--panel);border:1px solid var(--line);box-shadow:8px 8px 0 #c4b5fd12;font-family:var(--display);font-weight:700;position:relative;overflow:hidden;transition:color .3s}
+.socials a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:18px 26px;background:var(--panel);border:1px solid var(--line);box-shadow:8px 8px 0 #c4b5fd12;font-family:var(--display);font-weight:700;position:relative;overflow:hidden;transition:color .3s}
 .socials a::before{content:"";position:absolute;inset:0;background:var(--lav);transform:translateX(-101%);transition:transform .45s var(--ease);z-index:0}
 .socials a>*{position:relative;z-index:1}
 .socials a:hover{color:#0b0b10}
@@ -171,3 +171,8 @@ footer a:hover{color:var(--lav)}
 .tag i,.chip i,.win-bar i,.spot{border-radius:50%}
 .scroll-hint{border-radius:14px}
 .scroll-hint span{border-radius:2px}
+
+/* ícones das redes */
+.ico{display:grid;place-items:center;width:52px;height:52px;border:1px solid #c4b5fd66;color:var(--lav);background:#c4b5fd0d;transition:background .35s,color .35s,border-color .35s,transform .45s var(--ease)}
+.ico svg{width:26px;height:26px;display:block}
+.socials a:hover .ico{background:#0b0b10;color:var(--lav);border-color:#0b0b10;transform:rotate(-6deg) scale(1.06)}
