@@ -84,27 +84,6 @@
       "image": "",
       "soonLabel": "APK EM PREPARAÇÃO",
       "id": "p1"
-    },
-    {
-      "id": "pjms86q",
-      "category": "CATEGORIA",
-      "name": "TESTE",
-      "description": "",
-      "status": {
-        "label": "Em breve",
-        "type": "wip"
-      },
-      "progress": {
-        "value": 0,
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Em breve"
-      },
-      "image": "assets/uploads/82f527fec2908d19642fa772df9933ac-1ec2a7.webp",
-      "fit": "fill",
-      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
