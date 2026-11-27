@@ -84,26 +84,6 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
-    },
-    {
-      "id": "p9p6qkz",
-      "category": "CATEGORIA",
-      "name": "TESTE",
-      "description": "",
-      "status": {
-        "label": "Em breve",
-        "type": "wip"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Em breve"
-      },
-      "image": "assets/uploads/82f527fec2908d19642fa772df9933ac-a43dfd.webp",
-      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
