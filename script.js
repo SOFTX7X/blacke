@@ -174,6 +174,24 @@
     }, 650);
   }
 
+  /* ---------- porcentagem sobe até o valor ---------- */
+  const countIO = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    countIO.unobserve(e.target);
+    const el = $('em', e.target), to = +el.dataset.count;
+    if (reduce) { el.textContent = to; return; }
+    const D = 1800, delay = 450;
+    setTimeout(() => {
+      const t0 = performance.now();
+      (function step(t) {
+        const k = Math.min(1, (t - t0) / D);
+        el.textContent = Math.round((1 - Math.pow(1 - k, 3)) * to);
+        if (k < 1) requestAnimationFrame(step);
+      })(t0);
+    }, delay);
+  }), { threshold: .6 });
+  $$('.prog').forEach(p => countIO.observe(p));
+
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
