@@ -298,3 +298,22 @@ header:not(.sec-head) .logo:hover{transform:translateX(4px)}
 .soc:hover svg,.soc:focus-visible svg{transform:rotate(-8deg) scale(1.12)}
 .soc:hover .fold,.soc:focus-visible .fold{fill:var(--lav)}
 footer{justify-content:center}
+
+/* ---------- contato centralizado ---------- */
+.contact .sec-head{justify-content:center;text-align:center}
+.contact .sec-head h2{flex:0 1 auto}
+.contact .sec-head::after{left:50%;transform:translateX(-50%)}
+.contact .lead{text-align:center;margin-left:auto;margin-right:auto}
+
+/* abertura só na primeira visita da sessão */
+.seen .intro{display:none}
+
+/* telas muito estreitas */
+@media (max-width:380px){
+  header:not(.sec-head){left:8px;right:8px;padding:10px 12px}
+  .scrolled header:not(.sec-head){padding:7px 12px}
+  .logo{gap:8px;letter-spacing:.08em;font-size:.86rem}
+  .logo img{height:26px}
+  .scrolled .logo img{height:24px}
+  .nav-cta{padding:8px 12px!important;letter-spacing:.12em;font-size:.7rem}
+}

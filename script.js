@@ -243,11 +243,13 @@
   }
   /* ---------- abertura: corte de katana (espera o carregamento real) ---------- */
   const intro = $('.intro');
-  if (reduce || !intro) { if (intro) intro.remove(); start(); }
+  const seen = document.documentElement.classList.contains('seen');
+  if (reduce || !intro || seen) { if (intro) intro.remove(); start(); }
   else {
     let played = false;
     const play = () => {
       if (played) return; played = true;
+      try { sessionStorage.setItem('introSeen', '1'); } catch (e) {}
       intro.classList.add('go');
       setTimeout(() => { intro.classList.add('open'); start(); }, 340);
       setTimeout(() => intro.remove(), 1700);
