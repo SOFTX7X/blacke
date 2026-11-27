@@ -65,6 +65,21 @@
   }, { passive: true });
   document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -999; spot.style.opacity = 0; });
 
+  /* ---------- parallax das janelas ao rolar ---------- */
+  const wins = $$('.win');
+  let tick = false;
+  const parallax = () => {
+    tick = false;
+    if (reduce) return;
+    for (const w of wins) {
+      const r = w.getBoundingClientRect();
+      const d = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      w.style.setProperty('--py', (Math.max(-1, Math.min(1, d)) * -26).toFixed(1) + 'px');
+    }
+  };
+  addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(parallax); } }, { passive: true });
+  parallax();
+
   /* ---------- barra de progresso ---------- */
   const bar = $('.progress');
   const onScroll = () => {
@@ -96,6 +111,17 @@
   $$('.reveal').forEach(el => io.observe(el));
 
   if (!reduce && fine) {
+    /* janelas: inclinam com o mouse */
+    $$('.win').forEach(w => {
+      w.addEventListener('pointermove', e => {
+        const r = w.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        w.style.setProperty('--ry', (x * 7).toFixed(2) + 'deg');
+        w.style.setProperty('--rx', (-y * 6).toFixed(2) + 'deg');
+      });
+      w.addEventListener('pointerleave', () => { w.style.setProperty('--rx', '0deg'); w.style.setProperty('--ry', '0deg'); });
+    });
+
     /* botões magnéticos */
     $$('.magnetic').forEach(b => {
       b.addEventListener('pointermove', e => {
