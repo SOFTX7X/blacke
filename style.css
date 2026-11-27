@@ -95,18 +95,6 @@ footer a:hover{color:var(--lav)}
 }
 
 /* ---------- contato: linhas quadradas ---------- */
-.socials{display:grid;gap:16px}
-.socials a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:18px 26px;background:var(--panel);border:1px solid var(--line);box-shadow:8px 8px 0 #c4b5fd12;font-family:var(--display);font-weight:700;position:relative;overflow:hidden;transition:color .3s}
-.socials a::before{content:"";position:absolute;inset:0;background:var(--lav);transform:translateX(-101%);transition:transform .45s var(--ease);z-index:0}
-.socials a>*{position:relative;z-index:1}
-.socials a:hover{color:#0b0b10}
-.socials a:hover::before{transform:none}
-.socials a:hover small,.socials a:hover b{color:#0b0b10}
-.socials .n{font-size:.8rem;color:var(--lav);letter-spacing:.2em;transition:color .3s}
-.socials a:hover .n{color:#0b0b10}
-.socials small{display:block;font:400 .85rem var(--body);color:var(--mute);margin-top:2px;transition:color .3s}
-.socials b{font-size:1.3rem;color:var(--lav);transition:transform .35s var(--ease),color .3s}
-.socials a:hover b{transform:translate(4px,-4px)}
 
 .socials .n{min-width:2.4ch;display:inline-block}
 .contact{padding-top:clamp(20px,3vw,36px)!important}
@@ -170,9 +158,6 @@ footer a:hover{color:var(--lav)}
 .scroll-hint span{border-radius:2px}
 
 /* ícones das redes */
-.ico{display:grid;place-items:center;width:52px;height:52px;border:1px solid #c4b5fd66;color:var(--lav);background:#c4b5fd0d;transition:background .35s,color .35s,border-color .35s,transform .45s var(--ease)}
-.ico svg{width:26px;height:26px;display:block}
-.socials a:hover .ico{background:#0b0b10;color:var(--lav);border-color:#0b0b10;transform:rotate(-6deg) scale(1.06)}
 
 /* ---------- cabeçalho novo ---------- */
 header:not(.sec-head){background:#0b0b10f2;border-bottom:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px clamp(18px,5vw,56px);transition:padding .35s var(--ease),border-color .35s}
@@ -301,3 +286,15 @@ header:not(.sec-head) .logo:hover{transform:translateX(4px)}
 .r1 .sep img{width:100%;height:auto;opacity:.9;filter:drop-shadow(0 0 10px #c4b5fd77)}
 @keyframes marq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.marquee .track{animation:none}}
+
+/* ---------- redes: só ícones, quadrados, centralizados ---------- */
+.socials{display:flex;justify-content:center;align-items:center;gap:clamp(18px,3vw,30px);padding:18px 0 8px}
+.soc{position:relative;display:grid;place-items:center;width:clamp(78px,10vw,100px);aspect-ratio:1;color:var(--lav);background:var(--panel);border:1px solid #c4b5fd66;box-shadow:8px 8px 0 #c4b5fd14;overflow:hidden;transition:color .35s,transform .45s var(--ease),box-shadow .45s var(--ease),border-color .35s}
+.soc::before{content:"";position:absolute;inset:0;background:var(--lav);transform:translateY(101%);transition:transform .5s var(--ease)}
+.soc svg{position:relative;z-index:1;width:42%;height:42%;display:block;transition:transform .5s var(--ease)}
+.soc .fold{fill:var(--panel);transition:fill .35s}
+.soc:hover,.soc:focus-visible{color:#0b0b10;border-color:var(--lav);transform:translate(-4px,-4px);box-shadow:14px 14px 0 #c4b5fd30,0 24px 60px -20px #c4b5fd88;outline:none}
+.soc:hover::before,.soc:focus-visible::before{transform:none}
+.soc:hover svg,.soc:focus-visible svg{transform:rotate(-8deg) scale(1.12)}
+.soc:hover .fold,.soc:focus-visible .fold{fill:var(--lav)}
+footer{justify-content:center}
