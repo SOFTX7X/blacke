@@ -42,7 +42,8 @@
         "label": "Acessar projeto"
       },
       "image": "assets/soft-downloader.png",
-      "soonLabel": ""
+      "soonLabel": "",
+      "id": "p0"
     },
     {
       "category": "APLICATIVO",
@@ -61,7 +62,8 @@
         "label": "APK em breve"
       },
       "image": "",
-      "soonLabel": "APK EM PREPARAÇÃO"
+      "soonLabel": "APK EM PREPARAÇÃO",
+      "id": "p1"
     },
     {
       "category": "WEBIPTV",
@@ -80,7 +82,8 @@
         "label": "Acessar projeto"
       },
       "image": "assets/assista-player.png",
-      "soonLabel": ""
+      "soonLabel": "",
+      "id": "p2"
     },
     {
       "category": "CATEGORIA",
@@ -97,6 +100,47 @@
       "link": {
         "url": "",
         "label": "Acessar projeto"
+      },
+      "image": "",
+      "soonLabel": "EM BREVE",
+      "id": "p3"
+    },
+    {
+      "id": "n4f7dns",
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
+      "status": {
+        "label": "Em andamento",
+        "type": "live"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Acessar projeto"
+      },
+      "image": "",
+      "soonLabel": "EM BREVE"
+    },
+    {
+      "id": "pqqk1vu",
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
       },
       "image": "",
       "soonLabel": "EM BREVE"
