@@ -96,18 +96,6 @@
   $$('.reveal').forEach(el => io.observe(el));
 
   if (!reduce && fine) {
-    /* tilt 3D + luz nos cards */
-    $$('.card').forEach(c => {
-      c.addEventListener('pointermove', e => {
-        const r = c.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        c.style.transform = `perspective(900px) rotateX(${(.5 - y) * 8}deg) rotateY(${(x - .5) * 10}deg) translateY(-4px)`;
-        c.style.setProperty('--mx', x * 100 + '%');
-        c.style.setProperty('--my', y * 100 + '%');
-      });
-      c.addEventListener('pointerleave', () => { c.style.transform = ''; });
-    });
-
     /* botões magnéticos */
     $$('.magnetic').forEach(b => {
       b.addEventListener('pointermove', e => {

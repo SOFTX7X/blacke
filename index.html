@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="stylesheet" href="style.css">
 <script src="script.js" defer></script>
 </head>
@@ -19,7 +20,7 @@
 <div class="progress" aria-hidden="true"></div>
 
 <header>
-  <a class="logo" href="#inicio">BLACKE<span>_</span></a>
+  <a class="logo" href="#inicio"><img src="assets/logo.png" alt="" onerror="this.remove()"><b>BLACKE</b><span>_</span></a>
   <nav aria-label="Navegação">
     <a href="#projetos">Projetos</a>
     <a href="#contato" class="nav-cta magnetic">Contato</a>
@@ -29,6 +30,7 @@
 <main id="inicio">
   <!-- HERO -->
   <section class="hero">
+    <img class="hero-logo" src="assets/logo.png" alt="Logo BLACKE" width="564" height="427">
     <p class="tag"><i></i> PORTFÓLIO · BR / 2026</p>
     <h1 class="glitch" data-text="BLACKE" aria-label="BLACKE"></h1>
     <p class="typing"><span id="typed"></span><b class="caret"></b></p>
@@ -51,29 +53,35 @@
       <span class="count">03 criações</span>
     </header>
 
-    <div class="grid">
-      <article class="card reveal">
-        <div class="card-top"><span class="idx">01 · SOFTWARE</span><span class="chip live"><i></i>Online</span></div>
-        <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><path d="M120 30v116m-48-48 48 48 48-48M48 156v40h144v-40" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h3>SOFT DOWNLOADER</h3>
-        <p>Seu espaço para downloads.</p>
-        <a class="link" href="https://softdownloader.site/#midias" target="_blank" rel="noopener noreferrer">Acessar projeto <span>↗</span></a>
+    <div class="list">
+      <article class="proj reveal">
+        <div class="proj-info">
+          <div class="proj-meta"><span class="no">01</span><span class="cat">SOFTWARE</span><span class="chip live"><i></i>Online</span></div>
+          <h3>SOFT DOWNLOADER</h3>
+          <p>Seu espaço para downloads.</p>
+          <a class="link" href="https://softdownloader.site/#midias" target="_blank" rel="noopener noreferrer">Acessar projeto <span>↗</span></a>
+        </div>
+        <div class="shot"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><img src="assets/soft-downloader.png" alt="Tela inicial do Soft Downloader" loading="lazy" onerror="this.remove()"></div>
       </article>
 
-      <article class="card reveal">
-        <div class="card-top"><span class="idx">02 · APLICATIVO</span><span class="chip wip"><i></i>Em andamento</span></div>
-        <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><rect x="30" y="50" width="180" height="126" rx="24" fill="none" stroke="currentColor" stroke-width="12"/><path d="m103 83 52 30-52 30z" fill="currentColor"/><path d="M80 200h80" stroke="currentColor" stroke-width="12" stroke-linecap="round"/></svg>
-        <h3>BLACKE IPTV</h3>
-        <p>Player de reprodução. APK em preparação.</p>
-        <span class="link off">Em breve</span>
+      <article class="proj reveal">
+        <div class="proj-info">
+          <div class="proj-meta"><span class="no">02</span><span class="cat">APLICATIVO</span><span class="chip wip"><i></i>Em andamento</span></div>
+          <h3>BLACKE IPTV</h3>
+          <p>Player de reprodução. APK em preparação.</p>
+          <span class="link off">Em breve</span>
+        </div>
+        <div class="shot"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><img class="mark" src="assets/logo.png" alt=""><span class="ph">APK EM BREVE</span></div>
       </article>
 
-      <article class="card reveal">
-        <div class="card-top"><span class="idx">03 · WEBIPTV</span><span class="chip live"><i></i>Online</span></div>
-        <svg viewBox="0 0 240 240" class="icon" aria-hidden="true"><circle cx="120" cy="120" r="90" fill="none" stroke="currentColor" stroke-width="12"/><path d="m98 70 76 50-76 50z" fill="currentColor"/></svg>
-        <h3>ASSISTA PLAYER</h3>
-        <p>Player de reprodução para a web.</p>
-        <a class="link" href="https://assista-player.vercel.app/" target="_blank" rel="noopener noreferrer">Acessar projeto <span>↗</span></a>
+      <article class="proj reveal">
+        <div class="proj-info">
+          <div class="proj-meta"><span class="no">03</span><span class="cat">WEBIPTV</span><span class="chip live"><i></i>Online</span></div>
+          <h3>ASSISTA PLAYER</h3>
+          <p>Player de reprodução para a web.</p>
+          <a class="link" href="https://assista-player.vercel.app/" target="_blank" rel="noopener noreferrer">Acessar projeto <span>↗</span></a>
+        </div>
+        <div class="shot"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><img src="assets/assista-player.png" alt="Tela inicial do Assista Player" loading="lazy" onerror="this.remove()"></div>
       </article>
     </div>
   </section>
@@ -87,8 +95,8 @@
     <p class="lead reveal">Tem um projeto, ideia ou parceria? Me chama.</p>
 
     <div class="socials reveal">
-        <a href="https://t.me/pbhubxx" target="_blank" rel="noopener noreferrer"><span>Telegram<small>@pbhubxx</small></span><b>↗</b></a>
-        <a href="https://instagram.com/pbhubxx" target="_blank" rel="noopener noreferrer"><span>Instagram<small>@pbhubxx</small></span><b>↗</b></a>
+        <a href="https://t.me/pbhubxx" target="_blank" rel="noopener noreferrer"><span class="n">01</span><span>Telegram<small>@pbhubxx</small></span><b>↗</b></a>
+        <a href="https://instagram.com/pbhubxx" target="_blank" rel="noopener noreferrer"><span class="n">02</span><span>Instagram<small>@pbhubxx</small></span><b>↗</b></a>
     </div>
   </section>
 </main>
