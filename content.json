@@ -86,23 +86,23 @@
       "id": "p2"
     },
     {
-      "id": "px58iy2",
-      "category": "+18",
-      "name": "VIP VIDEOS",
-      "description": "Vendo site +18 com 83 filmes de FAMILIA SACANA + VIDEOS NO FEED além de automoção de pagamentos e publicação de membros.",
+      "id": "pj7lif5",
+      "category": "CATEGORIA",
+      "name": "NOVO\nPROJETO",
+      "description": "",
       "status": {
-        "label": "ATIVO",
+        "label": "Em breve",
         "type": "wip"
       },
       "progress": {
-        "value": 100,
+        "value": "",
         "note": ""
       },
       "link": {
-        "url": "https://videosvip.online",
+        "url": "",
         "label": "Em breve"
       },
-      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-0cf2c5.webp",
+      "image": "assets/uploads/82f527fec2908d19642fa772df9933ac-5bb567.webp",
       "soonLabel": "EM BREVE"
     }
   ],
