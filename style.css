@@ -162,3 +162,13 @@ footer a:hover{color:var(--lav)}
 .proj:hover .shot .mark{transform:translate(-50%,-50%) scale(1.06);filter:none}
 .shot .mark+.ph{position:relative;top:34%}
 @media (prefers-reduced-motion:reduce){.hero-logo{opacity:1}}
+
+/* ---------- correções dos quadros de preview ---------- */
+.proj h3{font-size:clamp(1.15rem,2.3vw,1.55rem);white-space:nowrap}
+.shot{aspect-ratio:2.2/1}
+.shot img:not(.mark){inset:12px;width:calc(100% - 24px);height:calc(100% - 24px);object-fit:contain;object-position:center;filter:none}
+.proj:hover .shot img:not(.mark){transform:none}
+.shot .mark{width:20%;opacity:.22;top:40%}
+.shot .mark+.ph{top:30%;font-size:.65rem}
+.proj:hover .shot .mark{transform:translate(-50%,-50%)}
+@media (max-width:760px){.proj h3{white-space:normal}}
