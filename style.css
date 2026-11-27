@@ -99,7 +99,7 @@ footer a:hover{color:var(--lav)}
 
 /* ---------- contato: linhas quadradas ---------- */
 .socials{display:grid;gap:16px}
-.socials a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:22px 26px;background:var(--panel);border:1px solid var(--line);box-shadow:8px 8px 0 #c4b5fd12;font-family:var(--display);font-weight:700;position:relative;overflow:hidden;transition:color .3s}
+.socials a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:18px;padding:22px 26px;background:var(--panel);border:1px solid var(--line);box-shadow:8px 8px 0 #c4b5fd12;font-family:var(--display);font-weight:700;position:relative;overflow:hidden;transition:color .3s}
 .socials a::before{content:"";position:absolute;inset:0;background:var(--lav);transform:translateX(-101%);transition:transform .45s var(--ease);z-index:0}
 .socials a>*{position:relative;z-index:1}
 .socials a:hover{color:#0b0b10}
@@ -166,3 +166,8 @@ footer a:hover{color:var(--lav)}
   .win{box-shadow:10px 10px 0 #c4b5fd14}
 }
 @media (prefers-reduced-motion:reduce){.win-body>img:not(.mark){clip-path:none}}
+
+/* ---------- elementos redondos (bolinhas, mouse, brilho) ---------- */
+.tag i,.chip i,.win-bar i,.spot{border-radius:50%}
+.scroll-hint{border-radius:14px}
+.scroll-hint span{border-radius:2px}
