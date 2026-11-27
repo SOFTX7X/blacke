@@ -328,3 +328,11 @@ footer{justify-content:center}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes starPulse{50%{transform:scale(.65);opacity:.7}}
 @media (prefers-reduced-motion:reduce){.marquee .track,.marquee .it,.marquee .sep,.marquee .sep svg,.marquee .row::before,.marquee .row::after{animation:none}.marquee .it{color:var(--fg);background:none}}
+
+/* quatro ícones */
+.socials.in a:nth-child(3){animation-delay:.28s}
+.socials.in a:nth-child(4){animation-delay:.42s}
+@media (max-width:520px){
+  .socials{gap:14px}
+  .soc{width:calc((100vw - 36px - 42px) / 4)}
+}
