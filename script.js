@@ -80,6 +80,17 @@
   addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(parallax); } }, { passive: true });
   parallax();
 
+  /* ---------- cabeçalho: compacta ao rolar + link ativo ---------- */
+  const setScrolled = () => document.body.classList.toggle('scrolled', scrollY > 40);
+  addEventListener('scroll', setScrolled, { passive: true }); setScrolled();
+  const spyLinks = $$('[data-spy]');
+  const spy = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) spyLinks.forEach(a => a.classList.toggle('active', a.dataset.spy === e.target.dataset.sec));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  [['.hero', 'inicio'], ['#projetos', 'projetos'], ['#contato', 'contato']].forEach(([s, n]) => {
+    const el = $(s); if (el) { el.dataset.sec = n; spy.observe(el); }
+  });
+
   /* ---------- barra de progresso ---------- */
   const bar = $('.progress');
   const onScroll = () => {
@@ -131,9 +142,5 @@
       b.addEventListener('pointerleave', () => { b.style.transform = ''; });
     });
 
-    /* parallax leve no título */
-    addEventListener('scroll', () => {
-      if (scrollY < innerHeight) h1.style.transform = `translateY(${scrollY * .18}px)`;
-    }, { passive: true });
   }
 })();
