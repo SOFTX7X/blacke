@@ -194,12 +194,10 @@
 
   /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
   const logoSep = '<span class="sep"><img src="assets/logo.png" alt=""></span>';
-  const dotSep = '<span class="sep"></span>';
   const row1 = ['CRIAÇÕES DIGITAIS', 'PLAYBOY', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
-  const row2 = ['Portfólio', 'Br <b>/</b> 2026', 'Soft Downloader', 'Assista Player', 'Blacke IPTV', 'M3U', 'Xtream'];
   function buildMarquee() {
     $$('.marquee .track').forEach((track, n) => {
-      const items = n === 0 ? row1 : row2, sep = n === 0 ? logoSep : dotSep;
+      const items = row1, sep = logoSep;
       const unit = items.map((t, i) => `<span class="it${n === 0 && i % 2 ? ' out' : ''}">${t}</span>${sep}`).join('');
       let reps = 1, grp;
       track.innerHTML = '<div class="grp"></div><div class="grp"></div>';
@@ -208,7 +206,7 @@
         g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps);
         grp = g[0].offsetWidth; reps++;
       } while (grp < innerWidth * 1.15 && reps < 12);
-      track.style.setProperty('--dur', (grp / (n === 0 ? 60 : 42)).toFixed(1) + 's');
+      track.style.setProperty('--dur', (grp / 60).toFixed(1) + 's');
     });
   }
   buildMarquee();
