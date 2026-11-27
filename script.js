@@ -202,6 +202,25 @@
     });
 
   }
-  /* ---------- abre direto, sem tela de carregamento ---------- */
-  start();
+  /* ---------- abertura: corte de katana (espera o carregamento real) ---------- */
+  const intro = $('.intro');
+  if (reduce || !intro) { if (intro) intro.remove(); start(); }
+  else {
+    let played = false;
+    const play = () => {
+      if (played) return; played = true;
+      intro.classList.add('go');
+      setTimeout(() => { intro.classList.add('open'); start(); }, 340);
+      setTimeout(() => intro.remove(), 1700);
+    };
+    const minTime = new Promise(r => setTimeout(r, 1700));
+    const loaded = new Promise(r => {
+      if (document.readyState === 'complete') r(); else addEventListener('load', r, { once: true });
+      setTimeout(r, 4500);
+    });
+    const fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+    Promise.all([minTime, loaded, fonts]).then(play);
+    intro.addEventListener('click', play);
+    setTimeout(play, 6500);
+  }
 })();
