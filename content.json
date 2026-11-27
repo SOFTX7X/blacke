@@ -84,6 +84,26 @@
       "image": "assets/assista-player.png",
       "soonLabel": "",
       "id": "p2"
+    },
+    {
+      "id": "px58iy2",
+      "category": "+18",
+      "name": "VIP VIDEOS",
+      "description": "Vendo site +18 com 83 filmes de FAMILIA SACANA + VIDEOS NO FEED além de automoção de pagamentos e publicação de membros.",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": "",
+        "note": ""
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
+      },
+      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-0cf2c5.webp",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
