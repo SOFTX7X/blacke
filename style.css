@@ -272,20 +272,6 @@ header:not(.sec-head) .logo:hover{transform:translateX(4px)}
 @keyframes shine{0%{transform:translateX(-120%)}55%,100%{transform:translateX(120%)}}
 @media (prefers-reduced-motion:reduce){.prog-bar i{transform:scaleX(1);transition:none}.prog-bar i::after{animation:none}}
 
-/* ---------- faixa de nomes: duas linhas, loop infinito ---------- */
-.marquee{position:relative;overflow:hidden;border-block:1px solid #c4b5fd2b;background:linear-gradient(180deg,#0e0e16cc,#0b0b10cc);padding:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
-.marquee .row{display:block;overflow:hidden;white-space:nowrap}
-.marquee .r1{padding:28px 0 26px}
-.marquee .track{display:flex;width:max-content;animation:marq var(--dur,46s) linear infinite;will-change:transform}
-.marquee .track.rev{animation-direction:reverse}
-.marquee .grp{display:flex;flex:none;align-items:center}
-.marquee .it,.marquee .sep{flex:none}
-.r1 .it{font-family:var(--display);font-weight:900;font-size:clamp(1.5rem,3.6vw,2.7rem);letter-spacing:.06em;line-height:1;padding:0 clamp(22px,3vw,40px);color:var(--fg)}
-.r1 .it.out{color:transparent;-webkit-text-stroke:1.5px var(--lav)}
-.r1 .sep{display:grid;place-items:center;width:clamp(26px,3vw,36px);height:clamp(26px,3vw,36px)}
-.r1 .sep img{width:100%;height:auto;opacity:.9;filter:drop-shadow(0 0 10px #c4b5fd77)}
-@keyframes marq{to{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){.marquee .track{animation:none}}
 
 /* ---------- redes: só ícones, quadrados, centralizados ---------- */
 .socials{display:flex;justify-content:center;align-items:center;gap:clamp(18px,3vw,30px);padding:18px 0 8px}
@@ -317,3 +303,28 @@ footer{justify-content:center}
   .scrolled .logo img{height:24px}
   .nav-cta{padding:8px 12px!important;letter-spacing:.12em;font-size:.7rem}
 }
+
+/* ---------- faixa de nomes: refinada, loop infinito ---------- */
+.marquee{position:relative;overflow:hidden;padding:0;background:linear-gradient(180deg,#c4b5fd07,transparent 45%,#c4b5fd07);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee::before,.marquee::after{content:"";position:absolute;left:0;right:0;height:1px;background:#c4b5fd24;z-index:2;pointer-events:none}
+.marquee::before{top:0}.marquee::after{bottom:0}
+.marquee .row{position:relative;display:block;overflow:hidden;white-space:nowrap;padding:19px 0}
+.marquee .row::before,.marquee .row::after{content:"";position:absolute;left:0;right:0;height:1px;z-index:3;pointer-events:none;background:linear-gradient(90deg,transparent,var(--lav),transparent) no-repeat;background-size:26% 100%;filter:drop-shadow(0 0 4px var(--lav))}
+.marquee .row::before{top:0;animation:travel 6s linear infinite}
+.marquee .row::after{bottom:0;animation:travel 6s 3s linear infinite reverse}
+.marquee .track{display:flex;width:max-content;animation:marq var(--dur,46s) linear infinite;will-change:transform}
+.marquee .grp{display:flex;flex:none;align-items:center}
+.marquee .it,.marquee .sep{flex:none}
+.marquee .it{font-family:var(--display);font-weight:700;font-size:clamp(.9rem,1.5vw,1.15rem);letter-spacing:.36em;line-height:1;padding:0 clamp(22px,3.2vw,44px);text-transform:uppercase;color:transparent;background-size:260% 100%;background-clip:text;-webkit-background-clip:text;animation:shimmer 7s linear infinite}
+.marquee .it.v1{background-image:linear-gradient(100deg,#7d7d8e 0 38%,#ffffff 50%,#7d7d8e 62% 100%)}
+.marquee .it.v2{background-image:linear-gradient(100deg,#9d8fe0 0 38%,#f3eeff 50%,#9d8fe0 62% 100%)}
+.marquee .it:nth-of-type(3n+1){animation-delay:-2s}
+.marquee .it:nth-of-type(3n+2){animation-delay:-4.5s}
+.marquee .sep{display:grid;place-items:center;width:14px;height:14px;animation:spin 9s linear infinite}
+.marquee .sep svg{width:100%;height:100%;fill:var(--lav);filter:drop-shadow(0 0 6px #c4b5fdaa);animation:starPulse 2.6s ease-in-out infinite}
+@keyframes marq{to{transform:translateX(-50%)}}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-160% 0}}
+@keyframes travel{from{background-position:-40% 0}to{background-position:140% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes starPulse{50%{transform:scale(.65);opacity:.7}}
+@media (prefers-reduced-motion:reduce){.marquee .track,.marquee .it,.marquee .sep,.marquee .sep svg,.marquee .row::before,.marquee .row::after{animation:none}.marquee .it{color:var(--fg);background:none}}

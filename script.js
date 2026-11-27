@@ -125,7 +125,11 @@
   /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */
   const heroIn = $('.hero-in');
   const mTracks = $$('.marquee .track'), mRows = $$('.marquee .row');
-  let lastY = scrollY, vel = 0;
+  let lastY = scrollY, vel = 0, mqHover = false;
+  const mq = $('.marquee');
+  mq.addEventListener('pointerenter', () => { mqHover = true; });
+  mq.addEventListener('pointerleave', () => { mqHover = false; });
+  let mqEase = 1;
   function updateHero() {
     const p = Math.max(0, Math.min(1, scrollY / (innerHeight * .85)));
     heroIn.style.setProperty('--hp', p.toFixed(3));
@@ -142,7 +146,8 @@
   if (!reduce) {
     (function loop() {
       vel *= .9;
-      const rate = 1 + Math.min(Math.abs(vel) * .18, 7);
+      mqEase += ((mqHover ? .18 : 1) - mqEase) * .06;
+      const rate = (1 + Math.min(Math.abs(vel) * .18, 7)) * mqEase;
       mTracks.forEach(t => { const a = t.getAnimations()[0]; if (a) a.playbackRate = rate; });
       const sk = Math.max(-14, Math.min(14, -vel * .28));
       mRows.forEach(r => { r.style.transform = `skewX(${sk.toFixed(2)}deg)`; });
@@ -193,12 +198,12 @@
   $$('.prog').forEach(p => countIO.observe(p));
 
   /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
-  const logoSep = '<span class="sep"><img src="assets/logo.png" alt=""></span>';
+  const logoSep = '<span class="sep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z"/></svg></span>';
   const row1 = ['CRIAÇÕES DIGITAIS', '@PBHUBXX', 'BLACKE', 'DESIGN', 'TECNOLOGIA'];
   function buildMarquee() {
     $$('.marquee .track').forEach((track, n) => {
       const items = row1, sep = logoSep;
-      const unit = items.map((t, i) => `<span class="it${n === 0 && i % 2 ? ' out' : ''}">${t}</span>${sep}`).join('');
+      const unit = items.map((t, i) => `<span class="it ${i % 2 ? 'v2' : 'v1'}">${t}</span>${sep}`).join('');
       let reps = 1, grp;
       track.innerHTML = '<div class="grp"></div><div class="grp"></div>';
       const g = track.children;
@@ -206,7 +211,7 @@
         g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps);
         grp = g[0].offsetWidth; reps++;
       } while (grp < innerWidth * 1.15 && reps < 12);
-      track.style.setProperty('--dur', (grp / 60).toFixed(1) + 's');
+      track.style.setProperty('--dur', (grp / 46).toFixed(1) + 's');
     });
   }
   buildMarquee();
