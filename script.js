@@ -124,7 +124,7 @@
       history.replaceState(null, '', id);
       lastY = scrollY; body.classList.remove('nav-hide'); updateHero();
       const open = wipe.animate([{ transform: `translateX(-300px) ${SK}` }, { transform: `translateX(${innerWidth + 200}px) ${SK}` }], { duration: 560, delay: 120, easing: 'cubic-bezier(.55,0,.2,1)', fill: 'forwards' });
-      open.onfinish = () => { open.cancel(); cover.cancel(); wipe.style.display = 'none'; wipe.style.pointerEvents = 'none'; jumping = false; if (window.__cutSnap) window.__cutSnap(); };
+      open.onfinish = () => { open.cancel(); cover.cancel(); wipe.style.display = 'none'; wipe.style.pointerEvents = 'none'; jumping = false; };
     };
   }));
 
@@ -186,123 +186,30 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
-  /* ---------- CORTE: a katana corta as palavras conforme você rola (sobe e desce) ---------- */
+  /* ---------- faixa em movimento: acompanha a rolagem (sobe/desce), leve ---------- */
   (function () {
-    const cut = $('.cut'); if (!cut) return;
-    const pin = $('.cut-pin', cut), view = $('.cut-view', cut), wordsEl = $('.cut-words', cut), cv = $('.cut-cv', cut), ctx = cv.getContext('2d'), nEl = $('.cut-n', cut), rail = $('.cut-rail', cut);
-    const list = (SITE.marquee && SITE.marquee.length ? SITE.marquee : ['BLACKE']).map(String).filter(t => t.trim());
-    const N = list.length, SEG = 78;
-    wordsEl.innerHTML = list.map(t => `<div class="cw" aria-hidden="true"><span class="hb">${t}</span><span class="ha">${t}</span></div>`).join('');
-    rail.innerHTML = list.map(() => '<i></i>').join('');
-    const sr = document.createElement('p'); sr.className = 'sr'; sr.textContent = list.join(', '); cut.append(sr);
-    if (reduce) { cut.classList.add('static'); nEl.textContent = ''; return; }
-
-    const TH = -20 * Math.PI / 180, U = { x: Math.cos(TH), y: Math.sin(TH) }, NV = { x: U.y, y: -U.x };
-    const cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
-    let W = 0, H = 0, dpr = 1, items = [], cur = 0, tgt = 0, idx = -1, last = performance.now(), raf = 0;
-    const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-    const SP = list.map((_, i) => { const r = rng(i * 977 + 13); return Array.from({ length: 34 }, () => ({ t: r(), a: (r() < .5 ? -1 : 1) * (80 + r() * 380), b: (r() - .5) * 260, g: 260 + r() * 220, r: .9 + r() * 1.9, w: r() < .35 })); });
-
-    function layout() {
-      W = pin.clientWidth; H = pin.clientHeight; dpr = Math.min(2, devicePixelRatio || 1);
-      cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cut.style.height = ((N - .33) * SEG + 100) + 'vh';
-      const els = $$('.cw', wordsEl);
-      items = els.map((el, i) => {
-        el.style.fontSize = '100px';
-        const r = el.offsetWidth / 100, fs = Math.max(28, Math.min(W * .88 / r, H * .34, 260));
-        el.style.fontSize = fs + 'px';
-        const w = el.offsetWidth, h = el.offsetHeight, cx = w / 2, cy = h / 2, L = Math.hypot(w, h), P0 = [cx - U.x * L, cy - U.y * L], P1 = [cx + U.x * L, cy + U.y * L];
-        const poly = k => `polygon(${P0[0]}px ${P0[1]}px,${P1[0]}px ${P1[1]}px,${P1[0] + NV.x * L * k}px ${P1[1] + NV.y * L * k}px,${P0[0] + NV.x * L * k}px ${P0[1] + NV.y * L * k}px)`;
-        return { el, a: $('.ha', el), b: $('.hb', el), w, h, pa: poly(1), pb: poly(-1), whole: null, i };
+    const box = $('.mq'); if (!box) return;
+    const rows = $$('.mq-row', box).map(r => ({ el: r, tr: r.firstElementChild, dir: +r.dataset.dir, x: 0, w: 0 }));
+    const measure = () => rows.forEach(r => { r.w = r.tr.scrollWidth / r.tr.children.length; });
+    measure(); addEventListener('resize', measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    if (reduce) return;
+    let vis = false, raf = 0, last = 0, ly = scrollY, vel = 0, sk = 0;
+    const frame = t => {
+      const dt = Math.min(.05, (t - last) / 1000 || .016); last = t;
+      const dy = scrollY - ly; ly = scrollY;
+      vel += ((dy / dt) - vel) * Math.min(1, dt * 7);                 // velocidade da rolagem, suavizada
+      const push = Math.max(-1400, Math.min(1400, vel));
+      sk += ((-push * .0035) - sk) * Math.min(1, dt * 8);             // inclinação leve, limitada
+      rows.forEach(r => {
+        r.x -= r.dir * (38 + push * .35) * dt;
+        if (r.w) { r.x %= r.w; if (r.x > 0) r.x -= r.w; }
+        r.tr.style.transform = 'translate3d(' + r.x.toFixed(2) + 'px,0,0)';
+        r.el.style.setProperty('--sk', (sk * (r.dir > 0 ? 1 : -1)).toFixed(2) + 'deg');
       });
-    }
-
-    function draw(pos) {
-      ctx.clearRect(0, 0, W, H);
-      const cx = W / 2, cy = H / 2;
-      ctx.globalCompositeOperation = 'lighter';
-      items.forEach(it => {
-        const s = pos - it.i; if (s < -.6 || s > 1.2) return;
-        const bp = cl((s - .15) / .2), sp = cl((s - .35) / .55), asm = s < -.05 ? cl((-.05 - s) / .5) : 0;
-        const Ll = Math.min(W * .62, it.w * .75 + 140), x0 = cx - U.x * Ll, y0 = cy - U.y * Ll, x1 = cx + U.x * Ll, y1 = cy + U.y * Ll;
-        // brilho da linha de corte (some quando as metades se afastam, volta quando se juntam)
-        const gap = bp >= 1 ? (1 - sp) : bp > 0 ? 1 : 0, join = asm > 0 ? (1 - asm) * .55 : 0, flash = asm > 0 && asm < .2 ? (1 - asm / .2) : 0;
-        const la = Math.max(gap * .9, join, flash);
-        if (la > .01) {
-          ctx.lineCap = 'round';
-          ctx.strokeStyle = `rgba(196,181,253,${(la * .22).toFixed(3)})`; ctx.lineWidth = 14 + flash * 18; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-          ctx.strokeStyle = `rgba(255,255,255,${(la * .9).toFixed(3)})`; ctx.lineWidth = 1.6 + flash * 2; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-        }
-        // lâmina cruzando
-        if (bp > 0 && bp < 1) {
-          const hx = x0 + (x1 - x0) * bp, hy = y0 + (y1 - y0) * bp, tb = Math.max(0, bp - .5), tx = x0 + (x1 - x0) * tb, ty = y0 + (y1 - y0) * tb;
-          const g = ctx.createLinearGradient(tx, ty, hx, hy); g.addColorStop(0, 'rgba(196,181,253,0)'); g.addColorStop(.7, 'rgba(196,181,253,.55)'); g.addColorStop(1, 'rgba(255,255,255,1)');
-          ctx.strokeStyle = g; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
-          const rg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 46); rg.addColorStop(0, 'rgba(255,255,255,.95)'); rg.addColorStop(.25, 'rgba(196,181,253,.5)'); rg.addColorStop(1, 'rgba(196,181,253,0)');
-          ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(hx, hy, 46, 0, 7); ctx.fill();
-        }
-        // faíscas
-        SP[it.i].forEach(p => {
-          const age = s - (.15 + .2 * p.t); if (age < 0 || age > .6) return;
-          const tau = age * 1.5, k = 1 - age / .6, px = x0 + (x1 - x0) * p.t + U.x * p.a * tau + NV.x * p.b * tau, py = y0 + (y1 - y0) * p.t + U.y * p.a * tau + NV.y * p.b * tau + p.g * tau * tau * .5;
-          ctx.fillStyle = p.w ? `rgba(255,255,255,${(k * k).toFixed(3)})` : `rgba(196,181,253,${(k * k).toFixed(3)})`;
-          ctx.beginPath(); ctx.arc(px, py, p.r * (.4 + k), 0, 7); ctx.fill();
-        });
-      });
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    function render(pos, lag) {
-      const D = Math.min(W * .5, 640);
-      items.forEach(it => {
-        const s = pos - it.i;
-        if (s < -.6 || s > 1.0) { if (it.el.style.visibility !== 'hidden') it.el.style.visibility = 'hidden'; return; }
-        it.el.style.visibility = 'visible';
-        const asm = s < -.05 ? cl((-.05 - s) / .5) : 0, sp = cl((s - .35) / .55), out = 1 - Math.pow(1 - sp, 3);
-        const off = D * out - D * asm * asm, rot = 5 * out - 5 * asm * asm;
-        const alpha = (1 - Math.pow(sp, 1.4)) * (1 - Math.pow(asm, 1.5));
-        const whole = off === 0 && rot === 0;
-        if (whole) {
-          if (it.whole !== true) { it.a.style.display = 'none'; it.b.style.clipPath = 'none'; it.b.style.transform = 'none'; it.whole = true; }
-        } else {
-          if (it.whole !== false) { it.a.style.display = ''; it.a.style.clipPath = it.pa; it.b.style.clipPath = it.pb; it.whole = false; }
-          it.a.style.transform = `translate3d(${(-U.x * off).toFixed(1)}px,${(-U.y * off).toFixed(1)}px,0) rotate(${(-rot).toFixed(2)}deg)`;
-          it.b.style.transform = `translate3d(${(U.x * off).toFixed(1)}px,${(U.y * off).toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`;
-        }
-        it.el.style.opacity = alpha.toFixed(3);
-        const pre = cl((s + .05) / .2), glow = 1 - cl((s - .15) / .25);
-        it.el.style.setProperty('--glow', (.25 + .75 * pre * glow).toFixed(2));
-      });
-      // tremor no instante do corte (qualquer palavra)
-      let sh = 0; items.forEach(it => { const s = pos - it.i, b = Math.max(0, 1 - Math.abs(s - .34) / .045); if (b > sh) sh = b * Math.sin(s * 220); });
-      view.style.transform = sh ? `translate3d(${(sh * 7).toFixed(1)}px,${(sh * -4).toFixed(1)}px,0)` : '';
-      wordsEl.style.transform = `skewX(${cl(-lag * 16, -7, 7).toFixed(2)}deg)`;
-      const ni = cl(Math.floor(pos + .45), 0, N - 1);
-      if (ni !== idx) { idx = ni; nEl.textContent = String(ni + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0'); $$('i', rail).forEach((t, k) => t.classList.toggle('on', k === ni)); }
-    }
-
-    function frame(t) {
-      raf = 0;
-      const dt = Math.min(.05, (t - last) / 1000); last = t;
-      const lag = tgt - cur; cur += lag * (1 - Math.pow(.0008, dt));
-      render(cur, tgt - cur); draw(cur);
-      if (Math.abs(tgt - cur) > .0006) raf = requestAnimationFrame(frame);
-    }
-    function onScroll() {
-      if (jumping) { cut.style.visibility = 'hidden'; return; }   // clique no menu: a cena não toca por baixo da transição
-      const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight, nt = -.05 + cl(-r.top / total) * (N - .33);
-      if (r.bottom < -200 || r.top > innerHeight + 200) { tgt = cur = nt; return; }
-      const big = Math.abs(nt - tgt) > 1.2;                       // salto grande (link/âncora): vai direto, sem animar
-      tgt = nt;
-      if (big) { cur = tgt; render(cur, 0); draw(cur); return; }
-      if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
-    }
-    window.__cutSnap = () => { cut.style.visibility = ''; const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight; tgt = cur = -.05 + cl(-r.top / total) * (N - .33); render(cur, 0); draw(cur); };
-    layout(); cur = tgt = -.05; onScroll(); cur = tgt; render(cur, 0); draw(cur);
-    addEventListener('scroll', onScroll, { passive: true });
-    let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); items.forEach(i => { i.whole = null; }); onScroll(); render(cur, 0); draw(cur); }, 120); });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); items.forEach(i => { i.whole = null; }); onScroll(); cur = tgt; render(cur, 0); draw(cur); });
+      raf = vis ? requestAnimationFrame(frame) : 0;
+    };
+    new IntersectionObserver(es => { vis = es[0].isIntersecting; if (vis && !raf) { last = performance.now(); ly = scrollY; raf = requestAnimationFrame(frame); } }, { rootMargin: '120px' }).observe(box);
   })();
 
   /* ---------- reveal ao rolar ---------- */

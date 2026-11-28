@@ -110,6 +110,9 @@ function build(c) {
   const brand = (site.brand || 'BLACKE').toString().toUpperCase();
   const projects = Array.isArray(c.projects) ? c.projects : [];
   const phrases = (hero.phrases || []).map(s => String(s)).filter(s => s.trim());
+  const mqWords = (c.marquee || []).map(s => String(s).trim()).filter(Boolean);
+  if (!mqWords.length) mqWords.push(brand);
+  const bandAria = mqWords.join(' · ');
   const marquee = (c.marquee || []).map(s => String(s)).filter(s => s.trim());
   const data = JSON.stringify({ phrases: phrases.length ? phrases : [''], marquee: marquee.length ? marquee : [brand] }).replace(/</g, '\\u003c');
   const count = projects.length === 1 ? '01 criação' : `${pad2(projects.length)} criações`;
@@ -176,11 +179,8 @@ function build(c) {
     </div>
   </section>
 
-  <div class="cut" id="corte">
-    <div class="cut-pin">
-      <div class="cut-view"><canvas class="cut-cv" aria-hidden="true"></canvas><div class="cut-words"></div></div>
-      <div class="cut-ui" aria-hidden="true"><span class="cut-n"></span><span class="cut-rail"></span><span class="cut-hint">role</span></div>
-    </div>
+  <div class="mq" role="img" aria-label="${esc(bandAria)}">
+    ${[1, -1].map(dir => `<div class="mq-row" data-dir="${dir}"><div class="mq-track" aria-hidden="true">${[0, 1, 2, 3].map(() => `<div class="mq-set">${mqWords.map((w, i) => `<span class="mq-w${(i + (dir < 0 ? 1 : 0)) % 2 ? ' o' : ''}">${esc(w)}</span><i class="mq-s"></i>`).join('')}</div>`).join('')}</div></div>`).join('')}
   </div>
 
   <!-- PROJETOS -->

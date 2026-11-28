@@ -318,26 +318,16 @@ footer{justify-content:center}
   .nav-cta{padding:8px 12px!important;letter-spacing:.12em;font-size:.7rem}
 }
 
-/* ---------- CORTE: a katana corta as palavras conforme você rola ---------- */
-.cut{position:relative;height:420vh}
-.cut-pin{position:sticky;top:0;height:100vh;overflow:hidden}
-.cut-view{position:absolute;inset:0;will-change:transform}
-.cut-cv{position:absolute;inset:0;pointer-events:none}
-.cut-words{position:absolute;inset:0;will-change:transform}
-.cw{position:absolute;left:50%;top:50%;translate:-50% -50%;font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:1;white-space:nowrap;letter-spacing:.02em;will-change:opacity;--glow:.25}
-.cw .hb{display:block}
-.cw .ha{position:absolute;inset:0}
-.cw span{color:#f4f0ff;text-shadow:0 0 calc(var(--glow)*46px) rgb(196 181 253/.55),0 0 2px rgb(255 255 255/.4);will-change:transform}
-.cut-ui{position:absolute;inset:0;pointer-events:none;font-family:var(--body);color:var(--mute);font-size:.78rem;letter-spacing:.3em}
-.cut-n{position:absolute;left:clamp(18px,5vw,64px);bottom:clamp(20px,5vh,48px);color:var(--lav);font-weight:600}
-.cut-hint{position:absolute;right:clamp(18px,5vw,64px);bottom:clamp(20px,5vh,48px);text-transform:uppercase}
-.cut-rail{position:absolute;right:clamp(14px,3vw,40px);top:50%;translate:0 -50%;display:flex;flex-direction:column;gap:12px}
-.cut-rail i{width:2px;height:22px;background:#ffffff1f;transition:background .35s,height .35s,box-shadow .35s;transform:skewY(-20deg)}
-.cut-rail i.on{height:44px;background:var(--lav);box-shadow:0 0 12px var(--lav)}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.cut.static{height:auto}.cut.static .cut-pin{position:relative;height:auto;padding:60px 0;overflow:visible}
-.cut.static .cut-view{position:relative;inset:auto}.cut.static .cut-words{position:relative;inset:auto;display:flex;flex-direction:column;align-items:center;gap:18px}
-.cut.static .cw{position:relative;left:auto;top:auto;translate:none;font-size:clamp(2rem,8vw,5rem)}.cut.static .ha,.cut.static .cut-cv,.cut.static .cut-ui{display:none}
+/* ---------- faixa em movimento (reage à rolagem, só transform) ---------- */
+.mq{padding:clamp(28px,6vw,72px) 0;overflow:hidden;display:grid;gap:clamp(6px,1.4vw,16px);contain:layout paint}
+.mq-row{overflow:visible;transform:skewX(var(--sk,0deg));will-change:transform}
+.mq-track{display:flex;width:max-content;will-change:transform;transform:translate3d(0,0,0)}
+.mq-set{display:flex;align-items:center;flex:none}
+.mq-w{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:1.1;letter-spacing:.02em;white-space:nowrap;font-size:clamp(2.2rem,7.2vw,6.2rem);color:var(--fg)}
+.mq-w.o{color:transparent;-webkit-text-stroke:1.5px #c4b5fdb3}
+.mq-s{flex:none;width:2px;height:.9em;margin:0 clamp(18px,3.6vw,52px);font-size:clamp(2.2rem,7.2vw,6.2rem);background:var(--lav);transform:skewX(-24deg);box-shadow:0 0 14px var(--lav-glow)}
+.mq-row[data-dir="-1"] .mq-w{font-size:clamp(1.6rem,5vw,4.2rem)}
+.mq-row[data-dir="-1"] .mq-s{font-size:clamp(1.6rem,5vw,4.2rem)}
 @keyframes travel{from{background-position:-40% 0}to{background-position:140% 0}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
