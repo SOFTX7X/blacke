@@ -186,37 +186,26 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
-  /* ---------- projetos: título gigante que enche + cartões em pilha (sobe/desce) ---------- */
+  /* ---------- fluxo de rolagem: cartões entram/saem conforme o sentido (só transform, 1 rAF) ---------- */
   (function () {
-    const list = $('.list'), head = $('.sec-big'), projs = $$('.proj');
-    if (!list || reduce) return;
-    const h2 = head && $('h2', head), cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-    let stack = false, tick = 0;
-    const fit = () => {                                   // empilha só se o cartão cabe na tela
-      const vh = innerHeight, ok = innerWidth > 900 && projs.every(p => p.offsetHeight <= vh - 120);
-      if (ok !== stack) { stack = ok; list.classList.toggle('stack', ok); if (!ok) projs.forEach(p => { p.style.removeProperty('--sc'); p.style.removeProperty('--dm'); }); }
-    };
-    function frame() {
-      tick = 0; const vh = innerHeight;
-      if (h2) {
-        const r = head.getBoundingClientRect(), t = cl((vh * .92 - r.top) / (vh * .62));
-        h2.style.setProperty('--f', (t * 100).toFixed(1) + '%');
-        h2.style.setProperty('--tx', ((.5 - t) * 7).toFixed(2) + 'vw');
-      }
-      if (!stack) return;
+    const projs = $$('.proj'); if (!projs.length || reduce) return;
+    const mob = matchMedia('(max-width:820px)'), cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    let tick = 0;
+    function flow() {
+      tick = 0;
+      const vh = innerHeight, d = mob.matches ? 34 : 120;
       projs.forEach((p, i) => {
-        const n = projs[i + 1]; let t = 0;
-        if (n) { const top = parseFloat(getComputedStyle(n).top) || 90; t = cl((vh - n.getBoundingClientRect().top) / (vh - top)); }
-        p.style.setProperty('--sc', (1 - t * .07).toFixed(4));
-        p.style.setProperty('--dm', (t * .65).toFixed(3));
+        const r = p.getBoundingClientRect();
+        if (r.bottom < -80 || r.top > vh + 80) return;
+        const k = Math.min(cl((vh - r.top) / (vh * .6)), cl(r.bottom / (vh * .45)));
+        const win = p.lastElementChild;
+        p.style.setProperty('--k', k.toFixed(3));
+        p.style.setProperty('--dx', (i % 2 ? d : -d) + 'px');
+        if (win && win.classList.contains('win')) win.style.setProperty('--cp', k < .995 ? 'inset(0 ' + ((1 - k) * 34).toFixed(1) + '% 0 0)' : 'none');
       });
     }
-    const req = () => { if (!tick) tick = requestAnimationFrame(frame); };
-    addEventListener('scroll', req, { passive: true });
-    addEventListener('resize', () => { fit(); req(); });
-    (document.fonts && document.fonts.ready || Promise.resolve()).then(() => { fit(); req(); });
-    window.addEventListener('load', () => { fit(); req(); });
-    fit(); req();
+    const req = () => { if (!tick) tick = requestAnimationFrame(flow); };
+    addEventListener('scroll', req, { passive: true }); addEventListener('resize', req); req();
   })();
 
   /* ---------- menu acende a seção em que você está ---------- */
