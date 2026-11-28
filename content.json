@@ -92,7 +92,7 @@
       "description": "",
       "status": {
         "label": "Em Breve",
-        "type": "wip"
+        "type": "soon"
       },
       "progress": {
         "value": 0,
