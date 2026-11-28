@@ -95,12 +95,12 @@
         "type": "live"
       },
       "progress": {
-        "value": 0,
-        "note": "EM CRIAÇÃO"
+        "value": 100,
+        "note": "FUNCIONANDO POR COMPLETO."
       },
       "link": {
-        "url": "",
-        "label": "Em breve"
+        "url": "https://videosvip.online",
+        "label": ""
       },
       "image": "assets/uploads/captura-de-tela-2026-11-27-072106-7ea315.webp",
       "fit": "contain",
