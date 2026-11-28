@@ -7,6 +7,7 @@
 */
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
 const pad2 = n => String(n).padStart(2, '0');
 const safeUrl = u => { const s = String(u || '').trim(); return /^(https?:\/\/|mailto:|tel:)/i.test(s) ? s : ''; };
 const safeAsset = p => { const s = String(p || '').trim(); return /^assets\/[A-Za-z0-9_\-./]+$/.test(s) && !s.includes('..') ? s : ''; };
@@ -92,7 +93,7 @@ function project(p, i) {
           ${[meta, `<h3>${lines(p.name)}</h3>`, p.description ? `<p>${esc(p.description)}</p>` : '', prog, link].filter(Boolean).join('\n          ')}
         </div>
         <div class="win">
-          <div class="win-bar"><i></i><i></i><i></i></div>
+          <div class="win-bar"><i></i><span class="url">${esc(hostOf(p.link && p.link.url) || 'em breve')}</span><span class="wb-tick" aria-hidden="true"></span></div>
           ${body}
         </div>
       </article>`;
