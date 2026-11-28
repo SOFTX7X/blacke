@@ -81,9 +81,10 @@
         "url": "",
         "label": "APK em breve"
       },
-      "image": "",
+      "image": "assets/uploads/whatsapp-image-2026-11-28-at-01-36-025312.webp",
       "soonLabel": "APK EM PREPARAÇÃO",
-      "id": "p1"
+      "id": "p1",
+      "fit": "contain"
     },
     {
       "id": "prbjfz2",
