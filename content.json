@@ -88,15 +88,15 @@
     {
       "id": "prbjfz2",
       "category": "SOFTWARE",
-      "name": "BLACKE",
+      "name": "PROJETO BLACKE",
       "description": "",
       "status": {
-        "label": "Em breve",
+        "label": "Em Breve",
         "type": "wip"
       },
       "progress": {
         "value": 0,
-        "note": "CRIANDO...."
+        "note": "EM CRIAÇÃO"
       },
       "link": {
         "url": "",
