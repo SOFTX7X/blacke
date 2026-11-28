@@ -68,7 +68,7 @@
     {
       "category": "APLICATIVO",
       "name": "BLACKE  IPTV",
-      "description": "Aplicativo de IPTV. Estou finalizando o player para rodar 100% com listas M3U e Xtream.",
+      "description": "Em modo de otimização.",
       "status": {
         "label": "Em andamento",
         "type": "wip"
@@ -87,7 +87,8 @@
       "fit": "cover",
       "gallery": [
         "assets/uploads/7542d341-cb1d-400f-8218-19b346dd9f24-710ac7.webp",
-        "assets/uploads/90f8e849-3640-4424-8a97-9add751e4f5d-d2caec.webp"
+        "assets/uploads/90f8e849-3640-4424-8a97-9add751e4f5d-d2caec.webp",
+        "assets/uploads/c1ad1187-70d1-4300-b6c6-71452b69c775-7d71a1.webp"
       ]
     },
     {
