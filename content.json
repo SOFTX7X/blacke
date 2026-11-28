@@ -100,11 +100,11 @@
       },
       "link": {
         "url": "https://videosvip.online",
-        "label": ""
+        "label": "Ver site"
       },
       "image": "assets/uploads/captura-de-tela-2026-11-27-072106-7ea315.webp",
       "fit": "contain",
-      "soonLabel": "EM BREVE"
+      "soonLabel": ""
     }
   ],
   "contact": {
