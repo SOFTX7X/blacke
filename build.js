@@ -185,7 +185,7 @@ function build(c) {
 
   <!-- PROJETOS -->
   <section id="projetos" class="projects">
-    <header class="sec-head reveal">
+    <header class="sec-head sec-big reveal">
       <h2>Projetos</h2>
       <span class="count">${count}</span>
     </header>
