@@ -103,23 +103,29 @@
     startTyping();
   };
 
-  /* ---------- transição entre seções (cortina) ---------- */
+  /* ---------- transição entre seções (corte diagonal) ---------- */
   let jumping = false;
+  const wipe = document.createElement('div');
+  wipe.className = 'wipe'; wipe.setAttribute('aria-hidden', 'true'); body.append(wipe);
+  const SK = 'skewX(-16deg)';
   $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
     const id = a.getAttribute('href');
     const target = id === '#' ? null : $(id);
     if (!target || reduce || jumping || !started) return;
     e.preventDefault(); jumping = true;
-    curtain.dataset.s = 'in';
-    setTimeout(() => {
-      const top = id === '#inicio' ? 0 : target.getBoundingClientRect().top + scrollY - (id === '#projetos' || id === '#contato' ? 0 : 0);
+    const w = innerWidth + 600;
+    wipe.style.display = 'block'; wipe.style.pointerEvents = 'all';
+    const cover = wipe.animate([{ transform: `translateX(${-w - 200}px) ${SK}` }, { transform: `translateX(-300px) ${SK}` }], { duration: 480, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' });
+    cover.onfinish = () => {
+      const top = id === '#inicio' ? 0 : target.getBoundingClientRect().top + scrollY;
       document.documentElement.style.scrollBehavior = 'auto';
       scrollTo(0, top);
       document.documentElement.style.scrollBehavior = '';
       history.replaceState(null, '', id);
       lastY = scrollY; body.classList.remove('nav-hide'); updateHero();
-      setTimeout(() => { curtain.dataset.s = 'out'; setTimeout(() => { jumping = false; }, 650); }, 160);
-    }, 620);
+      const open = wipe.animate([{ transform: `translateX(-300px) ${SK}` }, { transform: `translateX(${innerWidth + 200}px) ${SK}` }], { duration: 560, delay: 120, easing: 'cubic-bezier(.55,0,.2,1)', fill: 'forwards' });
+      open.onfinish = () => { open.cancel(); cover.cancel(); wipe.style.display = 'none'; wipe.style.pointerEvents = 'none'; jumping = false; };
+    };
   }));
 
   /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */

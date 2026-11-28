@@ -192,7 +192,10 @@ nav a:not(.nav-cta):hover::after,nav a.active:not(.nav-cta)::after{transform:sca
    ===================================================== */
 
 /* ---- cortina (abertura e troca de seção) ---- */
-.curtain{position:fixed;inset:0;z-index:200;display:flex;pointer-events:none}
+.curtain{display:none}
+.wipe{position:fixed;top:0;left:0;height:100vh;width:calc(100vw + 600px);z-index:200;display:none;pointer-events:none;background:linear-gradient(90deg,#c4b5fd14,#0d0d14 16%,#0d0d14 84%,#c4b5fd14);will-change:transform}
+.wipe::before,.wipe::after{content:"";position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;box-shadow:0 0 12px 2px #c4b5fd,0 0 46px 8px #c4b5fd77}
+.wipe::before{left:0}.wipe::after{right:0}
 .curtain i{flex:1;background:#0d0d14;border-right:1px solid #c4b5fd12;transform:scaleY(0);transform-origin:top;transition:transform .55s var(--ease),transform-origin 0s;transition-delay:calc(var(--k)*.045s)}
 .curtain i:last-of-type{border-right:0}
 .curtain[data-s="in"]{pointer-events:all}
