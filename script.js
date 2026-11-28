@@ -119,7 +119,7 @@
     cover.onfinish = () => {
       const top = id === '#inicio' ? 0 : target.getBoundingClientRect().top + scrollY;
       document.documentElement.style.scrollBehavior = 'auto';
-      scrollTo(0, top);
+      scrollTo({ top: top, left: 0, behavior: "instant" });
       document.documentElement.style.scrollBehavior = '';
       history.replaceState(null, '', id);
       lastY = scrollY; body.classList.remove('nav-hide'); updateHero();
