@@ -84,7 +84,11 @@
       "image": "assets/uploads/5e03cbf9-ffda-43f5-ae37-6491b229fb0f-4c50f7.webp",
       "soonLabel": "APK EM PREPARAÇÃO",
       "id": "p1",
-      "fit": "cover"
+      "fit": "cover",
+      "gallery": [
+        "assets/uploads/7542d341-cb1d-400f-8218-19b346dd9f24-710ac7.webp",
+        "assets/uploads/90f8e849-3640-4424-8a97-9add751e4f5d-d2caec.webp"
+      ]
     },
     {
       "id": "prbjfz2",
