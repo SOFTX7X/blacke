@@ -186,6 +186,39 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
+  /* ---------- fluxo de rolagem: cartões entram/saem conforme o sentido (só transform, 1 rAF) ---------- */
+  (function () {
+    const projs = $$('.proj'); if (!projs.length || reduce) return;
+    const mob = matchMedia('(max-width:820px)'), cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    let tick = 0;
+    function flow() {
+      tick = 0;
+      const vh = innerHeight, d = mob.matches ? 34 : 120;
+      projs.forEach((p, i) => {
+        const r = p.getBoundingClientRect();
+        if (r.bottom < -80 || r.top > vh + 80) return;
+        const k = Math.min(cl((vh - r.top) / (vh * .6)), cl(r.bottom / (vh * .45)));
+        const win = p.lastElementChild;
+        p.style.setProperty('--k', k.toFixed(3));
+        p.style.setProperty('--dx', (i % 2 ? d : -d) + 'px');
+        if (win && win.classList.contains('win')) win.style.setProperty('--cp', k < .995 ? 'inset(0 ' + ((1 - k) * 34).toFixed(1) + '% 0 0)' : 'none');
+      });
+    }
+    const req = () => { if (!tick) tick = requestAnimationFrame(flow); };
+    addEventListener('scroll', req, { passive: true }); addEventListener('resize', req); req();
+  })();
+
+  /* ---------- menu acende a seção em que você está ---------- */
+  (function () {
+    const links = $$('nav a[href^="#"]:not(.nav-cta)'); if (!links.length || !('IntersectionObserver' in window)) return;
+    const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+    const spy = new IntersectionObserver(es => es.forEach(e => {
+      const a = map.get(e.target.id); if (!a) return;
+      if (e.isIntersecting) { links.forEach(l => l.classList.remove('on')); a.classList.add('on'); }
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    map.forEach((_, id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
+  })();
+
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
