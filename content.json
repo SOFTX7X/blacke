@@ -84,6 +84,27 @@
       "image": "",
       "soonLabel": "APK EM PREPARAÇÃO",
       "id": "p1"
+    },
+    {
+      "id": "prbjfz2",
+      "category": "SOFTWARE",
+      "name": "BLACKE",
+      "description": "",
+      "status": {
+        "label": "Em breve",
+        "type": "wip"
+      },
+      "progress": {
+        "value": 0,
+        "note": "CRIANDO...."
+      },
+      "link": {
+        "url": "",
+        "label": "Em breve"
+      },
+      "image": "",
+      "fit": "cover",
+      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
