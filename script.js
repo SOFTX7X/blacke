@@ -124,7 +124,7 @@
       history.replaceState(null, '', id);
       lastY = scrollY; body.classList.remove('nav-hide'); updateHero();
       const open = wipe.animate([{ transform: `translateX(-300px) ${SK}` }, { transform: `translateX(${innerWidth + 200}px) ${SK}` }], { duration: 560, delay: 120, easing: 'cubic-bezier(.55,0,.2,1)', fill: 'forwards' });
-      open.onfinish = () => { open.cancel(); cover.cancel(); wipe.style.display = 'none'; wipe.style.pointerEvents = 'none'; jumping = false; };
+      open.onfinish = () => { open.cancel(); cover.cancel(); wipe.style.display = 'none'; wipe.style.pointerEvents = 'none'; jumping = false; if (window.__cutSnap) window.__cutSnap(); };
     };
   }));
 
@@ -290,11 +290,15 @@
       if (Math.abs(tgt - cur) > .0006) raf = requestAnimationFrame(frame);
     }
     function onScroll() {
-      const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight;
-      if (r.bottom < -200 || r.top > innerHeight + 200) return;
-      tgt = -.05 + cl(-r.top / total) * (N - .33);
+      if (jumping) { cut.style.visibility = 'hidden'; return; }   // clique no menu: a cena não toca por baixo da transição
+      const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight, nt = -.05 + cl(-r.top / total) * (N - .33);
+      if (r.bottom < -200 || r.top > innerHeight + 200) { tgt = cur = nt; return; }
+      const big = Math.abs(nt - tgt) > 1.2;                       // salto grande (link/âncora): vai direto, sem animar
+      tgt = nt;
+      if (big) { cur = tgt; render(cur, 0); draw(cur); return; }
       if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
     }
+    window.__cutSnap = () => { cut.style.visibility = ''; const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight; tgt = cur = -.05 + cl(-r.top / total) * (N - .33); render(cur, 0); draw(cur); };
     layout(); cur = tgt = -.05; onScroll(); cur = tgt; render(cur, 0); draw(cur);
     addEventListener('scroll', onScroll, { passive: true });
     let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); items.forEach(i => { i.whole = null; }); onScroll(); render(cur, 0); draw(cur); }, 120); });
