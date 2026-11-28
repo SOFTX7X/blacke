@@ -51,7 +51,7 @@
       "description": "Player de reprodução para a web.",
       "status": {
         "label": "Online",
-        "type": "wip"
+        "type": "live"
       },
       "progress": {
         "value": 100,
