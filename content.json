@@ -70,12 +70,12 @@
       "name": "BLACKE  IPTV",
       "description": "Em modo de otimização.",
       "status": {
-        "label": "Em andamento",
-        "type": "wip"
+        "label": "Em breve",
+        "type": "soon"
       },
       "progress": {
         "value": 95,
-        "note": "Ajustando o player · APK ainda não está pronto"
+        "note": "Ajustando o player · APK ainda estar em modo de otimização"
       },
       "link": {
         "url": "",
