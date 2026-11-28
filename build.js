@@ -55,7 +55,7 @@ function socials(links) {
 
 function project(p, i) {
   const st = p.status || {};
-  const chipCls = st.type === 'live' ? 'chip live' : st.type === 'wip' ? 'chip wip' : 'chip';
+  const chipCls = ['live', 'wip', 'soon', 'off'].includes(st.type) ? 'chip ' + st.type : 'chip';
   const meta = (p.category || st.label)
     ? `<div class="proj-meta">${p.category ? `<span class="cat">${esc(p.category)}</span>` : ''}${st.label ? `<span class="${chipCls}"><i></i>${esc(st.label)}</span>` : ''}</div>`
     : '';

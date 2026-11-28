@@ -90,6 +90,7 @@ footer a:hover{color:var(--lav)}
 @media (hover:none){.spot{display:none}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
+  .chip i{animation:none!important}
   .reveal,.tag,.typing,.hero-actions,.glitch .ch{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
@@ -118,9 +119,15 @@ footer a:hover{color:var(--lav)}
 .proj p{color:var(--mute);font-size:1.05rem;max-width:34ch}
 .chip{white-space:nowrap;display:inline-flex;align-items:center;gap:7px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--line);color:var(--mute)}
 .chip i{width:6px;height:6px;background:var(--mute)}
-.chip.live{color:var(--lav);border-color:#c4b5fd55}
-.chip.live i{background:var(--lav);animation:pulse 1.6s infinite}
-.chip.wip i{animation:pulse 1.2s infinite}
+.chip.live{color:#86efac;border-color:#4ade8066}
+.chip.live i{background:#4ade80;box-shadow:0 0 9px #4ade80;animation:blink 1.4s ease-in-out infinite}
+.chip.wip{color:#fcd34d;border-color:#fbbf2455}
+.chip.wip i{background:#fbbf24;animation:blink 2.2s ease-in-out infinite}
+.chip.soon{color:var(--lav);border-color:#c4b5fd55}
+.chip.soon i{background:var(--lav)}
+.chip.off{color:#fda4af;border-color:#fb718555}
+.chip.off i{background:#fb7185}
+@keyframes blink{50%{opacity:.25;transform:scale(.7)}}
 .link{align-self:flex-start;margin-top:8px;display:inline-flex;gap:8px;color:var(--lav);font-weight:600;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid #c4b5fd66;padding:12px 20px;transition:background .25s,color .25s,gap .25s,box-shadow .25s}
 .link:hover{background:var(--lav);color:#0b0b10;gap:16px;box-shadow:6px 6px 0 #c4b5fd44}
 .link.off{color:var(--mute);border:1px dashed #ffffff30}
