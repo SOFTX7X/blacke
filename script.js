@@ -130,11 +130,7 @@
 
   /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */
   const heroIn = $('.hero-in');
-  const mRows = $$('.marquee .row');
-  let M = [], push = 0, mqX = 0, mqDirS = 1, mqDirT = 1, mqHover = false, mqEase = 1, mqW = innerWidth, lastY = scrollY;
-  const mq = $('.marquee');
-  mq.addEventListener('pointerenter', () => { mqHover = true; });
-  mq.addEventListener('pointerleave', () => { mqHover = false; });
+  let lastY = scrollY;
   function updateHero() {
     const p = Math.max(0, Math.min(1, scrollY / (innerHeight * .85)));
     heroIn.style.setProperty('--hp', p.toFixed(3));
@@ -142,35 +138,11 @@
   addEventListener('scroll', () => {
     const y = scrollY, dy = y - lastY; lastY = y;
     if (!jumping) {
-      if (Math.abs(dy) > 0) { push = Math.max(-700, Math.min(700, push + dy)); if (Math.abs(dy) > 1) mqDirT = dy > 0 ? 1 : -1; }
       if (y > 220 && dy > 3) body.classList.add('nav-hide');
       else if (dy < -3 || y < 220) body.classList.remove('nav-hide');
     }
     if (!reduce) updateHero();
   }, { passive: true });
-  if (!reduce) {
-    let tPrev = performance.now();
-    (function loop(t) {
-      const dt = Math.min(.05, (t - tPrev) / 1000); tPrev = t;
-      mqDirS += (mqDirT - mqDirS) * Math.min(1, dt * 3);
-      mqEase += ((mqHover ? .2 : 1) - mqEase) * .06;
-      const mv = push * .14; push -= mv;
-      mqX += 46 * mqDirS * mqEase * dt + mv;
-      const sk = Math.max(-10, Math.min(10, -push * .05));
-      M.forEach((m, n) => {
-        const sg = n ? -1 : 1, p = (((sg * mqX * (n ? .7 : 1)) % m.G) + m.G) % m.G;
-        m.track.style.transform = `translate3d(${-p.toFixed(2)}px,0,0)`;
-        m.track.style.setProperty('--rot', (mqX * .45 * sg).toFixed(1) + 'deg');
-        m.row.style.transform = `skewX(${(sk * sg).toFixed(2)}deg)`;
-        for (const o of m.els) {
-          const d = Math.abs(o.c - p - mqW / 2) / (mqW * .24), k = d >= 1 ? 0 : 1 - d, kk = k * k * (3 - 2 * k);
-          if (Math.abs(kk - o.k) > .012) { o.k = kk; o.el.style.setProperty('--k', kk.toFixed(3)); }
-        }
-      });
-      requestAnimationFrame(loop);
-    })(tPrev);
-  }
-
   /* ---------- barra de progresso ---------- */
   const bar = $('.progress');
   const onScroll = () => {
@@ -214,25 +186,120 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
-  /* ---------- faixa de nomes: duas linhas em sentidos opostos, ligadas à rolagem ---------- */
-  const logoSep = '<span class="sep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z"/></svg></span>';
-  const row1 = SITE.marquee && SITE.marquee.length ? SITE.marquee : ['BLACKE'];
-  function buildMarquee() {
-    mqW = innerWidth;
-    M = mRows.map((row, n) => {
-      const track = row.firstElementChild, items = n ? row1.slice().reverse() : row1;
-      const unit = items.map(t => `<span class="it">${t}</span>${logoSep}`).join('');
-      let reps = 1, G;
-      track.innerHTML = '<div class="grp"></div><div class="grp"></div>';
-      const g = track.children;
-      do { g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps); G = g[0].offsetWidth; reps++; } while (G < innerWidth * 1.15 && reps < 12);
-      const els = [...track.querySelectorAll('.it')].map(el => ({ el, c: el.offsetLeft + el.offsetWidth / 2, k: 0 }));
-      return { row, track, G, els };
-    });
-  }
-  buildMarquee();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildMarquee);
-  let mqRz; addEventListener('resize', () => { clearTimeout(mqRz); mqRz = setTimeout(buildMarquee, 150); });
+  /* ---------- CORTE: a katana corta as palavras conforme você rola (sobe e desce) ---------- */
+  (function () {
+    const cut = $('.cut'); if (!cut) return;
+    const pin = $('.cut-pin', cut), view = $('.cut-view', cut), wordsEl = $('.cut-words', cut), cv = $('.cut-cv', cut), ctx = cv.getContext('2d'), nEl = $('.cut-n', cut), rail = $('.cut-rail', cut);
+    const list = (SITE.marquee && SITE.marquee.length ? SITE.marquee : ['BLACKE']).map(String).filter(t => t.trim());
+    const N = list.length, SEG = 78;
+    wordsEl.innerHTML = list.map(t => `<div class="cw" aria-hidden="true"><span class="hb">${t}</span><span class="ha">${t}</span></div>`).join('');
+    rail.innerHTML = list.map(() => '<i></i>').join('');
+    const sr = document.createElement('p'); sr.className = 'sr'; sr.textContent = list.join(', '); cut.append(sr);
+    if (reduce) { cut.classList.add('static'); nEl.textContent = ''; return; }
+
+    const TH = -20 * Math.PI / 180, U = { x: Math.cos(TH), y: Math.sin(TH) }, NV = { x: U.y, y: -U.x };
+    const cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+    let W = 0, H = 0, dpr = 1, items = [], cur = 0, tgt = 0, idx = -1, last = performance.now(), raf = 0;
+    const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const SP = list.map((_, i) => { const r = rng(i * 977 + 13); return Array.from({ length: 34 }, () => ({ t: r(), a: (r() < .5 ? -1 : 1) * (80 + r() * 380), b: (r() - .5) * 260, g: 260 + r() * 220, r: .9 + r() * 1.9, w: r() < .35 })); });
+
+    function layout() {
+      W = pin.clientWidth; H = pin.clientHeight; dpr = Math.min(2, devicePixelRatio || 1);
+      cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cut.style.height = ((N - .33) * SEG + 100) + 'vh';
+      const els = $$('.cw', wordsEl);
+      items = els.map((el, i) => {
+        el.style.fontSize = '100px';
+        const r = el.offsetWidth / 100, fs = Math.max(28, Math.min(W * .88 / r, H * .34, 260));
+        el.style.fontSize = fs + 'px';
+        const w = el.offsetWidth, h = el.offsetHeight, cx = w / 2, cy = h / 2, L = Math.hypot(w, h), P0 = [cx - U.x * L, cy - U.y * L], P1 = [cx + U.x * L, cy + U.y * L];
+        const poly = k => `polygon(${P0[0]}px ${P0[1]}px,${P1[0]}px ${P1[1]}px,${P1[0] + NV.x * L * k}px ${P1[1] + NV.y * L * k}px,${P0[0] + NV.x * L * k}px ${P0[1] + NV.y * L * k}px)`;
+        return { el, a: $('.ha', el), b: $('.hb', el), w, h, pa: poly(1), pb: poly(-1), whole: null, i };
+      });
+    }
+
+    function draw(pos) {
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      ctx.globalCompositeOperation = 'lighter';
+      items.forEach(it => {
+        const s = pos - it.i; if (s < -.6 || s > 1.2) return;
+        const bp = cl((s - .15) / .2), sp = cl((s - .35) / .55), asm = s < -.05 ? cl((-.05 - s) / .5) : 0;
+        const Ll = Math.min(W * .62, it.w * .75 + 140), x0 = cx - U.x * Ll, y0 = cy - U.y * Ll, x1 = cx + U.x * Ll, y1 = cy + U.y * Ll;
+        // brilho da linha de corte (some quando as metades se afastam, volta quando se juntam)
+        const gap = bp >= 1 ? (1 - sp) : bp > 0 ? 1 : 0, join = asm > 0 ? (1 - asm) * .55 : 0, flash = asm > 0 && asm < .2 ? (1 - asm / .2) : 0;
+        const la = Math.max(gap * .9, join, flash);
+        if (la > .01) {
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = `rgba(196,181,253,${(la * .22).toFixed(3)})`; ctx.lineWidth = 14 + flash * 18; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+          ctx.strokeStyle = `rgba(255,255,255,${(la * .9).toFixed(3)})`; ctx.lineWidth = 1.6 + flash * 2; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        }
+        // lâmina cruzando
+        if (bp > 0 && bp < 1) {
+          const hx = x0 + (x1 - x0) * bp, hy = y0 + (y1 - y0) * bp, tb = Math.max(0, bp - .5), tx = x0 + (x1 - x0) * tb, ty = y0 + (y1 - y0) * tb;
+          const g = ctx.createLinearGradient(tx, ty, hx, hy); g.addColorStop(0, 'rgba(196,181,253,0)'); g.addColorStop(.7, 'rgba(196,181,253,.55)'); g.addColorStop(1, 'rgba(255,255,255,1)');
+          ctx.strokeStyle = g; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
+          const rg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 46); rg.addColorStop(0, 'rgba(255,255,255,.95)'); rg.addColorStop(.25, 'rgba(196,181,253,.5)'); rg.addColorStop(1, 'rgba(196,181,253,0)');
+          ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(hx, hy, 46, 0, 7); ctx.fill();
+        }
+        // faíscas
+        SP[it.i].forEach(p => {
+          const age = s - (.15 + .2 * p.t); if (age < 0 || age > .6) return;
+          const tau = age * 1.5, k = 1 - age / .6, px = x0 + (x1 - x0) * p.t + U.x * p.a * tau + NV.x * p.b * tau, py = y0 + (y1 - y0) * p.t + U.y * p.a * tau + NV.y * p.b * tau + p.g * tau * tau * .5;
+          ctx.fillStyle = p.w ? `rgba(255,255,255,${(k * k).toFixed(3)})` : `rgba(196,181,253,${(k * k).toFixed(3)})`;
+          ctx.beginPath(); ctx.arc(px, py, p.r * (.4 + k), 0, 7); ctx.fill();
+        });
+      });
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function render(pos, lag) {
+      const D = Math.min(W * .5, 640);
+      items.forEach(it => {
+        const s = pos - it.i;
+        if (s < -.6 || s > 1.0) { if (it.el.style.visibility !== 'hidden') it.el.style.visibility = 'hidden'; return; }
+        it.el.style.visibility = 'visible';
+        const asm = s < -.05 ? cl((-.05 - s) / .5) : 0, sp = cl((s - .35) / .55), out = 1 - Math.pow(1 - sp, 3);
+        const off = D * out - D * asm * asm, rot = 5 * out - 5 * asm * asm;
+        const alpha = (1 - Math.pow(sp, 1.4)) * (1 - Math.pow(asm, 1.5));
+        const whole = off === 0 && rot === 0;
+        if (whole) {
+          if (it.whole !== true) { it.a.style.display = 'none'; it.b.style.clipPath = 'none'; it.b.style.transform = 'none'; it.whole = true; }
+        } else {
+          if (it.whole !== false) { it.a.style.display = ''; it.a.style.clipPath = it.pa; it.b.style.clipPath = it.pb; it.whole = false; }
+          it.a.style.transform = `translate3d(${(-U.x * off).toFixed(1)}px,${(-U.y * off).toFixed(1)}px,0) rotate(${(-rot).toFixed(2)}deg)`;
+          it.b.style.transform = `translate3d(${(U.x * off).toFixed(1)}px,${(U.y * off).toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`;
+        }
+        it.el.style.opacity = alpha.toFixed(3);
+        const pre = cl((s + .05) / .2), glow = 1 - cl((s - .15) / .25);
+        it.el.style.setProperty('--glow', (.25 + .75 * pre * glow).toFixed(2));
+      });
+      // tremor no instante do corte (qualquer palavra)
+      let sh = 0; items.forEach(it => { const s = pos - it.i, b = Math.max(0, 1 - Math.abs(s - .34) / .045); if (b > sh) sh = b * Math.sin(s * 220); });
+      view.style.transform = sh ? `translate3d(${(sh * 7).toFixed(1)}px,${(sh * -4).toFixed(1)}px,0)` : '';
+      wordsEl.style.transform = `skewX(${cl(-lag * 16, -7, 7).toFixed(2)}deg)`;
+      const ni = cl(Math.floor(pos + .45), 0, N - 1);
+      if (ni !== idx) { idx = ni; nEl.textContent = String(ni + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0'); $$('i', rail).forEach((t, k) => t.classList.toggle('on', k === ni)); }
+    }
+
+    function frame(t) {
+      raf = 0;
+      const dt = Math.min(.05, (t - last) / 1000); last = t;
+      const lag = tgt - cur; cur += lag * (1 - Math.pow(.0008, dt));
+      render(cur, tgt - cur); draw(cur);
+      if (Math.abs(tgt - cur) > .0006) raf = requestAnimationFrame(frame);
+    }
+    function onScroll() {
+      const r = cut.getBoundingClientRect(), total = cut.offsetHeight - pin.clientHeight;
+      if (r.bottom < -200 || r.top > innerHeight + 200) return;
+      tgt = -.05 + cl(-r.top / total) * (N - .33);
+      if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    }
+    layout(); cur = tgt = -.05; onScroll(); cur = tgt; render(cur, 0); draw(cur);
+    addEventListener('scroll', onScroll, { passive: true });
+    let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); items.forEach(i => { i.whole = null; }); onScroll(); render(cur, 0); draw(cur); }, 120); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); items.forEach(i => { i.whole = null; }); onScroll(); cur = tgt; render(cur, 0); draw(cur); });
+  })();
 
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
