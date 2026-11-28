@@ -88,7 +88,7 @@
     {
       "id": "prbjfz2",
       "category": "SOFTWARE",
-      "name": "PROJETO BLACKE",
+      "name": "VIP VIDEOS",
       "description": "",
       "status": {
         "label": "Em Breve",
@@ -102,7 +102,7 @@
         "url": "",
         "label": "Em breve"
       },
-      "image": "",
+      "image": "assets/uploads/captura-de-tela-2026-11-27-072106-7ea315.webp",
       "fit": "cover",
       "soonLabel": "EM BREVE"
     }
