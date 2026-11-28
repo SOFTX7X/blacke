@@ -79,13 +79,19 @@ function project(p, i) {
     : (lk.label ? `<span class="link off">${esc(lk.label)}</span>` : '');
 
   const img = safeAsset(p.image);
-  const body = img
+  let body = img
     ? (p.fit === 'fill'
       ? `<div class="win-body fill"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`
       : p.fit === 'contain'
       ? `<div class="win-body contain"><img class="bk" src="${esc(img)}" alt="" aria-hidden="true" loading="lazy"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`
       : `<div class="win-body"><img src="${esc(img)}" alt="${esc('Tela inicial do ' + flat(p.name))}" loading="lazy"></div>`)
     : `<div class="win-body soon"><img class="mark" src="assets/logo.png" alt=""><span class="ph">${esc(p.soonLabel || 'EM BREVE')}</span><span class="bar"></span></div>`;
+
+  const gal = img ? [img, ...(Array.isArray(p.gallery) ? p.gallery : []).map(safeAsset).filter(Boolean)] : [];
+  if (gal.length > 1) {
+    body = body.replace(/^<div class="win-body([^"]*)">/, (m, c) => `<div class="win-body gal${c}" data-gal="${esc(JSON.stringify(gal))}" data-alt="${esc('Foto do ' + flat(p.name))}">`)
+      .replace(/<\/div>$/, `<button type="button" class="g-nav g-prev" aria-label="Foto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button><button type="button" class="g-nav g-next" aria-label="Próxima foto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button><div class="g-dots" aria-hidden="true">${gal.map((_, k) => `<i${k ? '' : ' class="on"'}></i>`).join('')}</div><span class="g-count" aria-hidden="true">1/${gal.length}</span></div>`);
+  }
 
   return `      <article class="proj reveal">
         <div class="proj-info">

@@ -345,3 +345,27 @@ nav a:not(.nav-cta){position:relative}
 nav a:not(.nav-cta)::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--lav);box-shadow:0 0 10px var(--lav-glow);transform:scaleX(0);transform-origin:0 50%;transition:transform .35s var(--ease)}
 nav a.on{color:var(--fg)}nav a.on::after{transform:scaleX(1)}
 @media(prefers-reduced-motion:reduce){.win,.proj-info{transform:none!important;opacity:1!important;clip-path:none!important}}
+
+/* ---- galeria de fotos do projeto ---- */
+.win-body.gal{cursor:zoom-in;touch-action:pan-y}
+.win-body.gal>img:not(.mark){transition:clip-path 1.3s .35s var(--ease),transform 1s var(--ease),opacity .28s}
+.g-nav{position:absolute;top:50%;z-index:4;width:38px;height:38px;margin-top:-19px;display:grid;place-items:center;border:1px solid #c4b5fd55;background:#0b0b10b3;color:var(--fg);cursor:pointer;opacity:0;transition:opacity .25s,background .2s,border-color .2s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.g-nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.g-prev{left:10px}.g-next{right:10px}
+.win-body.gal:hover .g-nav,.win-body.gal:focus-within .g-nav{opacity:1}
+.g-nav:hover{background:var(--lav);border-color:var(--lav);color:#0b0b10}
+@media(hover:none){.g-nav{opacity:.9}}
+.g-dots{position:absolute;left:0;right:0;bottom:10px;z-index:4;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.g-dots i{width:6px;height:6px;background:#ffffff55;transition:background .25s,width .25s}
+.g-dots i.on{width:18px;background:var(--lav);box-shadow:0 0 8px var(--lav-glow)}
+.g-count{position:absolute;top:10px;right:10px;z-index:4;padding:3px 8px;font-size:.68rem;letter-spacing:.14em;color:var(--fg);background:#0b0b10b3;border:1px solid #c4b5fd40;pointer-events:none}
+.lb{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#06060af2;opacity:0;transition:opacity .22s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.lb.on{opacity:1}.lb[hidden]{display:none}
+.lb img{max-width:min(92vw,1400px);max-height:84vh;object-fit:contain;border:1px solid #c4b5fd44;box-shadow:0 30px 90px -20px #000}
+.lb button{position:absolute;border:1px solid #c4b5fd55;background:#0b0b10cc;color:var(--fg);cursor:pointer;font-size:1.6rem;line-height:1;transition:background .2s,color .2s}
+.lb button:hover{background:var(--lav);color:#0b0b10}
+.lb-x{top:16px;right:16px;width:44px;height:44px}
+.lb-n{top:50%;width:46px;height:56px;margin-top:-28px}
+.lb-p{left:clamp(8px,2vw,28px)}.lb-nx{right:clamp(8px,2vw,28px)}
+.lb-c{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-size:.8rem;letter-spacing:.2em;color:var(--mute)}
+.lb-open{overflow:hidden}

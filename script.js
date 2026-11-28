@@ -219,6 +219,52 @@
     map.forEach((_, id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
   })();
 
+  /* ---------- galeria de fotos do projeto (setas, pontos, deslizar e ampliar) ---------- */
+  (function () {
+    const bodies = $$('.win-body.gal'); if (!bodies.length) return;
+    const lb = document.createElement('div'); lb.className = 'lb'; lb.hidden = true;
+    lb.innerHTML = '<button class="lb-x" aria-label="Fechar">×</button><button class="lb-n lb-p" aria-label="Foto anterior">‹</button><img alt=""><button class="lb-n lb-nx" aria-label="Próxima foto">›</button><span class="lb-c"></span>';
+    document.body.appendChild(lb);
+    const lbImg = $('img', lb), lbC = $('.lb-c', lb); let cur = null;
+    const open = (g, i) => { cur = g; lb.hidden = false; requestAnimationFrame(() => lb.classList.add('on')); document.documentElement.classList.add('lb-open'); setLb(i); };
+    const close = () => { lb.classList.remove('on'); document.documentElement.classList.remove('lb-open'); setTimeout(() => { lb.hidden = true; }, 220); cur = null; };
+    const setLb = i => { cur.i = (i + cur.l.length) % cur.l.length; lbImg.src = cur.l[cur.i]; lbC.textContent = (cur.i + 1) + ' / ' + cur.l.length; (new Image()).src = cur.l[(cur.i + 1) % cur.l.length]; };
+    $('.lb-x', lb).onclick = close;
+    $('.lb-p', lb).onclick = () => setLb(cur.i - 1); $('.lb-nx', lb).onclick = () => setLb(cur.i + 1);
+    lb.addEventListener('click', e => { if (e.target === lb) close(); });
+    addEventListener('keydown', e => { if (!cur) return; if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft') setLb(cur.i - 1); else if (e.key === 'ArrowRight') setLb(cur.i + 1); });
+    let sx = null; lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', e => { if (sx == null || !cur) return; const d = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(d) > 40) setLb(cur.i + (d < 0 ? 1 : -1)); });
+
+    bodies.forEach(b => {
+      let list; try { list = JSON.parse(b.dataset.gal); } catch { return; }
+      const g = { l: list, i: 0 }, imgs = $$('img', b).filter(im => !im.classList.contains('mark')), dots = $$('.g-dots i', b), cnt = $('.g-count', b);
+      let busy = false;
+      const go = n => {
+        n = (n + list.length) % list.length; if (n === g.i || busy) return; busy = true; g.i = n;
+        imgs.forEach(im => { im.style.opacity = 0; });
+        const pre = new Image(); pre.src = list[n];
+        setTimeout(() => {
+          imgs.forEach(im => { im.src = list[n]; });
+          dots.forEach((d, k) => d.classList.toggle('on', k === n)); cnt.textContent = (n + 1) + '/' + list.length;
+          requestAnimationFrame(() => { imgs.forEach(im => { im.style.opacity = 1; }); busy = false; });
+          (new Image()).src = list[(n + 1) % list.length];
+        }, 200);
+      };
+      $('.g-prev', b).addEventListener('click', e => { e.stopPropagation(); go(g.i - 1); });
+      $('.g-next', b).addEventListener('click', e => { e.stopPropagation(); go(g.i + 1); });
+      let x0 = null, y0 = 0, moved = false;
+      b.addEventListener('pointerdown', e => { if (e.target.closest('.g-nav')) return; x0 = e.clientX; y0 = e.clientY; moved = false; });
+      b.addEventListener('pointerup', e => {
+        if (x0 == null) return; const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { moved = true; go(g.i + (dx < 0 ? 1 : -1)); }
+      });
+      b.addEventListener('click', e => { if (moved || e.target.closest('.g-nav')) { moved = false; return; } open(g, g.i); });
+      b.tabIndex = 0; b.setAttribute('role', 'button'); b.setAttribute('aria-label', 'Ampliar fotos do projeto');
+      b.addEventListener('keydown', e => { if (e.key === 'Enter') open(g, g.i); else if (e.key === 'ArrowRight') go(g.i + 1); else if (e.key === 'ArrowLeft') go(g.i - 1); });
+    });
+  })();
+
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
