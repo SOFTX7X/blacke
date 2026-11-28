@@ -177,7 +177,8 @@ function build(c) {
   </section>
 
   <div class="marquee" aria-hidden="true">
-    <div class="row r1"><div class="track" data-d="46"></div></div>
+    <div class="row r1"><div class="track"></div></div>
+    <div class="row r2"><div class="track"></div></div>
   </div>
 
   <!-- PROJETOS -->

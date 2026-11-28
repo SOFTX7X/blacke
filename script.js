@@ -130,12 +130,11 @@
 
   /* ---------- rolagem: cabeçalho some/volta, hero sobe, marquee acelera ---------- */
   const heroIn = $('.hero-in');
-  const mTracks = $$('.marquee .track'), mRows = $$('.marquee .row');
-  let lastY = scrollY, vel = 0, mqHover = false;
+  const mRows = $$('.marquee .row');
+  let M = [], push = 0, mqX = 0, mqDirS = 1, mqDirT = 1, mqHover = false, mqEase = 1, mqW = innerWidth, lastY = scrollY;
   const mq = $('.marquee');
   mq.addEventListener('pointerenter', () => { mqHover = true; });
   mq.addEventListener('pointerleave', () => { mqHover = false; });
-  let mqEase = 1;
   function updateHero() {
     const p = Math.max(0, Math.min(1, scrollY / (innerHeight * .85)));
     heroIn.style.setProperty('--hp', p.toFixed(3));
@@ -143,22 +142,33 @@
   addEventListener('scroll', () => {
     const y = scrollY, dy = y - lastY; lastY = y;
     if (!jumping) {
-      vel += dy;
+      if (Math.abs(dy) > 0) { push = Math.max(-700, Math.min(700, push + dy)); if (Math.abs(dy) > 1) mqDirT = dy > 0 ? 1 : -1; }
       if (y > 220 && dy > 3) body.classList.add('nav-hide');
       else if (dy < -3 || y < 220) body.classList.remove('nav-hide');
     }
     if (!reduce) updateHero();
   }, { passive: true });
   if (!reduce) {
-    (function loop() {
-      vel *= .9;
-      mqEase += ((mqHover ? .18 : 1) - mqEase) * .06;
-      const rate = (1 + Math.min(Math.abs(vel) * .18, 7)) * mqEase;
-      mTracks.forEach(t => { const a = t.getAnimations()[0]; if (a) a.playbackRate = rate; });
-      const sk = Math.max(-14, Math.min(14, -vel * .28));
-      mRows.forEach(r => { r.style.transform = `skewX(${sk.toFixed(2)}deg)`; });
+    let tPrev = performance.now();
+    (function loop(t) {
+      const dt = Math.min(.05, (t - tPrev) / 1000); tPrev = t;
+      mqDirS += (mqDirT - mqDirS) * Math.min(1, dt * 3);
+      mqEase += ((mqHover ? .2 : 1) - mqEase) * .06;
+      const mv = push * .14; push -= mv;
+      mqX += 46 * mqDirS * mqEase * dt + mv;
+      const sk = Math.max(-10, Math.min(10, -push * .05));
+      M.forEach((m, n) => {
+        const sg = n ? -1 : 1, p = (((sg * mqX * (n ? .7 : 1)) % m.G) + m.G) % m.G;
+        m.track.style.transform = `translate3d(${-p.toFixed(2)}px,0,0)`;
+        m.track.style.setProperty('--rot', (mqX * .45 * sg).toFixed(1) + 'deg');
+        m.row.style.transform = `skewX(${(sk * sg).toFixed(2)}deg)`;
+        for (const o of m.els) {
+          const d = Math.abs(o.c - p - mqW / 2) / (mqW * .24), k = d >= 1 ? 0 : 1 - d, kk = k * k * (3 - 2 * k);
+          if (Math.abs(kk - o.k) > .012) { o.k = kk; o.el.style.setProperty('--k', kk.toFixed(3)); }
+        }
+      });
       requestAnimationFrame(loop);
-    })();
+    })(tPrev);
   }
 
   /* ---------- barra de progresso ---------- */
@@ -204,26 +214,25 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
-  /* ---------- faixa de nomes: loop infinito sem emenda ---------- */
+  /* ---------- faixa de nomes: duas linhas em sentidos opostos, ligadas à rolagem ---------- */
   const logoSep = '<span class="sep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z"/></svg></span>';
   const row1 = SITE.marquee && SITE.marquee.length ? SITE.marquee : ['BLACKE'];
   function buildMarquee() {
-    $$('.marquee .track').forEach((track, n) => {
-      const items = row1, sep = logoSep;
-      const unit = items.map((t, i) => `<span class="it ${i % 2 ? 'v2' : 'v1'}">${t}</span>${sep}`).join('');
-      let reps = 1, grp;
+    mqW = innerWidth;
+    M = mRows.map((row, n) => {
+      const track = row.firstElementChild, items = n ? row1.slice().reverse() : row1;
+      const unit = items.map(t => `<span class="it">${t}</span>${logoSep}`).join('');
+      let reps = 1, G;
       track.innerHTML = '<div class="grp"></div><div class="grp"></div>';
       const g = track.children;
-      do {
-        g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps);
-        grp = g[0].offsetWidth; reps++;
-      } while (grp < innerWidth * 1.15 && reps < 12);
-      track.style.setProperty('--dur', (grp / 46).toFixed(1) + 's');
+      do { g[0].innerHTML = unit.repeat(reps); g[1].innerHTML = unit.repeat(reps); G = g[0].offsetWidth; reps++; } while (G < innerWidth * 1.15 && reps < 12);
+      const els = [...track.querySelectorAll('.it')].map(el => ({ el, c: el.offsetLeft + el.offsetWidth / 2, k: 0 }));
+      return { row, track, G, els };
     });
   }
   buildMarquee();
-  let mqW = innerWidth;
-  addEventListener('resize', () => { if (innerWidth > mqW * 1.1) { mqW = innerWidth; buildMarquee(); } });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildMarquee);
+  let mqRz; addEventListener('resize', () => { clearTimeout(mqRz); mqRz = setTimeout(buildMarquee, 150); });
 
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
