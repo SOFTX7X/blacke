@@ -55,7 +55,10 @@ function socials(links) {
 
 function project(p, i) {
   const st = p.status || {};
-  const chipCls = ['live', 'wip', 'soon', 'off'].includes(st.type) ? 'chip ' + st.type : 'chip';
+  const AL = { live: ['online', 'no ar', 'ao vivo'], wip: ['em andamento', 'em desenvolvimento', 'desenvolvendo'], soon: ['em breve', 'breve', 'lançamento', 'lancamento'], off: ['pausado', 'em pausa', 'offline', 'fora do ar'] };
+  const lbl = (st.label || '').trim().toLowerCase();
+  const sType = Object.keys(AL).find(k => AL[k].includes(lbl)) || st.type;
+  const chipCls = ['live', 'wip', 'soon', 'off'].includes(sType) ? 'chip ' + sType : 'chip';
   const meta = (p.category || st.label)
     ? `<div class="proj-meta">${p.category ? `<span class="cat">${esc(p.category)}</span>` : ''}${st.label ? `<span class="${chipCls}"><i></i>${esc(st.label)}</span>` : ''}</div>`
     : '';
