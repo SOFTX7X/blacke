@@ -103,7 +103,7 @@
         "label": "Em breve"
       },
       "image": "assets/uploads/captura-de-tela-2026-11-27-072106-7ea315.webp",
-      "fit": "cover",
+      "fit": "contain",
       "soonLabel": "EM BREVE"
     }
   ],
