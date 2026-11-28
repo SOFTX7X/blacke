@@ -318,16 +318,14 @@ footer{justify-content:center}
   .nav-cta{padding:8px 12px!important;letter-spacing:.12em;font-size:.7rem}
 }
 
-/* ---------- faixa em movimento (reage à rolagem, só transform) ---------- */
-.mq{padding:clamp(28px,6vw,72px) 0;overflow:hidden;display:grid;gap:clamp(6px,1.4vw,16px);contain:layout paint}
-.mq-row{overflow:visible;transform:skewX(var(--sk,0deg));will-change:transform}
-.mq-track{display:flex;width:max-content;will-change:transform;transform:translate3d(0,0,0)}
-.mq-set{display:flex;align-items:center;flex:none}
-.mq-w{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:1.1;letter-spacing:.02em;white-space:nowrap;font-size:clamp(2.2rem,7.2vw,6.2rem);color:var(--fg)}
-.mq-w.o{color:transparent;-webkit-text-stroke:1.5px #c4b5fdb3}
-.mq-s{flex:none;width:2px;height:.9em;margin:0 clamp(18px,3.6vw,52px);font-size:clamp(2.2rem,7.2vw,6.2rem);background:var(--lav);transform:skewX(-24deg);box-shadow:0 0 14px var(--lav-glow)}
-.mq-row[data-dir="-1"] .mq-w{font-size:clamp(1.6rem,5vw,4.2rem)}
-.mq-row[data-dir="-1"] .mq-s{font-size:clamp(1.6rem,5vw,4.2rem)}
+/* ---------- faixa fina em movimento contínuo (só CSS, leve) ---------- */
+.mq{position:relative;overflow:hidden;margin:clamp(21px,4.3vw,53px) 0 clamp(15px,1.4vw,19px);padding:15px 0;border-block:1px solid #c4b5fd1f;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.mq-track{display:flex;width:max-content;animation:mqmove 55s linear infinite;will-change:transform}
+.mq-set{display:flex;flex:none;align-items:center}
+.mq-w{flex:none;font-family:var(--display);font-weight:700;font-size:clamp(.78rem,1.2vw,.95rem);letter-spacing:.38em;line-height:1;text-transform:uppercase;color:#8d8d9c;white-space:nowrap}
+.mq-s{flex:none;width:5px;height:5px;margin:0 clamp(22px,3.4vw,46px);background:var(--lav);transform:rotate(45deg);box-shadow:0 0 8px var(--lav-glow)}
+@keyframes mqmove{to{transform:translate3d(-50%,0,0)}}
+@media(prefers-reduced-motion:reduce){.mq-track{animation:none}}
 @keyframes travel{from{background-position:-40% 0}to{background-position:140% 0}}
 @keyframes spin{to{transform:rotate(360deg)}}
 

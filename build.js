@@ -180,7 +180,7 @@ function build(c) {
   </section>
 
   <div class="mq" role="img" aria-label="${esc(bandAria)}">
-    ${[1, -1].map(dir => `<div class="mq-row" data-dir="${dir}"><div class="mq-track" aria-hidden="true">${[0, 1, 2, 3].map(() => `<div class="mq-set">${mqWords.map((w, i) => `<span class="mq-w${(i + (dir < 0 ? 1 : 0)) % 2 ? ' o' : ''}">${esc(w)}</span><i class="mq-s"></i>`).join('')}</div>`).join('')}</div></div>`).join('')}
+    <div class="mq-track" aria-hidden="true">${[0, 1].map(() => `<div class="mq-set">${mqWords.map(w => `<span class="mq-w">${esc(w)}</span><i class="mq-s"></i>`).join('')}</div>`).join('')}</div>
   </div>
 
   <!-- PROJETOS -->

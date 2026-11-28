@@ -186,32 +186,6 @@
   }), { threshold: .6 });
   $$('.prog').forEach(p => countIO.observe(p));
 
-  /* ---------- faixa em movimento: acompanha a rolagem (sobe/desce), leve ---------- */
-  (function () {
-    const box = $('.mq'); if (!box) return;
-    const rows = $$('.mq-row', box).map(r => ({ el: r, tr: r.firstElementChild, dir: +r.dataset.dir, x: 0, w: 0 }));
-    const measure = () => rows.forEach(r => { r.w = r.tr.scrollWidth / r.tr.children.length; });
-    measure(); addEventListener('resize', measure);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-    if (reduce) return;
-    let vis = false, raf = 0, last = 0, ly = scrollY, vel = 0, sk = 0;
-    const frame = t => {
-      const dt = Math.min(.05, (t - last) / 1000 || .016); last = t;
-      const dy = scrollY - ly; ly = scrollY;
-      vel += ((dy / dt) - vel) * Math.min(1, dt * 7);                 // velocidade da rolagem, suavizada
-      const push = Math.max(-1400, Math.min(1400, vel));
-      sk += ((-push * .0035) - sk) * Math.min(1, dt * 8);             // inclinação leve, limitada
-      rows.forEach(r => {
-        r.x -= r.dir * (38 + push * .35) * dt;
-        if (r.w) { r.x %= r.w; if (r.x > 0) r.x -= r.w; }
-        r.tr.style.transform = 'translate3d(' + r.x.toFixed(2) + 'px,0,0)';
-        r.el.style.setProperty('--sk', (sk * (r.dir > 0 ? 1 : -1)).toFixed(2) + 'deg');
-      });
-      raf = vis ? requestAnimationFrame(frame) : 0;
-    };
-    new IntersectionObserver(es => { vis = es[0].isIntersecting; if (vis && !raf) { last = performance.now(); ly = scrollY; raf = requestAnimationFrame(frame); } }, { rootMargin: '120px' }).observe(box);
-  })();
-
   /* ---------- reveal ao rolar ---------- */
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
