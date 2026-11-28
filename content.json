@@ -105,27 +105,6 @@
       "image": "",
       "fit": "cover",
       "soonLabel": "EM BREVE"
-    },
-    {
-      "id": "p34hhep",
-      "category": "CATEGORIA",
-      "name": "NOVO\nPROJETO",
-      "description": "",
-      "status": {
-        "label": "Em breve",
-        "type": "soon"
-      },
-      "progress": {
-        "value": "",
-        "note": ""
-      },
-      "link": {
-        "url": "",
-        "label": "Em breve"
-      },
-      "image": "",
-      "fit": "cover",
-      "soonLabel": "EM BREVE"
     }
   ],
   "contact": {
